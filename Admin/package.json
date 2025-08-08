@@ -1,0 +1,11 @@
+{
+    "name": "gov-nanay-pineda",
+    "version": "24.15.2",
+    "description": "gov nanay pineda",
+    "license": "SEE LICENSE IN LICENSE.md",
+    "private": true,
+    "dependencies": {},
+    "engines": {
+        "node": ">=18"
+    }
+}
