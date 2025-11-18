@@ -71,9 +71,6 @@ $Page->showMessage();
 <?php if ($Page->project_date->Visible) { // project_date ?>
         <th class="<?= $Page->project_date->headerCellClass() ?>"><span id="elh_projects_project_date" class="projects_project_date"><?= $Page->project_date->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->budget_amount->Visible) { // budget_amount ?>
-        <th class="<?= $Page->budget_amount->headerCellClass() ?>"><span id="elh_projects_budget_amount" class="projects_budget_amount"><?= $Page->budget_amount->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_projects_created_at" class="projects_created_at"><?= $Page->created_at->caption() ?></span></th>
 <?php } ?>
@@ -153,14 +150,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->project_date->viewAttributes() ?>>
 <?= $Page->project_date->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->budget_amount->Visible) { // budget_amount ?>
-        <td<?= $Page->budget_amount->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->budget_amount->viewAttributes() ?>>
-<?= $Page->budget_amount->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

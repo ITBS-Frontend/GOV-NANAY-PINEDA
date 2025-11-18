@@ -129,7 +129,7 @@ class ProjectsDelete extends Projects
         $this->featured_image->setVisibility();
         $this->is_featured->setVisibility();
         $this->project_date->setVisibility();
-        $this->budget_amount->setVisibility();
+        $this->budget_amount->Visible = false;
         $this->created_at->setVisibility();
     }
 
@@ -410,6 +410,7 @@ class ProjectsDelete extends Projects
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->category_id);
         $this->setupLookupOptions($this->is_featured);
 
         // Set up Breadcrumb
@@ -665,8 +666,27 @@ class ProjectsDelete extends Projects
             $this->_title->ViewValue = $this->_title->CurrentValue;
 
             // category_id
-            $this->category_id->ViewValue = $this->category_id->CurrentValue;
-            $this->category_id->ViewValue = FormatNumber($this->category_id->ViewValue, $this->category_id->formatPattern());
+            $curVal = strval($this->category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+                if ($this->category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
+                    } else {
+                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->category_id->ViewValue = null;
+            }
 
             // project_number
             $this->project_number->ViewValue = $this->project_number->CurrentValue;
@@ -747,10 +767,6 @@ class ProjectsDelete extends Projects
             // project_date
             $this->project_date->HrefValue = "";
             $this->project_date->TooltipValue = "";
-
-            // budget_amount
-            $this->budget_amount->HrefValue = "";
-            $this->budget_amount->TooltipValue = "";
 
             // created_at
             $this->created_at->HrefValue = "";
@@ -886,6 +902,8 @@ class ProjectsDelete extends Projects
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_category_id":
+                    break;
                 case "x_is_featured":
                     break;
                 default:

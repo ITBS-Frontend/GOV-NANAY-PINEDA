@@ -33,18 +33,22 @@ return [
     //     ]
     // ],
 
-        "DO" => [
-        "SPACES" => [
-            "END_POINT" => "http://127.0.0.1:9010", // S3 bucket name
-            "BUCKET" => "shopitbs", // S3 bucket name
-            "REGION" => "sgp1", // S3 region
-            "KEY" => "s3phatneglo-archive", // S3 access
-            "SECRET" => "0yq5h3to9" // S3 secret
-        ]
+       "DO" => [
+    "SPACES" => [
+        "END_POINT" => "https://sgp1.digitaloceanspaces.com",
+        "BUCKET" => "vector-icon-library",
+        "REGION" => "sgp1",
+        "KEY" => "DO801KKY7N3YQAWTVMVV",
+        "SECRET" => "pYBxnUxXbHYuGxVcfECQDI+euf+MuYK5FumhANQGojY",
+        // Add these timeout settings
+        "HTTP_TIMEOUT" => 1200,        // 20 minutes for large uploads
+        "CONNECT_TIMEOUT" => 60,       // Connection timeout
+        "REQUEST_TIMEOUT" => 1200      // Request timeout
+    ]
     ],
 
     "UPLOAD_TEMP_PATH" => "D:/Projects/Gov-Lilia-Nanay-Pineda/Admin/uploads", // Upload temp path (absolute local physical path)
     "UPLOAD_TEMP_HREF_PATH" => "//http://gov-pineda.localhost//uploads/", // Upload temp href path (absolute URL path for download)
     // "UPLOAD_DEST_PATH" => "s3://vector-icon-library/gov-pineda-images/"
-    "UPLOAD_DEST_PATH" => "s3://shopitbs/gov-pineda-images/"
+    "UPLOAD_DEST_PATH" => "s3://vector-icon-library/gov-pineda-images/"
 ];

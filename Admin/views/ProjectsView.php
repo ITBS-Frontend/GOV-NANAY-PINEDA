@@ -141,17 +141,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->budget_amount->Visible) { // budget_amount ?>
-    <tr id="r_budget_amount"<?= $Page->budget_amount->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_budget_amount"><?= $Page->budget_amount->caption() ?></span></td>
-        <td data-name="budget_amount"<?= $Page->budget_amount->cellAttributes() ?>>
-<span id="el_projects_budget_amount">
-<span<?= $Page->budget_amount->viewAttributes() ?>>
-<?= $Page->budget_amount->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
     <tr id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_created_at"><?= $Page->created_at->caption() ?></span></td>

@@ -168,9 +168,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->project_date->Visible) { // project_date ?>
         <th data-name="project_date" class="<?= $Page->project_date->headerCellClass() ?>"><div id="elh_projects_project_date" class="projects_project_date"><?= $Page->renderFieldHeader($Page->project_date) ?></div></th>
 <?php } ?>
-<?php if ($Page->budget_amount->Visible) { // budget_amount ?>
-        <th data-name="budget_amount" class="<?= $Page->budget_amount->headerCellClass() ?>"><div id="elh_projects_budget_amount" class="projects_budget_amount"><?= $Page->renderFieldHeader($Page->budget_amount) ?></div></th>
-<?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_projects_created_at" class="projects_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
 <?php } ?>
@@ -256,14 +253,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_project_date" class="el_projects_project_date">
 <span<?= $Page->project_date->viewAttributes() ?>>
 <?= $Page->project_date->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->budget_amount->Visible) { // budget_amount ?>
-        <td data-name="budget_amount"<?= $Page->budget_amount->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_budget_amount" class="el_projects_budget_amount">
-<span<?= $Page->budget_amount->viewAttributes() ?>>
-<?= $Page->budget_amount->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

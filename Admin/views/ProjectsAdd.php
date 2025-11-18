@@ -24,12 +24,11 @@ loadjs.ready(["wrapper", "head"], function () {
         .setFields([
             ["_title", [fields._title.visible && fields._title.required ? ew.Validators.required(fields._title.caption) : null], fields._title.isInvalid],
             ["description", [fields.description.visible && fields.description.required ? ew.Validators.required(fields.description.caption) : null], fields.description.isInvalid],
-            ["category_id", [fields.category_id.visible && fields.category_id.required ? ew.Validators.required(fields.category_id.caption) : null, ew.Validators.integer], fields.category_id.isInvalid],
+            ["category_id", [fields.category_id.visible && fields.category_id.required ? ew.Validators.required(fields.category_id.caption) : null], fields.category_id.isInvalid],
             ["project_number", [fields.project_number.visible && fields.project_number.required ? ew.Validators.required(fields.project_number.caption) : null, ew.Validators.integer], fields.project_number.isInvalid],
             ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.fileRequired(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
             ["is_featured", [fields.is_featured.visible && fields.is_featured.required ? ew.Validators.required(fields.is_featured.caption) : null], fields.is_featured.isInvalid],
             ["project_date", [fields.project_date.visible && fields.project_date.required ? ew.Validators.required(fields.project_date.caption) : null, ew.Validators.datetime(fields.project_date.clientFormatPattern)], fields.project_date.isInvalid],
-            ["budget_amount", [fields.budget_amount.visible && fields.budget_amount.required ? ew.Validators.required(fields.budget_amount.caption) : null, ew.Validators.float], fields.budget_amount.isInvalid],
             ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
         ])
 
@@ -46,6 +45,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "category_id": <?= $Page->category_id->toClientList($Page) ?>,
             "is_featured": <?= $Page->is_featured->toClientList($Page) ?>,
         })
         .build();
@@ -105,9 +105,43 @@ $Page->showMessage();
         <label id="elh_projects_category_id" for="x_category_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->category_id->caption() ?><?= $Page->category_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->category_id->cellAttributes() ?>>
 <span id="el_projects_category_id">
-<input type="<?= $Page->category_id->getInputTextType() ?>" name="x_category_id" id="x_category_id" data-table="projects" data-field="x_category_id" value="<?= $Page->category_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->category_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->category_id->formatPattern()) ?>"<?= $Page->category_id->editAttributes() ?> aria-describedby="x_category_id_help">
-<?= $Page->category_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->category_id->getErrorMessage() ?></div>
+    <select
+        id="x_category_id"
+        name="x_category_id"
+        class="form-select ew-select<?= $Page->category_id->isInvalidClass() ?>"
+        <?php if (!$Page->category_id->IsNativeSelect) { ?>
+        data-select2-id="fprojectsadd_x_category_id"
+        <?php } ?>
+        data-table="projects"
+        data-field="x_category_id"
+        data-value-separator="<?= $Page->category_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->category_id->getPlaceHolder()) ?>"
+        <?= $Page->category_id->editAttributes() ?>>
+        <?= $Page->category_id->selectOptionListHtml("x_category_id") ?>
+    </select>
+    <?= $Page->category_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->category_id->getErrorMessage() ?></div>
+<?= $Page->category_id->Lookup->getParamTag($Page, "p_x_category_id") ?>
+<?php if (!$Page->category_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fprojectsadd", function() {
+    var options = { name: "x_category_id", selectId: "fprojectsadd_x_category_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprojectsadd.lists.category_id?.lookupOptions.length) {
+        options.data = { id: "x_category_id", form: "fprojectsadd" };
+    } else {
+        options.ajax = { id: "x_category_id", form: "fprojectsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.projects.fields.category_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>
@@ -210,18 +244,6 @@ loadjs.ready(["fprojectsadd", "datetimepicker"], function () {
 });
 </script>
 <?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->budget_amount->Visible) { // budget_amount ?>
-    <div id="r_budget_amount"<?= $Page->budget_amount->rowAttributes() ?>>
-        <label id="elh_projects_budget_amount" for="x_budget_amount" class="<?= $Page->LeftColumnClass ?>"><?= $Page->budget_amount->caption() ?><?= $Page->budget_amount->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->budget_amount->cellAttributes() ?>>
-<span id="el_projects_budget_amount">
-<input type="<?= $Page->budget_amount->getInputTextType() ?>" name="x_budget_amount" id="x_budget_amount" data-table="projects" data-field="x_budget_amount" value="<?= $Page->budget_amount->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->budget_amount->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->budget_amount->formatPattern()) ?>"<?= $Page->budget_amount->editAttributes() ?> aria-describedby="x_budget_amount_help">
-<?= $Page->budget_amount->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->budget_amount->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

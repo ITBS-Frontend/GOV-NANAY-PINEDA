@@ -129,7 +129,7 @@ class ProjectsEdit extends Projects
         $this->featured_image->setVisibility();
         $this->is_featured->setVisibility();
         $this->project_date->setVisibility();
-        $this->budget_amount->setVisibility();
+        $this->budget_amount->Visible = false;
         $this->created_at->setVisibility();
     }
 
@@ -521,6 +521,7 @@ class ProjectsEdit extends Projects
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->category_id);
         $this->setupLookupOptions($this->is_featured);
 
         // Check modal
@@ -739,7 +740,7 @@ class ProjectsEdit extends Projects
             if (IsApi() && $val === null) {
                 $this->category_id->Visible = false; // Disable update for API request
             } else {
-                $this->category_id->setFormValue($val, true, $validate);
+                $this->category_id->setFormValue($val);
             }
         }
 
@@ -774,16 +775,6 @@ class ProjectsEdit extends Projects
             $this->project_date->CurrentValue = UnFormatDateTime($this->project_date->CurrentValue, $this->project_date->formatPattern());
         }
 
-        // Check field name 'budget_amount' first before field var 'x_budget_amount'
-        $val = $CurrentForm->hasValue("budget_amount") ? $CurrentForm->getValue("budget_amount") : $CurrentForm->getValue("x_budget_amount");
-        if (!$this->budget_amount->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->budget_amount->Visible = false; // Disable update for API request
-            } else {
-                $this->budget_amount->setFormValue($val, true, $validate);
-            }
-        }
-
         // Check field name 'created_at' first before field var 'x_created_at'
         $val = $CurrentForm->hasValue("created_at") ? $CurrentForm->getValue("created_at") : $CurrentForm->getValue("x_created_at");
         if (!$this->created_at->IsDetailKey) {
@@ -811,7 +802,6 @@ class ProjectsEdit extends Projects
         $this->is_featured->CurrentValue = $this->is_featured->FormValue;
         $this->project_date->CurrentValue = $this->project_date->FormValue;
         $this->project_date->CurrentValue = UnFormatDateTime($this->project_date->CurrentValue, $this->project_date->formatPattern());
-        $this->budget_amount->CurrentValue = $this->budget_amount->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
     }
@@ -957,8 +947,27 @@ class ProjectsEdit extends Projects
             $this->description->ViewValue = $this->description->CurrentValue;
 
             // category_id
-            $this->category_id->ViewValue = $this->category_id->CurrentValue;
-            $this->category_id->ViewValue = FormatNumber($this->category_id->ViewValue, $this->category_id->formatPattern());
+            $curVal = strval($this->category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+                if ($this->category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
+                    } else {
+                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->category_id->ViewValue = null;
+            }
 
             // project_number
             $this->project_number->ViewValue = $this->project_number->CurrentValue;
@@ -1029,9 +1038,6 @@ class ProjectsEdit extends Projects
             // project_date
             $this->project_date->HrefValue = "";
 
-            // budget_amount
-            $this->budget_amount->HrefValue = "";
-
             // created_at
             $this->created_at->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
@@ -1054,11 +1060,30 @@ class ProjectsEdit extends Projects
 
             // category_id
             $this->category_id->setupEditAttributes();
-            $this->category_id->EditValue = $this->category_id->CurrentValue;
-            $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
-            if (strval($this->category_id->EditValue) != "" && is_numeric($this->category_id->EditValue)) {
-                $this->category_id->EditValue = FormatNumber($this->category_id->EditValue, null);
+            $curVal = trim(strval($this->category_id->CurrentValue));
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+            } else {
+                $this->category_id->ViewValue = $this->category_id->Lookup !== null && is_array($this->category_id->lookupOptions()) && count($this->category_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->category_id->ViewValue !== null) { // Load from cache
+                $this->category_id->EditValue = array_values($this->category_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->category_id->CurrentValue, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->category_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->category_id->EditValue = $arwrk;
+            }
+            $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
 
             // project_number
             $this->project_number->setupEditAttributes();
@@ -1095,14 +1120,6 @@ class ProjectsEdit extends Projects
             $this->project_date->setupEditAttributes();
             $this->project_date->EditValue = HtmlEncode(FormatDateTime($this->project_date->CurrentValue, $this->project_date->formatPattern()));
             $this->project_date->PlaceHolder = RemoveHtml($this->project_date->caption());
-
-            // budget_amount
-            $this->budget_amount->setupEditAttributes();
-            $this->budget_amount->EditValue = $this->budget_amount->CurrentValue;
-            $this->budget_amount->PlaceHolder = RemoveHtml($this->budget_amount->caption());
-            if (strval($this->budget_amount->EditValue) != "" && is_numeric($this->budget_amount->EditValue)) {
-                $this->budget_amount->EditValue = FormatNumber($this->budget_amount->EditValue, null);
-            }
 
             // created_at
             $this->created_at->setupEditAttributes();
@@ -1144,9 +1161,6 @@ class ProjectsEdit extends Projects
 
             // project_date
             $this->project_date->HrefValue = "";
-
-            // budget_amount
-            $this->budget_amount->HrefValue = "";
 
             // created_at
             $this->created_at->HrefValue = "";
@@ -1191,9 +1205,6 @@ class ProjectsEdit extends Projects
                     $this->category_id->addErrorMessage(str_replace("%s", $this->category_id->caption(), $this->category_id->RequiredErrorMessage));
                 }
             }
-            if (!CheckInteger($this->category_id->FormValue)) {
-                $this->category_id->addErrorMessage($this->category_id->getErrorMessage(false));
-            }
             if ($this->project_number->Visible && $this->project_number->Required) {
                 if (!$this->project_number->IsDetailKey && EmptyValue($this->project_number->FormValue)) {
                     $this->project_number->addErrorMessage(str_replace("%s", $this->project_number->caption(), $this->project_number->RequiredErrorMessage));
@@ -1219,14 +1230,6 @@ class ProjectsEdit extends Projects
             }
             if (!CheckDate($this->project_date->FormValue, $this->project_date->formatPattern())) {
                 $this->project_date->addErrorMessage($this->project_date->getErrorMessage(false));
-            }
-            if ($this->budget_amount->Visible && $this->budget_amount->Required) {
-                if (!$this->budget_amount->IsDetailKey && EmptyValue($this->budget_amount->FormValue)) {
-                    $this->budget_amount->addErrorMessage(str_replace("%s", $this->budget_amount->caption(), $this->budget_amount->RequiredErrorMessage));
-                }
-            }
-            if (!CheckNumber($this->budget_amount->FormValue)) {
-                $this->budget_amount->addErrorMessage($this->budget_amount->getErrorMessage(false));
             }
             if ($this->created_at->Visible && $this->created_at->Required) {
                 if (!$this->created_at->IsDetailKey && EmptyValue($this->created_at->FormValue)) {
@@ -1372,9 +1375,6 @@ class ProjectsEdit extends Projects
         // project_date
         $this->project_date->setDbValueDef($rsnew, UnFormatDateTime($this->project_date->CurrentValue, $this->project_date->formatPattern()), $this->project_date->ReadOnly);
 
-        // budget_amount
-        $this->budget_amount->setDbValueDef($rsnew, $this->budget_amount->CurrentValue, $this->budget_amount->ReadOnly);
-
         // created_at
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), $this->created_at->ReadOnly);
         return $rsnew;
@@ -1407,9 +1407,6 @@ class ProjectsEdit extends Projects
         if (isset($row['project_date'])) { // project_date
             $this->project_date->CurrentValue = $row['project_date'];
         }
-        if (isset($row['budget_amount'])) { // budget_amount
-            $this->budget_amount->CurrentValue = $row['budget_amount'];
-        }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->CurrentValue = $row['created_at'];
         }
@@ -1439,6 +1436,8 @@ class ProjectsEdit extends Projects
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_category_id":
+                    break;
                 case "x_is_featured":
                     break;
                 default:

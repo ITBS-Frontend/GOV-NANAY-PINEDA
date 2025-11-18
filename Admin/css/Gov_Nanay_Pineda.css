@@ -1542,11 +1542,6 @@ input.cke_dialog_ui_input_text {
   transition-duration: 0.4s;
 }
 
-#cookie-consent {
-  z-index: 1034;
-  padding: 0;
-  border-radius: 0;
-}
 @media (min-width: 768px) {
   #cookie-consent {
     transition: margin-left 0.3s ease-in-out;
@@ -1567,6 +1562,11 @@ input.cke_dialog_ui_input_text {
   #cookie-consent, #cookie-consent:before {
     margin-left: 0;
   }
+}
+#cookie-consent {
+  z-index: 1034;
+  padding: 0;
+  border-radius: 0;
 }
 
 #cookie-consent > .alert.alert-dismissible {

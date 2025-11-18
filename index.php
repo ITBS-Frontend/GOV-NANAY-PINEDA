@@ -15,8 +15,13 @@
 </head>
 <body>
     <!-- Sidebar Navigation -->
-    <nav class="sidebar">
-        <div class="sidebar-logo">LP</div>
+    <nav class="">
+        <div class="logo">LP</div>
+        <button class="hamburger" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
         <div class="nav-menu">
             <div class="nav-item active" data-section="hero">
                 <i class="fas fa-home"></i>
@@ -34,6 +39,7 @@
                 <i class="fas fa-route"></i>
                 <span class="nav-tooltip">Journey</span>
             </div>
+            <div class="indicator"></div> <!-- moved here -->
         </div>
     </nav>
 
@@ -67,26 +73,6 @@
                     Transformative initiatives that have positioned Pampanga as a model 
                     province through innovative governance and inclusive development.
                 </p>
-            </div>
-
-            <!-- Stats Summary -->
-            <div class="stats-summary" id="statsSummary" style="display: none;">
-                <div class="summary-stat">
-                    <span class="summary-value" id="totalProjects">0</span>
-                    <span class="summary-label">Total Projects</span>
-                </div>
-                <div class="summary-stat">
-                    <span class="summary-value" id="totalInvestment">₱0</span>
-                    <span class="summary-label">Total Investment</span>
-                </div>
-                <div class="summary-stat">
-                    <span class="summary-value" id="yearsService">0</span>
-                    <span class="summary-label">Years of Service</span>
-                </div>
-                <div class="summary-stat">
-                    <span class="summary-value" id="featuredProjects">0</span>
-                    <span class="summary-label">Featured Projects</span>
-                </div>
             </div>
 
             <div class="category-tabs" id="categoryTabs">
@@ -126,7 +112,7 @@
                         <div class="about-shape shape-2"></div>
                         <div class="about-shape shape-3"></div>
                         <div class="about-avatar">
-                            <i class="fas fa-user"></i>
+                            <img src="assets/profile.jpg" alt="">
                         </div>
                     </div>
                 </div>
@@ -151,6 +137,10 @@
             </div>
         </section>
     </main>
+
+    <button class="scroll-top" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -260,6 +250,7 @@
                 });
             }
 
+
             // Render Functions
             function renderCarousel() {
                 if (featuredProjects.length === 0) return;
@@ -272,30 +263,23 @@
                     const slideNumber = String(project.project_number || index + 1).padStart(2, '0');
                     
                     slidesHtml += `
-                        <div class="carousel-slide ${isActive}">
+                        <div class="carousel-slide ${isActive}"
+                            style="background-image: url('${project.image_url || ''}');
+                                    background-size: cover;
+                                    background-position: center;">
                             <div class="slide-content">
                                 <div class="slide-text">
-                                    <span class="slide-category" style="background: ${project.color_code || '#3B82F6'}">${project.category_name || 'Project'}</span>
+                                    <span class="slide-category" style="background: ${project.color_code || '#3B82F6'}">
+                                        ${project.category_name || 'Project'}
+                                    </span>
                                     <h1 class="slide-title">${project.title}</h1>
                                     <p class="slide-description">${project.description}</p>
-                                    <div class="slide-stats">
-                                        ${project.stats.map(stat => `
-                                            <div class="stat-item">
-                                                <span class="stat-value">${stat.value}</span>
-                                                <span class="stat-label">${stat.label}</span>
-                                            </div>
-                                        `).join('')}
-                                    </div>
                                 </div>
-                                <div class="slide-visual">
-                                    <div class="slide-number">${slideNumber}</div>
-                                    <div class="slide-image" style="background: linear-gradient(135deg, ${project.color_code || '#3B82F6'}, ${project.color_code || '#3B82F6'}99);">
-                                        ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}">` : ''}
-                                    </div>
-                                </div>
+                    
                             </div>
                         </div>
                     `;
+
                     
                     dotsHtml += `<span class="carousel-dot ${isActive}" data-slide="${index}"></span>`;
                 });
@@ -344,16 +328,7 @@
                                 <span class="project-category">${project.category_name || 'Project'}</span>
                                 <h3 class="project-title">${project.title}</h3>
                                 <p class="project-description">${project.description}</p>
-                                ${project.stats && project.stats.length > 0 ? `
-                                    <div class="project-stats">
-                                        ${project.stats.map(stat => `
-                                            <div class="project-stat">
-                                                <span class="project-stat-value">${stat.value}</span>
-                                                <span class="project-stat-label">${stat.label}</span>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                ` : ''}
+                            
                             </div>
                         </div>
                     `;
@@ -389,14 +364,6 @@
                 });
                 
                 $('#timelineContainer').html(timelineHtml);
-            }
-
-            function renderStats(stats) {
-                $('#totalProjects').text(stats.total_projects || 0);
-                $('#totalInvestment').text(stats.total_investment_display || '₱0');
-                $('#yearsService').text(stats.years_of_service || 0);
-                $('#featuredProjects').text(stats.featured_count || 0);
-                $('#statsSummary').fadeIn();
             }
 
             // Carousel functionality
@@ -454,14 +421,17 @@
                 loadProjects(category === 'all' ? null : category);
             });
 
-            // Navigation
             $('.nav-item').click(function() {
                 $('.nav-item').removeClass('active');
                 $(this).addClass('active');
-                
+
+                // Slide the indicator immediately
+                let itemTop = $(this).position().top;
+                $('.indicator').stop().animate({ top: itemTop }, 300); // smooth move
+
+                // Scroll to section
                 const section = $(this).data('section');
                 const target = $('#' + section);
-                
                 if (target.length) {
                     $('html, body').animate({
                         scrollTop: target.offset().top
@@ -469,21 +439,26 @@
                 }
             });
 
-            // Scroll spy for navigation
+            // Scroll spy (updates indicator on manual scroll)
             $(window).scroll(function() {
                 const scrollPos = $(document).scrollTop() + 100;
-                
                 $('section').each(function() {
                     const top = $(this).offset().top;
                     const bottom = top + $(this).outerHeight();
                     const id = $(this).attr('id');
-                    
+
                     if (scrollPos >= top && scrollPos <= bottom) {
                         $('.nav-item').removeClass('active');
-                        $(`.nav-item[data-section="${id}"]`).addClass('active');
+                        let activeItem = $(`.nav-item[data-section="${id}"]`);
+                        activeItem.addClass('active');
+
+                        // Smoothly slide indicator to active item
+                        $('.indicator').stop().animate({ top: activeItem.position().top }, 300);
                     }
                 });
             });
+
+
 
             // Animate elements on scroll
             function animateOnScroll() {
@@ -505,6 +480,40 @@
             $(window).on('scroll', animateOnScroll);
             animateOnScroll();
         });
-    </script>
+
+        // Hamburger menu toggle
+        $('.hamburger').click(function() {
+            $(this).toggleClass('active');
+            $('.nav-menu').toggleClass('active');
+        });
+
+        // Close menu when clicking nav item
+        $('.nav-item').click(function() {
+            $('.hamburger').removeClass('active');
+            $('.nav-menu').removeClass('active');
+        });
+
+        // Close menu when clicking outside
+        $(document).click(function(event) {
+            if (!$(event.target).closest('nav').length) {
+                $('.hamburger').removeClass('active');
+                $('.nav-menu').removeClass('active');
+            }
+        });
+
+        // Scroll to top button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 300) {
+                $('.scroll-top').addClass('show');
+            } else {
+                $('.scroll-top').removeClass('show');
+            }
+        });
+
+        $('.scroll-top').click(function() {
+            $('html, body').animate({ scrollTop: 0 }, 800);
+        });
+</script>
+
 </body>
 </html>

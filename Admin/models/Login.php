@@ -202,6 +202,8 @@ class Login extends Users
 
         // Page is terminated
         $this->terminated = true;
+        global $OldSkipHeaderFooter, $SkipHeaderFooter;
+        $SkipHeaderFooter = $OldSkipHeaderFooter;
 
         // Page Unload event
         if (method_exists($this, "pageUnload")) {
@@ -289,6 +291,9 @@ class Login extends Users
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
         }
         $this->CurrentAction = Param("action"); // Set up current action
+        global $OldSkipHeaderFooter, $SkipHeaderFooter;
+        $OldSkipHeaderFooter = $SkipHeaderFooter;
+        $SkipHeaderFooter = true;
 
         // Global Page Loading event (in userfn*.php)
         DispatchEvent(new PageLoadingEvent($this), PageLoadingEvent::NAME);
@@ -534,9 +539,9 @@ class Login extends Users
     }
 
     // Page Load event
-    public function pageLoad()
+    public function pageLoad() 
     {
-        //Log("Page Load");
+     echo '<link rel="stylesheet" href="'.GetUrl('css/custom-login.css').'" />';
     }
 
     // Page Unload event
@@ -591,7 +596,32 @@ class Login extends Users
     // User Logged In event
     public function userLoggedIn($usr)
     {
-        //Log("User Logged In");
+            global $Security;
+
+        // Get user level after successful login
+        $userLevel = $Security->CurrentUserLevelID;
+
+        // Redirect based on user level
+        switch ($userLevel) {
+            case -1: // Administrator
+                header("Location: " . GetUrl("ProjectsList"));
+                exit();
+                break;
+            case 0: // Default users
+                header("Location: " . GetUrl("ProjectsList"));
+                exit();
+                break;
+            case 2: // Your custom user level
+                header("Location: " . GetUrl("ProjectsList"));
+                exit();
+                break;
+            default:
+                // Default redirect
+                header("Location: " . GetUrl("ProjectsList"));
+                exit();
+                break;
+        }
+        return true; // This line won't be reached due to exit() but included for completeness
     }
 
     // User Login Error event

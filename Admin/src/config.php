@@ -210,10 +210,10 @@ $CONFIG = [
     "FONT_PATH" => __DIR__ . "/../font", // No trailing delimiter
 
     // External JavaScripts
-    "JAVASCRIPT_FILES" => [],
+    "JAVASCRIPT_FILES" => ["js/custom.js"],
 
     // External StyleSheets
-    "STYLESHEET_FILES" => [],
+    "STYLESHEET_FILES" => ["css/custom.css"],
 
     // Authentication configuration for Google/Facebook/Saml
     "AUTH_CONFIG" => [
