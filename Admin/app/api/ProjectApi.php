@@ -82,3 +82,84 @@ $app->get("/stats", function ($request, $response, $args) {
         return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
     }
 });
+
+
+// About content endpoint
+$app->get("/about/content", function ($request, $response, $args) {
+    try {
+        $service = new ProjectService();
+        $result = $service->getAboutContent();
+        
+        $response = $response->withHeader('Content-Type', 'application/json');
+        return $response->write(json_encode($result, JSON_PRETTY_PRINT));
+    } catch (\Exception $e) {
+        $errorResponse = ['success' => false, 'message' => $e->getMessage()];
+        $response = $response->withHeader('Content-Type', 'application/json');
+        $response = $response->withStatus(500);
+        return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
+    }
+});
+
+// Profile details endpoint
+$app->get("/about/profile", function ($request, $response, $args) {
+    try {
+        $service = new ProjectService();
+        $result = $service->getProfileDetails();
+        
+        $response = $response->withHeader('Content-Type', 'application/json');
+        return $response->write(json_encode($result, JSON_PRETTY_PRINT));
+    } catch (\Exception $e) {
+        $errorResponse = ['success' => false, 'message' => $e->getMessage()];
+        $response = $response->withHeader('Content-Type', 'application/json');
+        $response = $response->withStatus(500);
+        return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
+    }
+});
+
+// Achievements endpoint
+$app->get("/about/achievements", function ($request, $response, $args) {
+    try {
+        $service = new ProjectService();
+        $result = $service->getAchievements();
+        
+        $response = $response->withHeader('Content-Type', 'application/json');
+        return $response->write(json_encode($result, JSON_PRETTY_PRINT));
+    } catch (\Exception $e) {
+        $errorResponse = ['success' => false, 'message' => $e->getMessage()];
+        $response = $response->withHeader('Content-Type', 'application/json');
+        $response = $response->withStatus(500);
+        return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
+    }
+});
+
+// Profile image endpoint
+$app->get("/about/image", function ($request, $response, $args) {
+    try {
+        $service = new ProjectService();
+        $result = $service->getProfileImage();
+        
+        $response = $response->withHeader('Content-Type', 'application/json');
+        return $response->write(json_encode($result, JSON_PRETTY_PRINT));
+    } catch (\Exception $e) {
+        $errorResponse = ['success' => false, 'message' => $e->getMessage()];
+        $response = $response->withHeader('Content-Type', 'application/json');
+        $response = $response->withStatus(500);
+        return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
+    }
+});
+
+// About preview endpoint (for homepage)
+$app->get("/about/preview", function ($request, $response, $args) {
+    try {
+        $service = new ProjectService();
+        $result = $service->getAboutPreview();
+        
+        $response = $response->withHeader('Content-Type', 'application/json');
+        return $response->write(json_encode($result, JSON_PRETTY_PRINT));
+    } catch (\Exception $e) {
+        $errorResponse = ['success' => false, 'message' => $e->getMessage()];
+        $response = $response->withHeader('Content-Type', 'application/json');
+        $response = $response->withStatus(500);
+        return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
+    }
+});

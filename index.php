@@ -91,20 +91,15 @@
             <div class="about-container">
                 <div class="about-content">
                     <h2>About Nanay Lilia</h2>
-                    <p class="about-text">
-                        Born Lilia Paule Garcia on February 21, 1951, Governor Lilia "Nanay" 
-                        Pineda has dedicated over three decades to public service in Pampanga. 
-                        Known for her compassionate leadership and innovative governance, she 
-                        has transformed the province through strategic development programs and 
-                        inclusive policies that put Kapampangans first.
-                    </p>
-                    <p class="about-text">
-                        From her early days as a community leader to becoming one of the 
-                        Philippines' most respected governors, Nanay Lilia's journey is marked by 
-                        unwavering commitment to progress, transparency, and social justice. Her 
-                        legacy continues to shape Pampanga's future as a progressive province in 
-                        Central Luzon.
-                    </p>
+                    <div id="aboutPreview">
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                    <a href="about.php" class="learn-more-btn">
+                        Learn More About Nanay Lilia
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
                 <div class="about-visual">
                     <div class="about-image-container">
@@ -112,7 +107,7 @@
                         <div class="about-shape shape-2"></div>
                         <div class="about-shape shape-3"></div>
                         <div class="about-avatar">
-                            <img src="assets/profile.jpg" alt="">
+                            <img id="aboutProfileImage" src="assets/profile.jpg" alt="Gov. Lilia Pineda">
                         </div>
                     </div>
                 </div>
@@ -164,6 +159,7 @@
             loadProjects();
             loadPoliticalJourney();
             loadPortfolioStats();
+            loadAboutPreview();
 
             // API Functions
             function loadFeaturedProjects() {
@@ -219,6 +215,71 @@
                     }
                 });
             }
+
+            function loadAboutPreview() {
+    // Load profile image
+    $.ajax({
+        url: `${API_BASE}/Admin/api/about/image`,
+        method: 'GET',
+        success: function(response) {
+            if (response.success && response.data.image_url) {
+                $('#aboutProfileImage').attr('src', response.data.image_url);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading about image:', error);
+        }
+    });
+    
+    // Load about content preview (first 2 paragraphs only)
+    $.ajax({
+        url: `${API_BASE}/Admin/api/about/content`,
+        method: 'GET',
+        success: function(response) {
+            if (response.success && response.data) {
+                renderAboutPreview(response.data);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading about preview:', error);
+            $('#aboutPreview').html('<p class="about-text">Error loading content</p>');
+        }
+    });
+}
+
+// Add this new function
+function renderAboutPreview(contentData) {
+    let html = '';
+    
+    // Get only first 2 paragraphs from main section for preview
+    if (contentData.main && contentData.main.length > 0) {
+        const previewItems = contentData.main.slice(0, 2); // First 2 items only
+        
+        previewItems.forEach(item => {
+            html += `<p class="about-text">${item.content}</p>`;
+        });
+    } else {
+        // Fallback if no data
+        html = `
+            <p class="about-text">
+                Born Lilia Paule Garcia on February 21, 1951, Governor Lilia "Nanay" 
+                Pineda has dedicated over three decades to public service in Pampanga. 
+                Known for her compassionate leadership and innovative governance, she 
+                has transformed the province through strategic development programs and 
+                inclusive policies that put Kapampangans first.
+            </p>
+            <p class="about-text">
+                From her early days as a community leader to becoming one of the 
+                Philippines' most respected governors, Nanay Lilia's journey is marked by 
+                unwavering commitment to progress, transparency, and social justice. Her 
+                legacy continues to shape Pampanga's future as a progressive province in 
+                Central Luzon.
+            </p>
+        `;
+    }
+    
+    $('#aboutPreview').html(html);
+}
 
             function loadPoliticalJourney() {
                 $.ajax({

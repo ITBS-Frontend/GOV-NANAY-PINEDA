@@ -87,6 +87,10 @@ return [
     "user_permissions" => \DI\create(UserPermissions::class),
     "users" => \DI\create(Users::class),
     "main" => \DI\create(Main::class),
+    "about_content" => \DI\create(AboutContent::class),
+    "achievements" => \DI\create(Achievements::class),
+    "profile_details" => \DI\create(ProfileDetails::class),
+    "profile_images" => \DI\create(ProfileImages::class),
 
     // User table
     "usertable" => \DI\get("users"),

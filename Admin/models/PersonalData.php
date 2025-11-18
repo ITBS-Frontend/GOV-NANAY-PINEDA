@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "MainController";
+    public $CurrentPageName = "ProfileImagesDelete";
 
     // Page headings
     public $Heading = "";

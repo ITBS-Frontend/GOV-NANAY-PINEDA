@@ -1,4 +1,4 @@
-<ew-language date="2025/11/17" id="en-US" author="e.World Technology Limited">
+<ew-language date="2025/11/18" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="footertext" value="&amp;copy;2023 e.World Technology Limited. All rights reserved." />
     <menu id="1">
@@ -12,6 +12,21 @@
     </menu>
     <menu id="4">
       <phrase id="menutext" value="projects" />
+    </menu>
+    <menu id="13">
+      <phrase id="menutext" value="About Section" />
+    </menu>
+    <menu id="11">
+      <phrase id="menutext" value="profile details" />
+    </menu>
+    <menu id="12">
+      <phrase id="menutext" value="profile images" />
+    </menu>
+    <menu id="9">
+      <phrase id="menutext" value="about content" />
+    </menu>
+    <menu id="10">
+      <phrase id="menutext" value="achievements" />
     </menu>
     <menu id="5">
       <phrase id="menutext" value="user levels" />
@@ -204,6 +219,118 @@
     </table>
     <table id="main">
       <phrase id="tblcaption" value="main" />
+    </table>
+    <table id="about_content">
+      <phrase id="tblcaption" value="about content" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="section_type">
+        <phrase id="fldcaption" value="section type" />
+      </field>
+      <field id="_title">
+        <phrase id="fldcaption" value="title" />
+      </field>
+      <field id="_content">
+        <phrase id="fldcaption" value="content" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+      <field id="updated_at">
+        <phrase id="fldcaption" value="updated at" />
+      </field>
+    </table>
+    <table id="achievements">
+      <phrase id="tblcaption" value="achievements" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="_title">
+        <phrase id="fldcaption" value="title" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="icon_class">
+        <phrase id="fldcaption" value="icon class" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="profile_details">
+      <phrase id="tblcaption" value="profile details" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="detail_key">
+        <phrase id="fldcaption" value="detail key" />
+      </field>
+      <field id="detail_label">
+        <phrase id="fldcaption" value="detail label" />
+      </field>
+      <field id="detail_value">
+        <phrase id="fldcaption" value="detail value" />
+      </field>
+      <field id="icon_class">
+        <phrase id="fldcaption" value="icon class" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="profile_images">
+      <phrase id="tblcaption" value="profile images" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="image_path">
+        <phrase id="fldcaption" value="image path" />
+      </field>
+      <field id="image_type">
+        <phrase id="fldcaption" value="image type" />
+      </field>
+      <field id="is_primary">
+        <phrase id="fldcaption" value="is primary" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
     </table>
   </project>
 </ew-language>

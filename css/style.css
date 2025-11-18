@@ -243,6 +243,7 @@ section{
     left: 0;
     z-index: 1;
     opacity: .5;
+    transition: ease-in-out .8s;
 }
 
 .slide-content {
@@ -572,7 +573,7 @@ section{
 }
 
 .about-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -845,6 +846,36 @@ section{
 
 .scroll-top i {
     font-size: 1.2rem;
+}
+
+/* Learn More Button */
+.learn-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: var(--primary-blue);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: var(--transition);
+    margin-top: 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+.learn-more-btn:hover {
+    background: var(--primary-blue-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.learn-more-btn i {
+    transition: var(--transition);
+}
+
+.learn-more-btn:hover i {
+    transform: translateX(5px);
 }
 
 @media (max-width: 768px) {

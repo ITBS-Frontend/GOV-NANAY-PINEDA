@@ -37,7 +37,15 @@ $USER_LEVEL_PRIVS = [["{05BA416D-6E12-4581-9EFA-04B8838F18C5}categories","-2","0
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}users","-2","0"],
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}users","0","0"],
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}main.php","-2","72"],
-    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}main.php","0","0"]];
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}main.php","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}about_content","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}about_content","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}achievements","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}achievements","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_details","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_details","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_images","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_images","0","0"]];
 
 /**
  * Tables
@@ -57,4 +65,8 @@ $USER_LEVEL_TABLES = [["categories","categories","categories",true,"{05BA416D-6E
     ["user_levels","_user_levels","user levels",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","UserLevelsList"],
     ["user_permissions","user_permissions","user permissions",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","UserPermissionsList"],
     ["users","users","users",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","UsersList"],
-    ["main.php","main","main",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","Main"]];
+    ["main.php","main","main",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","Main"],
+    ["about_content","about_content","about content",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","AboutContentList"],
+    ["achievements","achievements","achievements",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","AchievementsList"],
+    ["profile_details","profile_details","profile details",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProfileDetailsList"],
+    ["profile_images","profile_images","profile images",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProfileImagesList"]];

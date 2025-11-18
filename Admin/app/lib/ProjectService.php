@@ -256,4 +256,194 @@ class ProjectService
             return ['success' => false, 'message' => 'Failed to fetch portfolio stats'];
         }
     }
+
+    /**
+ * Get about page content
+ */
+public function getAboutContent() 
+{
+    try {
+        $conn = Conn();
+        
+        $sql = "
+            SELECT 
+                section_type,
+                title,
+                content,
+                display_order
+            FROM about_content
+            WHERE is_active = true
+            ORDER BY display_order ASC
+        ";
+        
+        $content = $conn->executeQuery($sql)->fetchAllAssociative();
+        
+        // Group by section type
+        $grouped = [];
+        foreach ($content as $item) {
+            $type = $item['section_type'];
+            if (!isset($grouped[$type])) {
+                $grouped[$type] = [];
+            }
+            $grouped[$type][] = $item;
+        }
+        
+        return [
+            'success' => true,
+            'data' => $grouped
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get about content error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch about content'];
+    }
+}
+
+/**
+ * Get profile details
+ */
+public function getProfileDetails() 
+{
+    try {
+        $conn = Conn();
+        
+        $sql = "
+            SELECT 
+                detail_key,
+                detail_label,
+                detail_value,
+                icon_class
+            FROM profile_details
+            WHERE is_active = true
+            ORDER BY display_order ASC
+        ";
+        
+        $details = $conn->executeQuery($sql)->fetchAllAssociative();
+        
+        return [
+            'success' => true,
+            'data' => $details
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get profile details error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch profile details'];
+    }
+}
+
+/**
+ * Get achievements
+ */
+public function getAchievements() 
+{
+    try {
+        $conn = Conn();
+        
+        $sql = "
+            SELECT 
+                title,
+                description,
+                icon_class
+            FROM achievements
+            WHERE is_active = true
+            ORDER BY display_order ASC
+        ";
+        
+        $achievements = $conn->executeQuery($sql)->fetchAllAssociative();
+        
+        return [
+            'success' => true,
+            'data' => $achievements
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get achievements error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch achievements'];
+    }
+}
+
+/**
+ * Get profile image
+ */
+public function getProfileImage() 
+{
+    try {
+        $conn = Conn();
+        
+        $sql = "
+            SELECT image_path
+            FROM profile_images
+            WHERE is_primary = true
+            AND image_type = 'profile'
+            LIMIT 1
+        ";
+        
+        $result = $conn->executeQuery($sql)->fetchAssociative();
+        
+        $imageUrl = null;
+        if ($result && !empty($result['image_path'])) {
+            $imageUrl = getPresignedUrl('gov-pineda-images/' . $result['image_path']);
+   
+        }
+        
+        return [
+            'success' => true,
+            'data' => ['image_url' => $imageUrl]
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get profile image error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch profile image'];
+    }
+}
+
+/**
+ * Get about preview (first 2 paragraphs + image)
+ */
+public function getAboutPreview() 
+{
+    try {
+        $conn = Conn();
+        
+        // Get first 2 paragraphs
+        $sql = "
+            SELECT content
+            FROM about_content
+            WHERE is_active = true
+            AND section_type = 'main'
+            ORDER BY display_order ASC
+            LIMIT 2
+        ";
+        
+        $content = $conn->executeQuery($sql)->fetchAllAssociative();
+        
+        // Get profile image
+        $imgSql = "
+            SELECT image_path
+            FROM profile_images
+            WHERE is_primary = true
+            AND image_type = 'profile'
+            LIMIT 1
+        ";
+        
+        $imgResult = $conn->executeQuery($imgSql)->fetchAssociative();
+        
+        $imageUrl = null;
+        if ($imgResult && !empty($imgResult['image_path'])) {
+            $imageUrl = getPresignedUrl($imgResult['image_path']);
+        }
+        
+        return [
+            'success' => true,
+            'data' => [
+                'content' => $content,
+                'image_url' => $imageUrl
+            ]
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get about preview error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch about preview'];
+    }
+}
 }
