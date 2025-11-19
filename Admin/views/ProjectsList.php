@@ -171,6 +171,18 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_projects_created_at" class="projects_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
 <?php } ?>
+<?php if ($Page->location->Visible) { // location ?>
+        <th data-name="location" class="<?= $Page->location->headerCellClass() ?>"><div id="elh_projects_location" class="projects_location"><?= $Page->renderFieldHeader($Page->location) ?></div></th>
+<?php } ?>
+<?php if ($Page->start_date->Visible) { // start_date ?>
+        <th data-name="start_date" class="<?= $Page->start_date->headerCellClass() ?>"><div id="elh_projects_start_date" class="projects_start_date"><?= $Page->renderFieldHeader($Page->start_date) ?></div></th>
+<?php } ?>
+<?php if ($Page->end_date->Visible) { // end_date ?>
+        <th data-name="end_date" class="<?= $Page->end_date->headerCellClass() ?>"><div id="elh_projects_end_date" class="projects_end_date"><?= $Page->renderFieldHeader($Page->end_date) ?></div></th>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+        <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_projects_status" class="projects_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -261,6 +273,38 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_created_at" class="el_projects_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->location->Visible) { // location ?>
+        <td data-name="location"<?= $Page->location->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_location" class="el_projects_location">
+<span<?= $Page->location->viewAttributes() ?>>
+<?= $Page->location->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->start_date->Visible) { // start_date ?>
+        <td data-name="start_date"<?= $Page->start_date->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_start_date" class="el_projects_start_date">
+<span<?= $Page->start_date->viewAttributes() ?>>
+<?= $Page->start_date->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->end_date->Visible) { // end_date ?>
+        <td data-name="end_date"<?= $Page->end_date->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_end_date" class="el_projects_end_date">
+<span<?= $Page->end_date->viewAttributes() ?>>
+<?= $Page->end_date->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->status->Visible) { // status ?>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_status" class="el_projects_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -237,7 +237,7 @@ ew.ready("head", [
                     <a class="nav-link" data-widget="pushmenu" data-enable-remember="true" data-ew-action="none"><i class="fa-solid fa-bars ew-icon"></i></a>
                 </li>
                 <a class="navbar-brand d-none" href="#" data-ew-action="none">
-                    <span class="brand-text">PHPMaker 2024</span>
+                    <span class="brand-text">Gov. Lilia "Nanay" Pineda</span>
                 </a>
             </ul>
             <!-- Right navbar links -->
@@ -250,7 +250,7 @@ ew.ready("head", [
         <div class="brand-container">
             <!-- Brand Logo //** Note: Only licensed users are allowed to change the logo ** -->
             <a href="#" class="brand-link">
-                <span class="brand-text">PHPMaker 2024</span>
+                <span class="brand-text">Gov. Lilia "Nanay" Pineda</span>
             </a>
             <?php if (preg_match('/\bsidebar-mini\b/', Config("BODY_CLASS"))) { ?>
             <a class="pushmenu mx-1" data-pushmenu="mini" role="button"><i class="fa-solid fa-angle-double-left"></i></a>

@@ -56,6 +56,13 @@ class Projects extends DbTable
     public $project_date;
     public $budget_amount;
     public $created_at;
+    public $full_description;
+    public $objectives;
+    public $impact;
+    public $location;
+    public $start_date;
+    public $end_date;
+    public $status;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -347,6 +354,165 @@ class Projects extends DbTable
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
+
+        // full_description
+        $this->full_description = new DbField(
+            $this, // Table
+            'x_full_description', // Variable name
+            'full_description', // Name
+            '"full_description"', // Expression
+            '"full_description"', // Basic search expression
+            201, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"full_description"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXTAREA' // Edit Tag
+        );
+        $this->full_description->InputTextType = "text";
+        $this->full_description->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['full_description'] = &$this->full_description;
+
+        // objectives
+        $this->objectives = new DbField(
+            $this, // Table
+            'x_objectives', // Variable name
+            'objectives', // Name
+            '"objectives"', // Expression
+            '"objectives"', // Basic search expression
+            201, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"objectives"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXTAREA' // Edit Tag
+        );
+        $this->objectives->InputTextType = "text";
+        $this->objectives->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['objectives'] = &$this->objectives;
+
+        // impact
+        $this->impact = new DbField(
+            $this, // Table
+            'x_impact', // Variable name
+            'impact', // Name
+            '"impact"', // Expression
+            '"impact"', // Basic search expression
+            201, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"impact"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXTAREA' // Edit Tag
+        );
+        $this->impact->InputTextType = "text";
+        $this->impact->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['impact'] = &$this->impact;
+
+        // location
+        $this->location = new DbField(
+            $this, // Table
+            'x_location', // Variable name
+            'location', // Name
+            '"location"', // Expression
+            '"location"', // Basic search expression
+            200, // Type
+            255, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"location"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->location->InputTextType = "text";
+        $this->location->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['location'] = &$this->location;
+
+        // start_date
+        $this->start_date = new DbField(
+            $this, // Table
+            'x_start_date', // Variable name
+            'start_date', // Name
+            '"start_date"', // Expression
+            CastDateFieldForLike("\"start_date\"", 0, "DB"), // Basic search expression
+            133, // Type
+            0, // Size
+            0, // Date/Time format
+            false, // Is upload field
+            '"start_date"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->start_date->InputTextType = "text";
+        $this->start_date->Raw = true;
+        $this->start_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->start_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['start_date'] = &$this->start_date;
+
+        // end_date
+        $this->end_date = new DbField(
+            $this, // Table
+            'x_end_date', // Variable name
+            'end_date', // Name
+            '"end_date"', // Expression
+            CastDateFieldForLike("\"end_date\"", 0, "DB"), // Basic search expression
+            133, // Type
+            0, // Size
+            0, // Date/Time format
+            false, // Is upload field
+            '"end_date"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->end_date->InputTextType = "text";
+        $this->end_date->Raw = true;
+        $this->end_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->end_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['end_date'] = &$this->end_date;
+
+        // status
+        $this->status = new DbField(
+            $this, // Table
+            'x_status', // Variable name
+            'status', // Name
+            '"status"', // Expression
+            '"status"', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"status"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->status->addMethod("getDefault", fn() => "completed");
+        $this->status->InputTextType = "text";
+        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['status'] = &$this->status;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -880,6 +1046,13 @@ class Projects extends DbTable
         $this->project_date->DbValue = $row['project_date'];
         $this->budget_amount->DbValue = $row['budget_amount'];
         $this->created_at->DbValue = $row['created_at'];
+        $this->full_description->DbValue = $row['full_description'];
+        $this->objectives->DbValue = $row['objectives'];
+        $this->impact->DbValue = $row['impact'];
+        $this->location->DbValue = $row['location'];
+        $this->start_date->DbValue = $row['start_date'];
+        $this->end_date->DbValue = $row['end_date'];
+        $this->status->DbValue = $row['status'];
     }
 
     // Delete uploaded files
@@ -1249,6 +1422,13 @@ class Projects extends DbTable
         $this->project_date->setDbValue($row['project_date']);
         $this->budget_amount->setDbValue($row['budget_amount']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->full_description->setDbValue($row['full_description']);
+        $this->objectives->setDbValue($row['objectives']);
+        $this->impact->setDbValue($row['impact']);
+        $this->location->setDbValue($row['location']);
+        $this->start_date->setDbValue($row['start_date']);
+        $this->end_date->setDbValue($row['end_date']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Render list content
@@ -1298,6 +1478,20 @@ class Projects extends DbTable
         // budget_amount
 
         // created_at
+
+        // full_description
+
+        // objectives
+
+        // impact
+
+        // location
+
+        // start_date
+
+        // end_date
+
+        // status
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1366,6 +1560,29 @@ class Projects extends DbTable
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+        // full_description
+        $this->full_description->ViewValue = $this->full_description->CurrentValue;
+
+        // objectives
+        $this->objectives->ViewValue = $this->objectives->CurrentValue;
+
+        // impact
+        $this->impact->ViewValue = $this->impact->CurrentValue;
+
+        // location
+        $this->location->ViewValue = $this->location->CurrentValue;
+
+        // start_date
+        $this->start_date->ViewValue = $this->start_date->CurrentValue;
+        $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, $this->start_date->formatPattern());
+
+        // end_date
+        $this->end_date->ViewValue = $this->end_date->CurrentValue;
+        $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
+
+        // status
+        $this->status->ViewValue = $this->status->CurrentValue;
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
@@ -1422,6 +1639,34 @@ class Projects extends DbTable
         // created_at
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
+
+        // full_description
+        $this->full_description->HrefValue = "";
+        $this->full_description->TooltipValue = "";
+
+        // objectives
+        $this->objectives->HrefValue = "";
+        $this->objectives->TooltipValue = "";
+
+        // impact
+        $this->impact->HrefValue = "";
+        $this->impact->TooltipValue = "";
+
+        // location
+        $this->location->HrefValue = "";
+        $this->location->TooltipValue = "";
+
+        // start_date
+        $this->start_date->HrefValue = "";
+        $this->start_date->TooltipValue = "";
+
+        // end_date
+        $this->end_date->HrefValue = "";
+        $this->end_date->TooltipValue = "";
+
+        // status
+        $this->status->HrefValue = "";
+        $this->status->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1505,6 +1750,47 @@ class Projects extends DbTable
         $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
 
+        // full_description
+        $this->full_description->setupEditAttributes();
+        $this->full_description->EditValue = $this->full_description->CurrentValue;
+        $this->full_description->PlaceHolder = RemoveHtml($this->full_description->caption());
+
+        // objectives
+        $this->objectives->setupEditAttributes();
+        $this->objectives->EditValue = $this->objectives->CurrentValue;
+        $this->objectives->PlaceHolder = RemoveHtml($this->objectives->caption());
+
+        // impact
+        $this->impact->setupEditAttributes();
+        $this->impact->EditValue = $this->impact->CurrentValue;
+        $this->impact->PlaceHolder = RemoveHtml($this->impact->caption());
+
+        // location
+        $this->location->setupEditAttributes();
+        if (!$this->location->Raw) {
+            $this->location->CurrentValue = HtmlDecode($this->location->CurrentValue);
+        }
+        $this->location->EditValue = $this->location->CurrentValue;
+        $this->location->PlaceHolder = RemoveHtml($this->location->caption());
+
+        // start_date
+        $this->start_date->setupEditAttributes();
+        $this->start_date->EditValue = FormatDateTime($this->start_date->CurrentValue, $this->start_date->formatPattern());
+        $this->start_date->PlaceHolder = RemoveHtml($this->start_date->caption());
+
+        // end_date
+        $this->end_date->setupEditAttributes();
+        $this->end_date->EditValue = FormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
+        $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
+
+        // status
+        $this->status->setupEditAttributes();
+        if (!$this->status->Raw) {
+            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+        }
+        $this->status->EditValue = $this->status->CurrentValue;
+        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1542,6 +1828,13 @@ class Projects extends DbTable
                     $doc->exportCaption($this->is_featured);
                     $doc->exportCaption($this->project_date);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->full_description);
+                    $doc->exportCaption($this->objectives);
+                    $doc->exportCaption($this->impact);
+                    $doc->exportCaption($this->location);
+                    $doc->exportCaption($this->start_date);
+                    $doc->exportCaption($this->end_date);
+                    $doc->exportCaption($this->status);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->_title);
@@ -1552,6 +1845,10 @@ class Projects extends DbTable
                     $doc->exportCaption($this->project_date);
                     $doc->exportCaption($this->budget_amount);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->location);
+                    $doc->exportCaption($this->start_date);
+                    $doc->exportCaption($this->end_date);
+                    $doc->exportCaption($this->status);
                 }
                 $doc->endExportRow();
             }
@@ -1587,6 +1884,13 @@ class Projects extends DbTable
                         $doc->exportField($this->is_featured);
                         $doc->exportField($this->project_date);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->full_description);
+                        $doc->exportField($this->objectives);
+                        $doc->exportField($this->impact);
+                        $doc->exportField($this->location);
+                        $doc->exportField($this->start_date);
+                        $doc->exportField($this->end_date);
+                        $doc->exportField($this->status);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->_title);
@@ -1597,6 +1901,10 @@ class Projects extends DbTable
                         $doc->exportField($this->project_date);
                         $doc->exportField($this->budget_amount);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->location);
+                        $doc->exportField($this->start_date);
+                        $doc->exportField($this->end_date);
+                        $doc->exportField($this->status);
                     }
                     $doc->endExportRow($rowCnt);
                 }

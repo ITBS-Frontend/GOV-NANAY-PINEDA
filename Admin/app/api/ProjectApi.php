@@ -163,3 +163,21 @@ $app->get("/about/preview", function ($request, $response, $args) {
         return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
     }
 });
+
+// Single project detail endpoint
+$app->get("/projects/{id}", function ($request, $response, $args) {
+    try {
+        $projectId = $args['id'];
+        
+        $service = new ProjectService();
+        $result = $service->getProjectDetails($projectId);
+        
+        $response = $response->withHeader('Content-Type', 'application/json');
+        return $response->write(json_encode($result, JSON_PRETTY_PRINT));
+    } catch (\Exception $e) {
+        $errorResponse = ['success' => false, 'message' => $e->getMessage()];
+        $response = $response->withHeader('Content-Type', 'application/json');
+        $response = $response->withStatus(500);
+        return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
+    }
+});

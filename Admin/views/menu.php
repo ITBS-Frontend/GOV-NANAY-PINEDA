@@ -8,9 +8,12 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(24, "mci_Projects", $Language->menuPhrase("24", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
+$sideMenu->addMenuItem(4, "mi_projects", $Language->menuPhrase("4", "MenuText"), "ProjectsList", 24, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}projects'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(14, "mi_project_gallery", $Language->menuPhrase("14", "MenuText"), "ProjectGalleryList", 24, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_gallery'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(15, "mi_project_highlights", $Language->menuPhrase("15", "MenuText"), "ProjectHighlightsList", 24, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_highlights'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(1, "mi_categories", $Language->menuPhrase("1", "MenuText"), "CategoriesList", -1, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}categories'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(2, "mi_political_journey", $Language->menuPhrase("2", "MenuText"), "PoliticalJourneyList", -1, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}political_journey'), false, false, "", "", false, true);
-$sideMenu->addMenuItem(4, "mi_projects", $Language->menuPhrase("4", "MenuText"), "ProjectsList", -1, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}projects'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(13, "mci_About_Section", $Language->menuPhrase("13", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
 $sideMenu->addMenuItem(11, "mi_profile_details", $Language->menuPhrase("11", "MenuText"), "ProfileDetailsList", 13, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_details'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(12, "mi_profile_images", $Language->menuPhrase("12", "MenuText"), "ProfileImagesList", 13, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_images'), false, false, "", "", false, true);

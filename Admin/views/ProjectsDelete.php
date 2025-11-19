@@ -74,6 +74,18 @@ $Page->showMessage();
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_projects_created_at" class="projects_created_at"><?= $Page->created_at->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->location->Visible) { // location ?>
+        <th class="<?= $Page->location->headerCellClass() ?>"><span id="elh_projects_location" class="projects_location"><?= $Page->location->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->start_date->Visible) { // start_date ?>
+        <th class="<?= $Page->start_date->headerCellClass() ?>"><span id="elh_projects_start_date" class="projects_start_date"><?= $Page->start_date->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->end_date->Visible) { // end_date ?>
+        <th class="<?= $Page->end_date->headerCellClass() ?>"><span id="elh_projects_end_date" class="projects_end_date"><?= $Page->end_date->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+        <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_projects_status" class="projects_status"><?= $Page->status->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -158,6 +170,38 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->location->Visible) { // location ?>
+        <td<?= $Page->location->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->location->viewAttributes() ?>>
+<?= $Page->location->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->start_date->Visible) { // start_date ?>
+        <td<?= $Page->start_date->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->start_date->viewAttributes() ?>>
+<?= $Page->start_date->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->end_date->Visible) { // end_date ?>
+        <td<?= $Page->end_date->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->end_date->viewAttributes() ?>>
+<?= $Page->end_date->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+        <td<?= $Page->status->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

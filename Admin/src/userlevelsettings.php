@@ -45,7 +45,11 @@ $USER_LEVEL_PRIVS = [["{05BA416D-6E12-4581-9EFA-04B8838F18C5}categories","-2","0
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_details","-2","0"],
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_details","0","0"],
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_images","-2","0"],
-    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_images","0","0"]];
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}profile_images","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_gallery","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_gallery","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_highlights","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_highlights","0","0"]];
 
 /**
  * Tables
@@ -69,4 +73,6 @@ $USER_LEVEL_TABLES = [["categories","categories","categories",true,"{05BA416D-6E
     ["about_content","about_content","about content",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","AboutContentList"],
     ["achievements","achievements","achievements",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","AchievementsList"],
     ["profile_details","profile_details","profile details",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProfileDetailsList"],
-    ["profile_images","profile_images","profile images",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProfileImagesList"]];
+    ["profile_images","profile_images","profile images",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProfileImagesList"],
+    ["project_gallery","project_gallery","project gallery",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProjectGalleryList"],
+    ["project_highlights","project_highlights","project highlights",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProjectHighlightsList"]];

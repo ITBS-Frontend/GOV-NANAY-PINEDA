@@ -79,8 +79,8 @@ loadjs.ready("head", function () {
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_profile_images_image_type"><?= $Page->image_type->caption() ?></span></td>
         <td data-name="image_type"<?= $Page->image_type->cellAttributes() ?>>
 <span id="el_profile_images_image_type">
-<span<?= $Page->image_type->viewAttributes() ?>>
-<?= $Page->image_type->getViewValue() ?></span>
+<span>
+<?= GetImageViewTag($Page->image_type, $Page->image_type->getViewValue()) ?></span>
 </span>
 </td>
     </tr>

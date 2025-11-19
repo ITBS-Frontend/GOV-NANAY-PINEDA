@@ -36,7 +36,14 @@ loadjs.ready(["wrapper", "head"], function () {
             ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.fileRequired(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
             ["is_featured", [fields.is_featured.visible && fields.is_featured.required ? ew.Validators.required(fields.is_featured.caption) : null], fields.is_featured.isInvalid],
             ["project_date", [fields.project_date.visible && fields.project_date.required ? ew.Validators.required(fields.project_date.caption) : null, ew.Validators.datetime(fields.project_date.clientFormatPattern)], fields.project_date.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid],
+            ["full_description", [fields.full_description.visible && fields.full_description.required ? ew.Validators.required(fields.full_description.caption) : null], fields.full_description.isInvalid],
+            ["objectives", [fields.objectives.visible && fields.objectives.required ? ew.Validators.required(fields.objectives.caption) : null], fields.objectives.isInvalid],
+            ["impact", [fields.impact.visible && fields.impact.required ? ew.Validators.required(fields.impact.caption) : null], fields.impact.isInvalid],
+            ["location", [fields.location.visible && fields.location.required ? ew.Validators.required(fields.location.caption) : null], fields.location.isInvalid],
+            ["start_date", [fields.start_date.visible && fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(fields.start_date.clientFormatPattern)], fields.start_date.isInvalid],
+            ["end_date", [fields.end_date.visible && fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(fields.end_date.clientFormatPattern)], fields.end_date.isInvalid],
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -299,6 +306,148 @@ loadjs.ready(["fprojectsedit", "datetimepicker"], function () {
 });
 </script>
 <?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->full_description->Visible) { // full_description ?>
+    <div id="r_full_description"<?= $Page->full_description->rowAttributes() ?>>
+        <label id="elh_projects_full_description" for="x_full_description" class="<?= $Page->LeftColumnClass ?>"><?= $Page->full_description->caption() ?><?= $Page->full_description->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->full_description->cellAttributes() ?>>
+<span id="el_projects_full_description">
+<textarea data-table="projects" data-field="x_full_description" name="x_full_description" id="x_full_description" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->full_description->getPlaceHolder()) ?>"<?= $Page->full_description->editAttributes() ?> aria-describedby="x_full_description_help"><?= $Page->full_description->EditValue ?></textarea>
+<?= $Page->full_description->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->full_description->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->objectives->Visible) { // objectives ?>
+    <div id="r_objectives"<?= $Page->objectives->rowAttributes() ?>>
+        <label id="elh_projects_objectives" for="x_objectives" class="<?= $Page->LeftColumnClass ?>"><?= $Page->objectives->caption() ?><?= $Page->objectives->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->objectives->cellAttributes() ?>>
+<span id="el_projects_objectives">
+<textarea data-table="projects" data-field="x_objectives" name="x_objectives" id="x_objectives" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->objectives->getPlaceHolder()) ?>"<?= $Page->objectives->editAttributes() ?> aria-describedby="x_objectives_help"><?= $Page->objectives->EditValue ?></textarea>
+<?= $Page->objectives->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->objectives->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->impact->Visible) { // impact ?>
+    <div id="r_impact"<?= $Page->impact->rowAttributes() ?>>
+        <label id="elh_projects_impact" for="x_impact" class="<?= $Page->LeftColumnClass ?>"><?= $Page->impact->caption() ?><?= $Page->impact->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->impact->cellAttributes() ?>>
+<span id="el_projects_impact">
+<textarea data-table="projects" data-field="x_impact" name="x_impact" id="x_impact" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->impact->getPlaceHolder()) ?>"<?= $Page->impact->editAttributes() ?> aria-describedby="x_impact_help"><?= $Page->impact->EditValue ?></textarea>
+<?= $Page->impact->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->impact->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->location->Visible) { // location ?>
+    <div id="r_location"<?= $Page->location->rowAttributes() ?>>
+        <label id="elh_projects_location" for="x_location" class="<?= $Page->LeftColumnClass ?>"><?= $Page->location->caption() ?><?= $Page->location->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->location->cellAttributes() ?>>
+<span id="el_projects_location">
+<input type="<?= $Page->location->getInputTextType() ?>" name="x_location" id="x_location" data-table="projects" data-field="x_location" value="<?= $Page->location->EditValue ?>" size="30" maxlength="255" placeholder="<?= HtmlEncode($Page->location->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->location->formatPattern()) ?>"<?= $Page->location->editAttributes() ?> aria-describedby="x_location_help">
+<?= $Page->location->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->location->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->start_date->Visible) { // start_date ?>
+    <div id="r_start_date"<?= $Page->start_date->rowAttributes() ?>>
+        <label id="elh_projects_start_date" for="x_start_date" class="<?= $Page->LeftColumnClass ?>"><?= $Page->start_date->caption() ?><?= $Page->start_date->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->start_date->cellAttributes() ?>>
+<span id="el_projects_start_date">
+<input type="<?= $Page->start_date->getInputTextType() ?>" name="x_start_date" id="x_start_date" data-table="projects" data-field="x_start_date" value="<?= $Page->start_date->EditValue ?>" placeholder="<?= HtmlEncode($Page->start_date->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->start_date->formatPattern()) ?>"<?= $Page->start_date->editAttributes() ?> aria-describedby="x_start_date_help">
+<?= $Page->start_date->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->start_date->getErrorMessage() ?></div>
+<?php if (!$Page->start_date->ReadOnly && !$Page->start_date->Disabled && !isset($Page->start_date->EditAttrs["readonly"]) && !isset($Page->start_date->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fprojectsedit", "datetimepicker"], function () {
+    let format = "<?= DateFormat(0) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("fprojectsedit", "x_start_date", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->end_date->Visible) { // end_date ?>
+    <div id="r_end_date"<?= $Page->end_date->rowAttributes() ?>>
+        <label id="elh_projects_end_date" for="x_end_date" class="<?= $Page->LeftColumnClass ?>"><?= $Page->end_date->caption() ?><?= $Page->end_date->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->end_date->cellAttributes() ?>>
+<span id="el_projects_end_date">
+<input type="<?= $Page->end_date->getInputTextType() ?>" name="x_end_date" id="x_end_date" data-table="projects" data-field="x_end_date" value="<?= $Page->end_date->EditValue ?>" placeholder="<?= HtmlEncode($Page->end_date->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->end_date->formatPattern()) ?>"<?= $Page->end_date->editAttributes() ?> aria-describedby="x_end_date_help">
+<?= $Page->end_date->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->end_date->getErrorMessage() ?></div>
+<?php if (!$Page->end_date->ReadOnly && !$Page->end_date->Disabled && !isset($Page->end_date->EditAttrs["readonly"]) && !isset($Page->end_date->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fprojectsedit", "datetimepicker"], function () {
+    let format = "<?= DateFormat(0) ?>",
+        options = {
+            localization: {
+                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
+                hourCycle: format.match(/H/) ? "h24" : "h12",
+                format,
+                ...ew.language.phrase("datetimepicker")
+            },
+            display: {
+                icons: {
+                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
+                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
+                },
+                components: {
+                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
+                    hours: !!format.match(/h/i),
+                    minutes: !!format.match(/m/),
+                    seconds: !!format.match(/s/i)
+                },
+                theme: ew.getPreferredTheme()
+            }
+        };
+    ew.createDateTimePicker("fprojectsedit", "x_end_date", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <div id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <label id="elh_projects_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
+<span id="el_projects_status">
+<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="projects" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
+<?= $Page->status->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

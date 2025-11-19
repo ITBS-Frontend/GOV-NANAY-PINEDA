@@ -1,19 +1,13 @@
+<?php
+// Page specific variables
+$pageTitle = "About Gov. Lilia 'Nanay' Pineda";
+$pageDescription = "Learn about the life, career, and achievements of Governor Lilia 'Nanay' Pineda - a dedicated public servant transforming Pampanga through compassionate leadership.";
+$additionalCSS = ['css/about.css'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Gov. Lilia "Nanay" Pineda</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/about.css">
-    
-
+    <?php include 'components/head.php'; ?>
 </head>
 <body>
     <div class="about-page">
@@ -65,20 +59,27 @@
         </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Footer -->
+    <?php include 'components/footer.php'; ?>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <?php include 'components/scripts.php'; ?>
+    
+    <!-- Page Specific JavaScript -->
     <script>
         $(document).ready(function() {
-            // API Base URL
             const API_BASE = window.location.origin;
             
-            // Load all data
             loadProfileImage();
             loadProfileDetails();
             loadAboutContent();
             loadAchievements();
             
-            // Load profile image
             function loadProfileImage() {
                 $.ajax({
                     url: `${API_BASE}/Admin/api/about/image`,
@@ -94,7 +95,6 @@
                 });
             }
             
-            // Load profile details
             function loadProfileDetails() {
                 $.ajax({
                     url: `${API_BASE}/Admin/api/about/profile`,
@@ -103,15 +103,10 @@
                         if (response.success && response.data) {
                             renderProfileDetails(response.data);
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading profile details:', error);
-                        $('#profileDetails').html('<p>Error loading profile details</p>');
                     }
                 });
             }
             
-            // Load about content
             function loadAboutContent() {
                 $.ajax({
                     url: `${API_BASE}/Admin/api/about/content`,
@@ -120,15 +115,10 @@
                         if (response.success && response.data) {
                             renderAboutContent(response.data);
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading about content:', error);
-                        $('#aboutBio').html('<p>Error loading content</p>');
                     }
                 });
             }
             
-            // Load achievements
             function loadAchievements() {
                 $.ajax({
                     url: `${API_BASE}/Admin/api/about/achievements`,
@@ -137,18 +127,12 @@
                         if (response.success && response.data) {
                             renderAchievements(response.data);
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading achievements:', error);
-                        $('#achievementsGrid').html('<p>Error loading achievements</p>');
                     }
                 });
             }
             
-            // Render profile details
             function renderProfileDetails(details) {
                 let html = '';
-                
                 details.forEach(detail => {
                     html += `
                         <div class="detail-item">
@@ -162,40 +146,29 @@
                         </div>
                     `;
                 });
-                
                 $('#profileDetails').html(html);
             }
             
-            // Render about content
             function renderAboutContent(contentData) {
                 let html = '';
                 
-                // Render main content
                 if (contentData.main) {
                     contentData.main.forEach((item, index) => {
-                        if (item.title) {
-                            html += `<h2>${item.title}</h2>`;
-                        }
+                        if (item.title) html += `<h2>${item.title}</h2>`;
                         html += `<p>${item.content}</p>`;
                     });
                 }
                 
-                // Render vision section
                 if (contentData.vision) {
                     contentData.vision.forEach(item => {
-                        if (item.title) {
-                            html += `<h2 style="margin-top: 2rem;">${item.title}</h2>`;
-                        }
+                        if (item.title) html += `<h2 style="margin-top: 2rem;">${item.title}</h2>`;
                         html += `<p>${item.content}</p>`;
                     });
                 }
                 
-                // Render mission section
                 if (contentData.mission) {
                     contentData.mission.forEach(item => {
-                        if (item.title) {
-                            html += `<h2 style="margin-top: 2rem;">${item.title}</h2>`;
-                        }
+                        if (item.title) html += `<h2 style="margin-top: 2rem;">${item.title}</h2>`;
                         html += `<p>${item.content}</p>`;
                     });
                 }
@@ -203,10 +176,8 @@
                 $('#aboutBio').html(html);
             }
             
-            // Render achievements
             function renderAchievements(achievements) {
                 let html = '';
-                
                 achievements.forEach(achievement => {
                     html += `
                         <div class="achievement-card">
@@ -218,12 +189,8 @@
                         </div>
                     `;
                 });
-                
                 $('#achievementsGrid').html(html);
             }
-            
-            // Smooth page load animation
-            $('body').css('opacity', '0').animate({opacity: 1}, 500);
         });
     </script>
 </body>

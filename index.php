@@ -1,47 +1,17 @@
+<?php
+// Page specific variables
+$pageTitle = "Gov. Lilia 'Nanay' Pineda - Official Portfolio";
+$pageDescription = "Official portfolio showcasing transformative governance and development initiatives in Pampanga under Governor Lilia 'Nanay' Pineda.";
+$additionalCSS = []; // Add any page-specific CSS files here
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gov. Lilia "Nanay" Pineda - Official Portfolio</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-     
+    <?php include 'components/head.php'; ?>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
-    <nav class="">
-        <div class="logo">LP</div>
-        <button class="hamburger" aria-label="Toggle menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div class="nav-menu">
-            <div class="nav-item active" data-section="hero">
-                <i class="fas fa-home"></i>
-                <span class="nav-tooltip">Home</span>
-            </div>
-            <div class="nav-item" data-section="projects">
-                <i class="fas fa-briefcase"></i>
-                <span class="nav-tooltip">Projects</span>
-            </div>
-            <div class="nav-item" data-section="about">
-                <i class="fas fa-user"></i>
-                <span class="nav-tooltip">About</span>
-            </div>
-            <div class="nav-item" data-section="journey">
-                <i class="fas fa-route"></i>
-                <span class="nav-tooltip">Journey</span>
-            </div>
-            <div class="indicator"></div> <!-- moved here -->
-        </div>
-    </nav>
+    <!-- Header Navigation -->
+    <?php include 'components/header.php'; ?>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -54,8 +24,7 @@
             </div>
 
             <!-- Carousel Controls -->
-            <div class="carousel-controls" id="carouselControls" style="display: none;">
-            </div>
+            <div class="carousel-controls" id="carouselControls" style="display: none;"></div>
 
             <div class="carousel-nav carousel-prev" style="display: none;">
                 <i class="fas fa-chevron-left"></i>
@@ -133,32 +102,33 @@
         </section>
     </main>
 
+    <!-- Footer -->
+    <?php include 'components/footer.php'; ?>
+
+    <!-- Scroll to Top Button -->
     <button class="scroll-top" aria-label="Scroll to top">
         <i class="fas fa-chevron-up"></i>
     </button>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Scripts -->
+    <?php include 'components/scripts.php'; ?>
     
+    <!-- Page Specific JavaScript -->
     <script>
         $(document).ready(function() {
-            // API Base URL - adjust based on your setup
             const API_BASE = window.location.origin;
-            //  const API_BASE = '/admin';
             
-            // State management
             let featuredProjects = [];
             let allProjects = [];
             let categories = [];
             let currentSlide = 0;
             let slideInterval;
 
-            // Load all data on page load
+            // Load all data
             loadFeaturedProjects();
             loadCategories();
             loadProjects();
             loadPoliticalJourney();
-            loadPortfolioStats();
             loadAboutPreview();
 
             // API Functions
@@ -174,7 +144,6 @@
                     },
                     error: function(xhr, status, error) {
                         console.error('Error loading featured projects:', error);
-                        $('#carouselContainer').html('<p class="text-center">Error loading featured projects</p>');
                     }
                 });
             }
@@ -211,75 +180,9 @@
                     },
                     error: function(xhr, status, error) {
                         console.error('Error loading projects:', error);
-                        $('#projectsGrid').html('<p class="text-center">Error loading projects</p>');
                     }
                 });
             }
-
-            function loadAboutPreview() {
-    // Load profile image
-    $.ajax({
-        url: `${API_BASE}/Admin/api/about/image`,
-        method: 'GET',
-        success: function(response) {
-            if (response.success && response.data.image_url) {
-                $('#aboutProfileImage').attr('src', response.data.image_url);
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error loading about image:', error);
-        }
-    });
-    
-    // Load about content preview (first 2 paragraphs only)
-    $.ajax({
-        url: `${API_BASE}/Admin/api/about/content`,
-        method: 'GET',
-        success: function(response) {
-            if (response.success && response.data) {
-                renderAboutPreview(response.data);
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error loading about preview:', error);
-            $('#aboutPreview').html('<p class="about-text">Error loading content</p>');
-        }
-    });
-}
-
-// Add this new function
-function renderAboutPreview(contentData) {
-    let html = '';
-    
-    // Get only first 2 paragraphs from main section for preview
-    if (contentData.main && contentData.main.length > 0) {
-        const previewItems = contentData.main.slice(0, 2); // First 2 items only
-        
-        previewItems.forEach(item => {
-            html += `<p class="about-text">${item.content}</p>`;
-        });
-    } else {
-        // Fallback if no data
-        html = `
-            <p class="about-text">
-                Born Lilia Paule Garcia on February 21, 1951, Governor Lilia "Nanay" 
-                Pineda has dedicated over three decades to public service in Pampanga. 
-                Known for her compassionate leadership and innovative governance, she 
-                has transformed the province through strategic development programs and 
-                inclusive policies that put Kapampangans first.
-            </p>
-            <p class="about-text">
-                From her early days as a community leader to becoming one of the 
-                Philippines' most respected governors, Nanay Lilia's journey is marked by 
-                unwavering commitment to progress, transparency, and social justice. Her 
-                legacy continues to shape Pampanga's future as a progressive province in 
-                Central Luzon.
-            </p>
-        `;
-    }
-    
-    $('#aboutPreview').html(html);
-}
 
             function loadPoliticalJourney() {
                 $.ajax({
@@ -296,21 +199,27 @@ function renderAboutPreview(contentData) {
                 });
             }
 
-            function loadPortfolioStats() {
+            function loadAboutPreview() {
                 $.ajax({
-                    url: `${API_BASE}/Admin/api/stats`,
+                    url: `${API_BASE}/Admin/api/about/image`,
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success && response.data.image_url) {
+                            $('#aboutProfileImage').attr('src', response.data.image_url);
+                        }
+                    }
+                });
+                
+                $.ajax({
+                    url: `${API_BASE}/Admin/api/about/content`,
                     method: 'GET',
                     success: function(response) {
                         if (response.success && response.data) {
-                            renderStats(response.data);
+                            renderAboutPreview(response.data);
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading portfolio stats:', error);
                     }
                 });
             }
-
 
             // Render Functions
             function renderCarousel() {
@@ -321,7 +230,6 @@ function renderAboutPreview(contentData) {
                 
                 featuredProjects.forEach((project, index) => {
                     const isActive = index === 0 ? 'active' : '';
-                    const slideNumber = String(project.project_number || index + 1).padStart(2, '0');
                     
                     slidesHtml += `
                         <div class="carousel-slide ${isActive}"
@@ -329,6 +237,7 @@ function renderAboutPreview(contentData) {
                                     background-size: cover;
                                     background-position: center;">
                             <div class="slide-content">
+                                <div class="slide-overlay"></div>
                                 <div class="slide-text">
                                     <span class="slide-category" style="background: ${project.color_code || '#3B82F6'}">
                                         ${project.category_name || 'Project'}
@@ -336,11 +245,9 @@ function renderAboutPreview(contentData) {
                                     <h1 class="slide-title">${project.title}</h1>
                                     <p class="slide-description">${project.description}</p>
                                 </div>
-                    
                             </div>
                         </div>
                     `;
-
                     
                     dotsHtml += `<span class="carousel-dot ${isActive}" data-slide="${index}"></span>`;
                 });
@@ -349,7 +256,6 @@ function renderAboutPreview(contentData) {
                 $('#carouselControls').html(dotsHtml).show();
                 $('.carousel-nav').show();
                 
-                // Start auto-play
                 startCarousel();
             }
 
@@ -389,7 +295,10 @@ function renderAboutPreview(contentData) {
                                 <span class="project-category">${project.category_name || 'Project'}</span>
                                 <h3 class="project-title">${project.title}</h3>
                                 <p class="project-description">${project.description}</p>
-                            
+                                <a href="project-detail.php?id=${project.id}" class="project-read-more">
+                                    Read More
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     `;
@@ -427,16 +336,25 @@ function renderAboutPreview(contentData) {
                 $('#timelineContainer').html(timelineHtml);
             }
 
-            // Carousel functionality
+            function renderAboutPreview(contentData) {
+                let html = '';
+                
+                if (contentData.main && contentData.main.length > 0) {
+                    const previewItems = contentData.main.slice(0, 2);
+                    previewItems.forEach(item => {
+                        html += `<p class="about-text">${item.content}</p>`;
+                    });
+                }
+                
+                $('#aboutPreview').html(html);
+            }
+
+            // Carousel functions
             function showSlide(index) {
-                const slides = $('.carousel-slide');
-                const dots = $('.carousel-dot');
-                
-                slides.removeClass('active');
-                dots.removeClass('active');
-                
-                slides.eq(index).addClass('active');
-                dots.eq(index).addClass('active');
+                $('.carousel-slide').removeClass('active');
+                $('.carousel-dot').removeClass('active');
+                $('.carousel-slide').eq(index).addClass('active');
+                $('.carousel-dot').eq(index).addClass('active');
             }
 
             function nextSlide() {
@@ -455,25 +373,20 @@ function renderAboutPreview(contentData) {
             }
 
             function stopCarousel() {
-                if (slideInterval) {
-                    clearInterval(slideInterval);
-                }
+                if (slideInterval) clearInterval(slideInterval);
             }
 
-            // Event Handlers
+            // Event handlers
             $(document).on('click', '.carousel-next', nextSlide);
             $(document).on('click', '.carousel-prev', prevSlide);
-            
             $(document).on('click', '.carousel-dot', function() {
                 currentSlide = parseInt($(this).data('slide'));
                 showSlide(currentSlide);
-                startCarousel(); // Restart auto-play
+                startCarousel();
             });
 
-            // Pause carousel on hover
             $('#carouselContainer').hover(stopCarousel, startCarousel);
 
-            // Category filter
             $(document).on('click', '.category-tab', function() {
                 $('.category-tab').removeClass('active');
                 $(this).addClass('active');
@@ -481,100 +394,7 @@ function renderAboutPreview(contentData) {
                 const category = $(this).data('category');
                 loadProjects(category === 'all' ? null : category);
             });
-
-            $('.nav-item').click(function() {
-                $('.nav-item').removeClass('active');
-                $(this).addClass('active');
-
-                // Slide the indicator immediately
-                let itemTop = $(this).position().top;
-                $('.indicator').stop().animate({ top: itemTop }, 300); // smooth move
-
-                // Scroll to section
-                const section = $(this).data('section');
-                const target = $('#' + section);
-                if (target.length) {
-                    $('html, body').animate({
-                        scrollTop: target.offset().top
-                    }, 800);
-                }
-            });
-
-            // Scroll spy (updates indicator on manual scroll)
-            $(window).scroll(function() {
-                const scrollPos = $(document).scrollTop() + 100;
-                $('section').each(function() {
-                    const top = $(this).offset().top;
-                    const bottom = top + $(this).outerHeight();
-                    const id = $(this).attr('id');
-
-                    if (scrollPos >= top && scrollPos <= bottom) {
-                        $('.nav-item').removeClass('active');
-                        let activeItem = $(`.nav-item[data-section="${id}"]`);
-                        activeItem.addClass('active');
-
-                        // Smoothly slide indicator to active item
-                        $('.indicator').stop().animate({ top: activeItem.position().top }, 300);
-                    }
-                });
-            });
-
-
-
-            // Animate elements on scroll
-            function animateOnScroll() {
-                $('.project-card, .timeline-item').each(function() {
-                    const elementTop = $(this).offset().top;
-                    const elementBottom = elementTop + $(this).outerHeight();
-                    const viewportTop = $(window).scrollTop();
-                    const viewportBottom = viewportTop + $(window).height();
-                    
-                    if (elementBottom > viewportTop && elementTop < viewportBottom) {
-                        $(this).css({
-                            'opacity': '1',
-                            'transform': 'translateY(0)'
-                        });
-                    }
-                });
-            }
-
-            $(window).on('scroll', animateOnScroll);
-            animateOnScroll();
         });
-
-        // Hamburger menu toggle
-        $('.hamburger').click(function() {
-            $(this).toggleClass('active');
-            $('.nav-menu').toggleClass('active');
-        });
-
-        // Close menu when clicking nav item
-        $('.nav-item').click(function() {
-            $('.hamburger').removeClass('active');
-            $('.nav-menu').removeClass('active');
-        });
-
-        // Close menu when clicking outside
-        $(document).click(function(event) {
-            if (!$(event.target).closest('nav').length) {
-                $('.hamburger').removeClass('active');
-                $('.nav-menu').removeClass('active');
-            }
-        });
-
-        // Scroll to top button
-        $(window).scroll(function() {
-            if ($(this).scrollTop() > 300) {
-                $('.scroll-top').addClass('show');
-            } else {
-                $('.scroll-top').removeClass('show');
-            }
-        });
-
-        $('.scroll-top').click(function() {
-            $('html, body').animate({ scrollTop: 0 }, 800);
-        });
-</script>
-
+    </script>
 </body>
 </html>

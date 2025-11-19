@@ -106,8 +106,8 @@ while ($Page->fetch()) {
 <?php if ($Page->image_type->Visible) { // image_type ?>
         <td<?= $Page->image_type->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->image_type->viewAttributes() ?>>
-<?= $Page->image_type->getViewValue() ?></span>
+<span>
+<?= GetImageViewTag($Page->image_type, $Page->image_type->getViewValue()) ?></span>
 </span>
 </td>
 <?php } ?>

@@ -131,6 +131,13 @@ class ProjectsDelete extends Projects
         $this->project_date->setVisibility();
         $this->budget_amount->Visible = false;
         $this->created_at->setVisibility();
+        $this->full_description->Visible = false;
+        $this->objectives->Visible = false;
+        $this->impact->Visible = false;
+        $this->location->setVisibility();
+        $this->start_date->setVisibility();
+        $this->end_date->setVisibility();
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -606,6 +613,13 @@ class ProjectsDelete extends Projects
         $this->project_date->setDbValue($row['project_date']);
         $this->budget_amount->setDbValue($row['budget_amount']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->full_description->setDbValue($row['full_description']);
+        $this->objectives->setDbValue($row['objectives']);
+        $this->impact->setDbValue($row['impact']);
+        $this->location->setDbValue($row['location']);
+        $this->start_date->setDbValue($row['start_date']);
+        $this->end_date->setDbValue($row['end_date']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -622,6 +636,13 @@ class ProjectsDelete extends Projects
         $row['project_date'] = $this->project_date->DefaultValue;
         $row['budget_amount'] = $this->budget_amount->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['full_description'] = $this->full_description->DefaultValue;
+        $row['objectives'] = $this->objectives->DefaultValue;
+        $row['impact'] = $this->impact->DefaultValue;
+        $row['location'] = $this->location->DefaultValue;
+        $row['start_date'] = $this->start_date->DefaultValue;
+        $row['end_date'] = $this->end_date->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -656,6 +677,20 @@ class ProjectsDelete extends Projects
         // budget_amount
 
         // created_at
+
+        // full_description
+
+        // objectives
+
+        // impact
+
+        // location
+
+        // start_date
+
+        // end_date
+
+        // status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -723,6 +758,20 @@ class ProjectsDelete extends Projects
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // location
+            $this->location->ViewValue = $this->location->CurrentValue;
+
+            // start_date
+            $this->start_date->ViewValue = $this->start_date->CurrentValue;
+            $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, $this->start_date->formatPattern());
+
+            // end_date
+            $this->end_date->ViewValue = $this->end_date->CurrentValue;
+            $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
+
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -771,6 +820,22 @@ class ProjectsDelete extends Projects
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // location
+            $this->location->HrefValue = "";
+            $this->location->TooltipValue = "";
+
+            // start_date
+            $this->start_date->HrefValue = "";
+            $this->start_date->TooltipValue = "";
+
+            // end_date
+            $this->end_date->HrefValue = "";
+            $this->end_date->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
         }
 
         // Call Row Rendered event

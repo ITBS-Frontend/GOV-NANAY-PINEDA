@@ -209,8 +209,8 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php if ($Page->image_type->Visible) { // image_type ?>
         <td data-name="image_type"<?= $Page->image_type->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_profile_images_image_type" class="el_profile_images_image_type">
-<span<?= $Page->image_type->viewAttributes() ?>>
-<?= $Page->image_type->getViewValue() ?></span>
+<span>
+<?= GetImageViewTag($Page->image_type, $Page->image_type->getViewValue()) ?></span>
 </span>
 </td>
     <?php } ?>

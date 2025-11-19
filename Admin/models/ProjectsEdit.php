@@ -131,6 +131,13 @@ class ProjectsEdit extends Projects
         $this->project_date->setVisibility();
         $this->budget_amount->Visible = false;
         $this->created_at->setVisibility();
+        $this->full_description->setVisibility();
+        $this->objectives->setVisibility();
+        $this->impact->setVisibility();
+        $this->location->setVisibility();
+        $this->start_date->setVisibility();
+        $this->end_date->setVisibility();
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -785,6 +792,78 @@ class ProjectsEdit extends Projects
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         }
+
+        // Check field name 'full_description' first before field var 'x_full_description'
+        $val = $CurrentForm->hasValue("full_description") ? $CurrentForm->getValue("full_description") : $CurrentForm->getValue("x_full_description");
+        if (!$this->full_description->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->full_description->Visible = false; // Disable update for API request
+            } else {
+                $this->full_description->setFormValue($val);
+            }
+        }
+
+        // Check field name 'objectives' first before field var 'x_objectives'
+        $val = $CurrentForm->hasValue("objectives") ? $CurrentForm->getValue("objectives") : $CurrentForm->getValue("x_objectives");
+        if (!$this->objectives->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->objectives->Visible = false; // Disable update for API request
+            } else {
+                $this->objectives->setFormValue($val);
+            }
+        }
+
+        // Check field name 'impact' first before field var 'x_impact'
+        $val = $CurrentForm->hasValue("impact") ? $CurrentForm->getValue("impact") : $CurrentForm->getValue("x_impact");
+        if (!$this->impact->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->impact->Visible = false; // Disable update for API request
+            } else {
+                $this->impact->setFormValue($val);
+            }
+        }
+
+        // Check field name 'location' first before field var 'x_location'
+        $val = $CurrentForm->hasValue("location") ? $CurrentForm->getValue("location") : $CurrentForm->getValue("x_location");
+        if (!$this->location->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->location->Visible = false; // Disable update for API request
+            } else {
+                $this->location->setFormValue($val);
+            }
+        }
+
+        // Check field name 'start_date' first before field var 'x_start_date'
+        $val = $CurrentForm->hasValue("start_date") ? $CurrentForm->getValue("start_date") : $CurrentForm->getValue("x_start_date");
+        if (!$this->start_date->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->start_date->Visible = false; // Disable update for API request
+            } else {
+                $this->start_date->setFormValue($val, true, $validate);
+            }
+            $this->start_date->CurrentValue = UnFormatDateTime($this->start_date->CurrentValue, $this->start_date->formatPattern());
+        }
+
+        // Check field name 'end_date' first before field var 'x_end_date'
+        $val = $CurrentForm->hasValue("end_date") ? $CurrentForm->getValue("end_date") : $CurrentForm->getValue("x_end_date");
+        if (!$this->end_date->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->end_date->Visible = false; // Disable update for API request
+            } else {
+                $this->end_date->setFormValue($val, true, $validate);
+            }
+            $this->end_date->CurrentValue = UnFormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
+        }
+
+        // Check field name 'status' first before field var 'x_status'
+        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
+        if (!$this->status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status->Visible = false; // Disable update for API request
+            } else {
+                $this->status->setFormValue($val);
+            }
+        }
 		$this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
 		$this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
         $this->getUploadFiles(); // Get upload files
@@ -804,6 +883,15 @@ class ProjectsEdit extends Projects
         $this->project_date->CurrentValue = UnFormatDateTime($this->project_date->CurrentValue, $this->project_date->formatPattern());
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->full_description->CurrentValue = $this->full_description->FormValue;
+        $this->objectives->CurrentValue = $this->objectives->FormValue;
+        $this->impact->CurrentValue = $this->impact->FormValue;
+        $this->location->CurrentValue = $this->location->FormValue;
+        $this->start_date->CurrentValue = $this->start_date->FormValue;
+        $this->start_date->CurrentValue = UnFormatDateTime($this->start_date->CurrentValue, $this->start_date->formatPattern());
+        $this->end_date->CurrentValue = $this->end_date->FormValue;
+        $this->end_date->CurrentValue = UnFormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
+        $this->status->CurrentValue = $this->status->FormValue;
     }
 
     /**
@@ -855,6 +943,13 @@ class ProjectsEdit extends Projects
         $this->project_date->setDbValue($row['project_date']);
         $this->budget_amount->setDbValue($row['budget_amount']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->full_description->setDbValue($row['full_description']);
+        $this->objectives->setDbValue($row['objectives']);
+        $this->impact->setDbValue($row['impact']);
+        $this->location->setDbValue($row['location']);
+        $this->start_date->setDbValue($row['start_date']);
+        $this->end_date->setDbValue($row['end_date']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -871,6 +966,13 @@ class ProjectsEdit extends Projects
         $row['project_date'] = $this->project_date->DefaultValue;
         $row['budget_amount'] = $this->budget_amount->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['full_description'] = $this->full_description->DefaultValue;
+        $row['objectives'] = $this->objectives->DefaultValue;
+        $row['impact'] = $this->impact->DefaultValue;
+        $row['location'] = $this->location->DefaultValue;
+        $row['start_date'] = $this->start_date->DefaultValue;
+        $row['end_date'] = $this->end_date->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -934,6 +1036,27 @@ class ProjectsEdit extends Projects
 
         // created_at
         $this->created_at->RowCssClass = "row";
+
+        // full_description
+        $this->full_description->RowCssClass = "row";
+
+        // objectives
+        $this->objectives->RowCssClass = "row";
+
+        // impact
+        $this->impact->RowCssClass = "row";
+
+        // location
+        $this->location->RowCssClass = "row";
+
+        // start_date
+        $this->start_date->RowCssClass = "row";
+
+        // end_date
+        $this->end_date->RowCssClass = "row";
+
+        // status
+        $this->status->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1004,6 +1127,29 @@ class ProjectsEdit extends Projects
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // full_description
+            $this->full_description->ViewValue = $this->full_description->CurrentValue;
+
+            // objectives
+            $this->objectives->ViewValue = $this->objectives->CurrentValue;
+
+            // impact
+            $this->impact->ViewValue = $this->impact->CurrentValue;
+
+            // location
+            $this->location->ViewValue = $this->location->CurrentValue;
+
+            // start_date
+            $this->start_date->ViewValue = $this->start_date->CurrentValue;
+            $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, $this->start_date->formatPattern());
+
+            // end_date
+            $this->end_date->ViewValue = $this->end_date->CurrentValue;
+            $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
+
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
 
@@ -1040,6 +1186,27 @@ class ProjectsEdit extends Projects
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // full_description
+            $this->full_description->HrefValue = "";
+
+            // objectives
+            $this->objectives->HrefValue = "";
+
+            // impact
+            $this->impact->HrefValue = "";
+
+            // location
+            $this->location->HrefValue = "";
+
+            // start_date
+            $this->start_date->HrefValue = "";
+
+            // end_date
+            $this->end_date->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1126,6 +1293,47 @@ class ProjectsEdit extends Projects
             $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
             $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
 
+            // full_description
+            $this->full_description->setupEditAttributes();
+            $this->full_description->EditValue = HtmlEncode($this->full_description->CurrentValue);
+            $this->full_description->PlaceHolder = RemoveHtml($this->full_description->caption());
+
+            // objectives
+            $this->objectives->setupEditAttributes();
+            $this->objectives->EditValue = HtmlEncode($this->objectives->CurrentValue);
+            $this->objectives->PlaceHolder = RemoveHtml($this->objectives->caption());
+
+            // impact
+            $this->impact->setupEditAttributes();
+            $this->impact->EditValue = HtmlEncode($this->impact->CurrentValue);
+            $this->impact->PlaceHolder = RemoveHtml($this->impact->caption());
+
+            // location
+            $this->location->setupEditAttributes();
+            if (!$this->location->Raw) {
+                $this->location->CurrentValue = HtmlDecode($this->location->CurrentValue);
+            }
+            $this->location->EditValue = HtmlEncode($this->location->CurrentValue);
+            $this->location->PlaceHolder = RemoveHtml($this->location->caption());
+
+            // start_date
+            $this->start_date->setupEditAttributes();
+            $this->start_date->EditValue = HtmlEncode(FormatDateTime($this->start_date->CurrentValue, $this->start_date->formatPattern()));
+            $this->start_date->PlaceHolder = RemoveHtml($this->start_date->caption());
+
+            // end_date
+            $this->end_date->setupEditAttributes();
+            $this->end_date->EditValue = HtmlEncode(FormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern()));
+            $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
             // Edit refer script
 
             // id
@@ -1164,6 +1372,27 @@ class ProjectsEdit extends Projects
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // full_description
+            $this->full_description->HrefValue = "";
+
+            // objectives
+            $this->objectives->HrefValue = "";
+
+            // impact
+            $this->impact->HrefValue = "";
+
+            // location
+            $this->location->HrefValue = "";
+
+            // start_date
+            $this->start_date->HrefValue = "";
+
+            // end_date
+            $this->end_date->HrefValue = "";
+
+            // status
+            $this->status->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1238,6 +1467,47 @@ class ProjectsEdit extends Projects
             }
             if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
                 $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
+            }
+            if ($this->full_description->Visible && $this->full_description->Required) {
+                if (!$this->full_description->IsDetailKey && EmptyValue($this->full_description->FormValue)) {
+                    $this->full_description->addErrorMessage(str_replace("%s", $this->full_description->caption(), $this->full_description->RequiredErrorMessage));
+                }
+            }
+            if ($this->objectives->Visible && $this->objectives->Required) {
+                if (!$this->objectives->IsDetailKey && EmptyValue($this->objectives->FormValue)) {
+                    $this->objectives->addErrorMessage(str_replace("%s", $this->objectives->caption(), $this->objectives->RequiredErrorMessage));
+                }
+            }
+            if ($this->impact->Visible && $this->impact->Required) {
+                if (!$this->impact->IsDetailKey && EmptyValue($this->impact->FormValue)) {
+                    $this->impact->addErrorMessage(str_replace("%s", $this->impact->caption(), $this->impact->RequiredErrorMessage));
+                }
+            }
+            if ($this->location->Visible && $this->location->Required) {
+                if (!$this->location->IsDetailKey && EmptyValue($this->location->FormValue)) {
+                    $this->location->addErrorMessage(str_replace("%s", $this->location->caption(), $this->location->RequiredErrorMessage));
+                }
+            }
+            if ($this->start_date->Visible && $this->start_date->Required) {
+                if (!$this->start_date->IsDetailKey && EmptyValue($this->start_date->FormValue)) {
+                    $this->start_date->addErrorMessage(str_replace("%s", $this->start_date->caption(), $this->start_date->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->start_date->FormValue, $this->start_date->formatPattern())) {
+                $this->start_date->addErrorMessage($this->start_date->getErrorMessage(false));
+            }
+            if ($this->end_date->Visible && $this->end_date->Required) {
+                if (!$this->end_date->IsDetailKey && EmptyValue($this->end_date->FormValue)) {
+                    $this->end_date->addErrorMessage(str_replace("%s", $this->end_date->caption(), $this->end_date->RequiredErrorMessage));
+                }
+            }
+            if (!CheckDate($this->end_date->FormValue, $this->end_date->formatPattern())) {
+                $this->end_date->addErrorMessage($this->end_date->getErrorMessage(false));
+            }
+            if ($this->status->Visible && $this->status->Required) {
+                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
+                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1377,6 +1647,27 @@ class ProjectsEdit extends Projects
 
         // created_at
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), $this->created_at->ReadOnly);
+
+        // full_description
+        $this->full_description->setDbValueDef($rsnew, $this->full_description->CurrentValue, $this->full_description->ReadOnly);
+
+        // objectives
+        $this->objectives->setDbValueDef($rsnew, $this->objectives->CurrentValue, $this->objectives->ReadOnly);
+
+        // impact
+        $this->impact->setDbValueDef($rsnew, $this->impact->CurrentValue, $this->impact->ReadOnly);
+
+        // location
+        $this->location->setDbValueDef($rsnew, $this->location->CurrentValue, $this->location->ReadOnly);
+
+        // start_date
+        $this->start_date->setDbValueDef($rsnew, UnFormatDateTime($this->start_date->CurrentValue, $this->start_date->formatPattern()), $this->start_date->ReadOnly);
+
+        // end_date
+        $this->end_date->setDbValueDef($rsnew, UnFormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern()), $this->end_date->ReadOnly);
+
+        // status
+        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
         return $rsnew;
     }
 
@@ -1409,6 +1700,27 @@ class ProjectsEdit extends Projects
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->CurrentValue = $row['created_at'];
+        }
+        if (isset($row['full_description'])) { // full_description
+            $this->full_description->CurrentValue = $row['full_description'];
+        }
+        if (isset($row['objectives'])) { // objectives
+            $this->objectives->CurrentValue = $row['objectives'];
+        }
+        if (isset($row['impact'])) { // impact
+            $this->impact->CurrentValue = $row['impact'];
+        }
+        if (isset($row['location'])) { // location
+            $this->location->CurrentValue = $row['location'];
+        }
+        if (isset($row['start_date'])) { // start_date
+            $this->start_date->CurrentValue = $row['start_date'];
+        }
+        if (isset($row['end_date'])) { // end_date
+            $this->end_date->CurrentValue = $row['end_date'];
+        }
+        if (isset($row['status'])) { // status
+            $this->status->CurrentValue = $row['status'];
         }
     }
 

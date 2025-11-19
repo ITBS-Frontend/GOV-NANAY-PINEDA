@@ -155,6 +155,13 @@ class ProjectsList extends Projects
         $this->project_date->setVisibility();
         $this->budget_amount->Visible = false;
         $this->created_at->setVisibility();
+        $this->full_description->Visible = false;
+        $this->objectives->Visible = false;
+        $this->impact->Visible = false;
+        $this->location->setVisibility();
+        $this->start_date->setVisibility();
+        $this->end_date->setVisibility();
+        $this->status->setVisibility();
     }
 
     // Constructor
@@ -1047,6 +1054,13 @@ class ProjectsList extends Projects
         $filterList = Concat($filterList, $this->project_date->AdvancedSearch->toJson(), ","); // Field project_date
         $filterList = Concat($filterList, $this->budget_amount->AdvancedSearch->toJson(), ","); // Field budget_amount
         $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
+        $filterList = Concat($filterList, $this->full_description->AdvancedSearch->toJson(), ","); // Field full_description
+        $filterList = Concat($filterList, $this->objectives->AdvancedSearch->toJson(), ","); // Field objectives
+        $filterList = Concat($filterList, $this->impact->AdvancedSearch->toJson(), ","); // Field impact
+        $filterList = Concat($filterList, $this->location->AdvancedSearch->toJson(), ","); // Field location
+        $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
+        $filterList = Concat($filterList, $this->end_date->AdvancedSearch->toJson(), ","); // Field end_date
+        $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1165,6 +1179,62 @@ class ProjectsList extends Projects
         $this->created_at->AdvancedSearch->SearchValue2 = @$filter["y_created_at"];
         $this->created_at->AdvancedSearch->SearchOperator2 = @$filter["w_created_at"];
         $this->created_at->AdvancedSearch->save();
+
+        // Field full_description
+        $this->full_description->AdvancedSearch->SearchValue = @$filter["x_full_description"];
+        $this->full_description->AdvancedSearch->SearchOperator = @$filter["z_full_description"];
+        $this->full_description->AdvancedSearch->SearchCondition = @$filter["v_full_description"];
+        $this->full_description->AdvancedSearch->SearchValue2 = @$filter["y_full_description"];
+        $this->full_description->AdvancedSearch->SearchOperator2 = @$filter["w_full_description"];
+        $this->full_description->AdvancedSearch->save();
+
+        // Field objectives
+        $this->objectives->AdvancedSearch->SearchValue = @$filter["x_objectives"];
+        $this->objectives->AdvancedSearch->SearchOperator = @$filter["z_objectives"];
+        $this->objectives->AdvancedSearch->SearchCondition = @$filter["v_objectives"];
+        $this->objectives->AdvancedSearch->SearchValue2 = @$filter["y_objectives"];
+        $this->objectives->AdvancedSearch->SearchOperator2 = @$filter["w_objectives"];
+        $this->objectives->AdvancedSearch->save();
+
+        // Field impact
+        $this->impact->AdvancedSearch->SearchValue = @$filter["x_impact"];
+        $this->impact->AdvancedSearch->SearchOperator = @$filter["z_impact"];
+        $this->impact->AdvancedSearch->SearchCondition = @$filter["v_impact"];
+        $this->impact->AdvancedSearch->SearchValue2 = @$filter["y_impact"];
+        $this->impact->AdvancedSearch->SearchOperator2 = @$filter["w_impact"];
+        $this->impact->AdvancedSearch->save();
+
+        // Field location
+        $this->location->AdvancedSearch->SearchValue = @$filter["x_location"];
+        $this->location->AdvancedSearch->SearchOperator = @$filter["z_location"];
+        $this->location->AdvancedSearch->SearchCondition = @$filter["v_location"];
+        $this->location->AdvancedSearch->SearchValue2 = @$filter["y_location"];
+        $this->location->AdvancedSearch->SearchOperator2 = @$filter["w_location"];
+        $this->location->AdvancedSearch->save();
+
+        // Field start_date
+        $this->start_date->AdvancedSearch->SearchValue = @$filter["x_start_date"];
+        $this->start_date->AdvancedSearch->SearchOperator = @$filter["z_start_date"];
+        $this->start_date->AdvancedSearch->SearchCondition = @$filter["v_start_date"];
+        $this->start_date->AdvancedSearch->SearchValue2 = @$filter["y_start_date"];
+        $this->start_date->AdvancedSearch->SearchOperator2 = @$filter["w_start_date"];
+        $this->start_date->AdvancedSearch->save();
+
+        // Field end_date
+        $this->end_date->AdvancedSearch->SearchValue = @$filter["x_end_date"];
+        $this->end_date->AdvancedSearch->SearchOperator = @$filter["z_end_date"];
+        $this->end_date->AdvancedSearch->SearchCondition = @$filter["v_end_date"];
+        $this->end_date->AdvancedSearch->SearchValue2 = @$filter["y_end_date"];
+        $this->end_date->AdvancedSearch->SearchOperator2 = @$filter["w_end_date"];
+        $this->end_date->AdvancedSearch->save();
+
+        // Field status
+        $this->status->AdvancedSearch->SearchValue = @$filter["x_status"];
+        $this->status->AdvancedSearch->SearchOperator = @$filter["z_status"];
+        $this->status->AdvancedSearch->SearchCondition = @$filter["v_status"];
+        $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
+        $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
+        $this->status->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1207,6 +1277,11 @@ class ProjectsList extends Projects
         $searchFlds[] = &$this->_title;
         $searchFlds[] = &$this->description;
         $searchFlds[] = &$this->featured_image;
+        $searchFlds[] = &$this->full_description;
+        $searchFlds[] = &$this->objectives;
+        $searchFlds[] = &$this->impact;
+        $searchFlds[] = &$this->location;
+        $searchFlds[] = &$this->status;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1293,6 +1368,10 @@ class ProjectsList extends Projects
             $this->updateSort($this->is_featured); // is_featured
             $this->updateSort($this->project_date); // project_date
             $this->updateSort($this->created_at); // created_at
+            $this->updateSort($this->location); // location
+            $this->updateSort($this->start_date); // start_date
+            $this->updateSort($this->end_date); // end_date
+            $this->updateSort($this->status); // status
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1327,6 +1406,13 @@ class ProjectsList extends Projects
                 $this->project_date->setSort("");
                 $this->budget_amount->setSort("");
                 $this->created_at->setSort("");
+                $this->full_description->setSort("");
+                $this->objectives->setSort("");
+                $this->impact->setSort("");
+                $this->location->setSort("");
+                $this->start_date->setSort("");
+                $this->end_date->setSort("");
+                $this->status->setSort("");
             }
 
             // Reset start position
@@ -1569,6 +1655,10 @@ class ProjectsList extends Projects
             $this->createColumnOption($option, "is_featured");
             $this->createColumnOption($option, "project_date");
             $this->createColumnOption($option, "created_at");
+            $this->createColumnOption($option, "location");
+            $this->createColumnOption($option, "start_date");
+            $this->createColumnOption($option, "end_date");
+            $this->createColumnOption($option, "status");
         }
 
         // Set up custom actions
@@ -2018,6 +2108,13 @@ class ProjectsList extends Projects
         $this->project_date->setDbValue($row['project_date']);
         $this->budget_amount->setDbValue($row['budget_amount']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->full_description->setDbValue($row['full_description']);
+        $this->objectives->setDbValue($row['objectives']);
+        $this->impact->setDbValue($row['impact']);
+        $this->location->setDbValue($row['location']);
+        $this->start_date->setDbValue($row['start_date']);
+        $this->end_date->setDbValue($row['end_date']);
+        $this->status->setDbValue($row['status']);
     }
 
     // Return a row with default values
@@ -2034,6 +2131,13 @@ class ProjectsList extends Projects
         $row['project_date'] = $this->project_date->DefaultValue;
         $row['budget_amount'] = $this->budget_amount->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['full_description'] = $this->full_description->DefaultValue;
+        $row['objectives'] = $this->objectives->DefaultValue;
+        $row['impact'] = $this->impact->DefaultValue;
+        $row['location'] = $this->location->DefaultValue;
+        $row['start_date'] = $this->start_date->DefaultValue;
+        $row['end_date'] = $this->end_date->DefaultValue;
+        $row['status'] = $this->status->DefaultValue;
         return $row;
     }
 
@@ -2093,6 +2197,20 @@ class ProjectsList extends Projects
         // budget_amount
 
         // created_at
+
+        // full_description
+
+        // objectives
+
+        // impact
+
+        // location
+
+        // start_date
+
+        // end_date
+
+        // status
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2160,6 +2278,20 @@ class ProjectsList extends Projects
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // location
+            $this->location->ViewValue = $this->location->CurrentValue;
+
+            // start_date
+            $this->start_date->ViewValue = $this->start_date->CurrentValue;
+            $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, $this->start_date->formatPattern());
+
+            // end_date
+            $this->end_date->ViewValue = $this->end_date->CurrentValue;
+            $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
+
+            // status
+            $this->status->ViewValue = $this->status->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2208,6 +2340,22 @@ class ProjectsList extends Projects
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // location
+            $this->location->HrefValue = "";
+            $this->location->TooltipValue = "";
+
+            // start_date
+            $this->start_date->HrefValue = "";
+            $this->start_date->TooltipValue = "";
+
+            // end_date
+            $this->end_date->HrefValue = "";
+            $this->end_date->TooltipValue = "";
+
+            // status
+            $this->status->HrefValue = "";
+            $this->status->TooltipValue = "";
         }
 
         // Call Row Rendered event

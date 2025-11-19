@@ -164,7 +164,7 @@ class ProfileImages extends DbTable
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
+            'IMAGE', // View Tag
             'TEXT' // Edit Tag
         );
         $this->image_type->addMethod("getDefault", fn() => "profile");
@@ -1166,6 +1166,8 @@ class ProfileImages extends DbTable
 
         // image_type
         $this->image_type->ViewValue = $this->image_type->CurrentValue;
+        $this->image_type->ImageAlt = $this->image_type->alt();
+            $this->image_type->ImageCssClass = "ew-image";
 
         // is_primary
         if (ConvertToBool($this->is_primary->CurrentValue)) {

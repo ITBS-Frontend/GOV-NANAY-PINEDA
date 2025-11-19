@@ -1,41 +1,51 @@
-<ew-language date="2025/11/18" id="en-US" author="e.World Technology Limited">
+<ew-language date="2025/11/19" id="en-US" author="e.World Technology Limited">
   <project>
+    <phrase id="bodytitle" value="Gov. Lilia &quot;Nanay&quot; Pineda" />
     <phrase id="footertext" value="&amp;copy;2023 e.World Technology Limited. All rights reserved." />
+    <menu id="24">
+      <phrase id="menutext" value="Projects" />
+    </menu>
+    <menu id="4">
+      <phrase id="menutext" value="Projects" />
+    </menu>
+    <menu id="14">
+      <phrase id="menutext" value="Project Gallery" />
+    </menu>
+    <menu id="15">
+      <phrase id="menutext" value="Project Highlights" />
+    </menu>
     <menu id="1">
-      <phrase id="menutext" value="categories" />
+      <phrase id="menutext" value="Categories" />
     </menu>
     <menu id="2">
-      <phrase id="menutext" value="political journey" />
+      <phrase id="menutext" value="Political Journey" />
     </menu>
     <menu id="3">
       <phrase id="menutext" value="project stats" />
-    </menu>
-    <menu id="4">
-      <phrase id="menutext" value="projects" />
     </menu>
     <menu id="13">
       <phrase id="menutext" value="About Section" />
     </menu>
     <menu id="11">
-      <phrase id="menutext" value="profile details" />
+      <phrase id="menutext" value="Profile Details" />
     </menu>
     <menu id="12">
-      <phrase id="menutext" value="profile images" />
+      <phrase id="menutext" value="Profile Images" />
     </menu>
     <menu id="9">
-      <phrase id="menutext" value="about content" />
+      <phrase id="menutext" value="About Content" />
     </menu>
     <menu id="10">
-      <phrase id="menutext" value="achievements" />
+      <phrase id="menutext" value="Achievements" />
     </menu>
     <menu id="5">
-      <phrase id="menutext" value="user levels" />
+      <phrase id="menutext" value="User Levels" />
     </menu>
     <menu id="6">
-      <phrase id="menutext" value="user permissions" />
+      <phrase id="menutext" value="User Permissions" />
     </menu>
     <menu id="7">
-      <phrase id="menutext" value="users" />
+      <phrase id="menutext" value="Users" />
     </menu>
     <menu id="8">
       <phrase id="menutext" value="main" />
@@ -142,6 +152,27 @@
       </field>
       <field id="created_at">
         <phrase id="fldcaption" value="created at" />
+      </field>
+      <field id="full_description">
+        <phrase id="fldcaption" value="full description" />
+      </field>
+      <field id="objectives">
+        <phrase id="fldcaption" value="objectives" />
+      </field>
+      <field id="impact">
+        <phrase id="fldcaption" value="impact" />
+      </field>
+      <field id="location">
+        <phrase id="fldcaption" value="location" />
+      </field>
+      <field id="start_date">
+        <phrase id="fldcaption" value="start date" />
+      </field>
+      <field id="end_date">
+        <phrase id="fldcaption" value="end date" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="status" />
       </field>
     </table>
     <table id="_user_levels">
@@ -327,6 +358,45 @@
         <phrase id="fldtagcaption1" value="Yes" />
         <phrase id="fldtagvalue2" value="0" />
         <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="project_gallery">
+      <phrase id="tblcaption" value="project gallery" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="project_id">
+        <phrase id="fldcaption" value="project id" />
+      </field>
+      <field id="image_path">
+        <phrase id="fldcaption" value="image path" />
+      </field>
+      <field id="caption">
+        <phrase id="fldcaption" value="caption" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="project_highlights">
+      <phrase id="tblcaption" value="project highlights" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="project_id">
+        <phrase id="fldcaption" value="project id" />
+      </field>
+      <field id="highlight_text">
+        <phrase id="fldcaption" value="highlight text" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
       </field>
       <field id="created_at">
         <phrase id="fldcaption" value="created at" />

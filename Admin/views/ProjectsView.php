@@ -152,6 +152,83 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->full_description->Visible) { // full_description ?>
+    <tr id="r_full_description"<?= $Page->full_description->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_full_description"><?= $Page->full_description->caption() ?></span></td>
+        <td data-name="full_description"<?= $Page->full_description->cellAttributes() ?>>
+<span id="el_projects_full_description">
+<span<?= $Page->full_description->viewAttributes() ?>>
+<?= $Page->full_description->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->objectives->Visible) { // objectives ?>
+    <tr id="r_objectives"<?= $Page->objectives->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_objectives"><?= $Page->objectives->caption() ?></span></td>
+        <td data-name="objectives"<?= $Page->objectives->cellAttributes() ?>>
+<span id="el_projects_objectives">
+<span<?= $Page->objectives->viewAttributes() ?>>
+<?= $Page->objectives->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->impact->Visible) { // impact ?>
+    <tr id="r_impact"<?= $Page->impact->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_impact"><?= $Page->impact->caption() ?></span></td>
+        <td data-name="impact"<?= $Page->impact->cellAttributes() ?>>
+<span id="el_projects_impact">
+<span<?= $Page->impact->viewAttributes() ?>>
+<?= $Page->impact->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->location->Visible) { // location ?>
+    <tr id="r_location"<?= $Page->location->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_location"><?= $Page->location->caption() ?></span></td>
+        <td data-name="location"<?= $Page->location->cellAttributes() ?>>
+<span id="el_projects_location">
+<span<?= $Page->location->viewAttributes() ?>>
+<?= $Page->location->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->start_date->Visible) { // start_date ?>
+    <tr id="r_start_date"<?= $Page->start_date->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_start_date"><?= $Page->start_date->caption() ?></span></td>
+        <td data-name="start_date"<?= $Page->start_date->cellAttributes() ?>>
+<span id="el_projects_start_date">
+<span<?= $Page->start_date->viewAttributes() ?>>
+<?= $Page->start_date->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->end_date->Visible) { // end_date ?>
+    <tr id="r_end_date"<?= $Page->end_date->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_end_date"><?= $Page->end_date->caption() ?></span></td>
+        <td data-name="end_date"<?= $Page->end_date->cellAttributes() ?>>
+<span id="el_projects_end_date">
+<span<?= $Page->end_date->viewAttributes() ?>>
+<?= $Page->end_date->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->status->Visible) { // status ?>
+    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_status"><?= $Page->status->caption() ?></span></td>
+        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
+<span id="el_projects_status">
+<span<?= $Page->status->viewAttributes() ?>>
+<?= $Page->status->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 </main>

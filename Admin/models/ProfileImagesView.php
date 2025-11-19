@@ -798,6 +798,8 @@ class ProfileImagesView extends ProfileImages
 
             // image_type
             $this->image_type->ViewValue = $this->image_type->CurrentValue;
+            $this->image_type->ImageAlt = $this->image_type->alt();
+                $this->image_type->ImageCssClass = "ew-image";
 
             // is_primary
             if (ConvertToBool($this->is_primary->CurrentValue)) {

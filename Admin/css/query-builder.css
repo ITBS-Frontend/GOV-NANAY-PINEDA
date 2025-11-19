@@ -100,9 +100,9 @@
 }
 :root {
   --qb-group-background-color: rgba(0, 0, 0, .015);
-  --qb-group-border-color: #dee2e6;
+  --qb-group-border-color: #DEE2E6;
   --qb-rule-background-color: rgba(0, 0, 0, .015);
-  --qb-rule-border-color: #dee2e6;
+  --qb-rule-border-color: #DEE2E6;
   --qb-error-border-color: var(--bs-form-invalid-color);
   --qb-error-background-color: transparent;
   --qb-ticks-color: #CCC;

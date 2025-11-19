@@ -61,6 +61,32 @@ class Project extends AbstractEntity
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
+    #[Column(name: "full_description", type: "text", nullable: true)]
+    private ?string $fullDescription;
+
+    #[Column(type: "text", nullable: true)]
+    private ?string $objectives;
+
+    #[Column(type: "text", nullable: true)]
+    private ?string $impact;
+
+    #[Column(type: "string", nullable: true)]
+    private ?string $location;
+
+    #[Column(name: "start_date", type: "date", nullable: true)]
+    private ?DateTime $startDate;
+
+    #[Column(name: "end_date", type: "date", nullable: true)]
+    private ?DateTime $endDate;
+
+    #[Column(type: "string", nullable: true)]
+    private ?string $status;
+
+    public function __construct()
+    {
+        $this->status = "completed";
+    }
+
     public function getId(): int
     {
         return $this->id;
@@ -168,6 +194,83 @@ class Project extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getFullDescription(): ?string
+    {
+        return HtmlDecode($this->fullDescription);
+    }
+
+    public function setFullDescription(?string $value): static
+    {
+        $this->fullDescription = RemoveXss($value);
+        return $this;
+    }
+
+    public function getObjectives(): ?string
+    {
+        return HtmlDecode($this->objectives);
+    }
+
+    public function setObjectives(?string $value): static
+    {
+        $this->objectives = RemoveXss($value);
+        return $this;
+    }
+
+    public function getImpact(): ?string
+    {
+        return HtmlDecode($this->impact);
+    }
+
+    public function setImpact(?string $value): static
+    {
+        $this->impact = RemoveXss($value);
+        return $this;
+    }
+
+    public function getLocation(): ?string
+    {
+        return HtmlDecode($this->location);
+    }
+
+    public function setLocation(?string $value): static
+    {
+        $this->location = RemoveXss($value);
+        return $this;
+    }
+
+    public function getStartDate(): ?DateTime
+    {
+        return $this->startDate;
+    }
+
+    public function setStartDate(?DateTime $value): static
+    {
+        $this->startDate = $value;
+        return $this;
+    }
+
+    public function getEndDate(): ?DateTime
+    {
+        return $this->endDate;
+    }
+
+    public function setEndDate(?DateTime $value): static
+    {
+        $this->endDate = $value;
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return HtmlDecode($this->status);
+    }
+
+    public function setStatus(?string $value): static
+    {
+        $this->status = RemoveXss($value);
         return $this;
     }
 }

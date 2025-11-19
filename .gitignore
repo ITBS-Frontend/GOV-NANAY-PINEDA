@@ -1,18 +1,18 @@
 # PHPMaker temporary files
-/log/cache/
-/log/debug.log
-/log/error.log
-/log/*.log
+Admin/log/cache/
+Admin/log/debug.log
+Admin/log/error.log
+Admin/log/*.log
 
 # Temporary uploads
-/temp_uploads/
-/files/temp/
-/files/upload/
-/api/uploads/
-/uploads/
+Admin/temp_uploads/
+Admin/files/temp/
+Admin/files/upload/
+Admin/api/uploads/
+Admin/uploads/
 
 # Composer packages
-/vendor/
+Admin/vendor/
 
 # Environment-specific files
 .env
@@ -44,6 +44,6 @@ Thumbs.db
 !/files/pdf/.htaccess
 
 # Session files
-/session/
+Admin/session/
 
-/Admin/src/config.development.php
+Admin/src/config.development.php

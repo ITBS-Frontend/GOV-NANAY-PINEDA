@@ -446,4 +446,95 @@ public function getAboutPreview()
         return ['success' => false, 'message' => 'Failed to fetch about preview'];
     }
 }
+
+/**
+ * Get single project details
+ */
+public function getProjectDetails($projectId) 
+{
+    try {
+        $conn = Conn();
+        
+        // Get project basic info
+        $sql = "
+            SELECT 
+                p.id,
+                p.title,
+                p.description,
+                p.full_description,
+                p.objectives,
+                p.impact,
+                p.location,
+                p.project_number,
+                p.featured_image,
+                p.budget_amount,
+                p.project_date,
+                p.start_date,
+                p.end_date,
+                p.status,
+                c.name as category_name,
+                c.color_code
+            FROM projects p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.id = ?
+        ";
+        
+        $project = $conn->executeQuery($sql, [$projectId])->fetchAssociative();
+        
+        if (!$project) {
+            return ['success' => false, 'message' => 'Project not found'];
+        }
+        
+        // Get project stats
+        $project['stats'] = $this->getProjectStats($projectId);
+        
+        // Get project highlights
+        $highlightsSql = "
+            SELECT highlight_text
+            FROM project_highlights
+            WHERE project_id = ?
+            ORDER BY display_order ASC
+        ";
+        $project['highlights'] = $conn->executeQuery($highlightsSql, [$projectId])->fetchAllAssociative();
+        
+        // Get project gallery
+        $gallerySql = "
+            SELECT image_path, caption
+            FROM project_gallery
+            WHERE project_id = ?
+            ORDER BY display_order ASC
+        ";
+        $gallery = $conn->executeQuery($gallerySql, [$projectId])->fetchAllAssociative();
+        
+        // Generate presigned URLs for gallery images
+        $project['gallery'] = array_map(function($img) {
+            return [
+                'url' => getPresignedUrl('gov-pineda-images/' . $img['image_path']),
+                'caption' => $img['caption']
+            ];
+        }, $gallery);
+        
+        // Generate presigned URL for featured image
+        if (!empty($project['featured_image'])) {
+            $project['image_url'] = getPresignedUrl('gov-pineda-images/' . $project['featured_image']);
+        } else {
+            $project['image_url'] = null;
+        }
+        
+        // Format budget
+        if ($project['budget_amount']) {
+            $billion = $project['budget_amount'] / 1000000000;
+            $project['budget_display'] = '₱' . number_format($billion, 1) . 'B';
+        }
+        
+        return [
+            'success' => true,
+            'data' => $project
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get project details error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch project details'];
+    }
+}
 }

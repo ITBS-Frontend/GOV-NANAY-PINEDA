@@ -91,6 +91,8 @@ return [
     "achievements" => \DI\create(Achievements::class),
     "profile_details" => \DI\create(ProfileDetails::class),
     "profile_images" => \DI\create(ProfileImages::class),
+    "project_gallery" => \DI\create(ProjectGallery::class),
+    "project_highlights" => \DI\create(ProjectHighlights::class),
 
     // User table
     "usertable" => \DI\get("users"),
