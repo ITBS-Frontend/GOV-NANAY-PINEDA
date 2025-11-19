@@ -82,6 +82,34 @@ CREATE TABLE political_journey (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+INSERT INTO user_levels (user_level_id, user_level_name, hierarchy) VALUES
+(-1, 'Administrator', -1),
+(0, 'Default', 0),
+(1, 'Editor', 1),
+(2, 'Viewer', 2);
+
+INSERT INTO users (
+    username, 
+    password, 
+    email, 
+    first_name, 
+    last_name, 
+    user_level_id, 
+    activated,
+    created_at,
+    updated_at
+) VALUES (
+    'admin',
+    'admin123',
+    'admin@pampanga.gov.ph',
+    'System',
+    'Administrator',
+    -1,
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+);
+
 -- Insert sample categories
 INSERT INTO categories (name, color_code) VALUES
 ('Healthcare', '#3B82F6'),

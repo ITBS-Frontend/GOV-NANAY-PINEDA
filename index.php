@@ -16,7 +16,7 @@ $additionalCSS = []; // Add any page-specific CSS files here
     <?php include 'components/header.php'; ?>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content"> 
         <!-- Hero Section with Carousel -->
         <section id="hero" class="hero-section">
             <div class="carousel-container" id="carouselContainer">
@@ -234,18 +234,17 @@ $additionalCSS = []; // Add any page-specific CSS files here
                     
                     slidesHtml += `
                         <div class="carousel-slide ${isActive}"
-                            style="background-image: url('${project.image_url || ''}');
-                                    background-size: cover;
-                                    background-position: center;">
+                           ">
                             <div class="slide-content">
-                                <div class="slide-overlay"></div>
-                                <div class="slide-text">
+                            <div class="slide-text">
                                     <span class="slide-category" style="background: ${project.color_code || '#3B82F6'}">
                                         ${project.category_name || 'Project'}
                                     </span>
                                     <h1 class="slide-title">${project.title}</h1>
                                     <p class="slide-description">${project.description}</p>
                                 </div>
+                                <div class="slide-picture"><img src="${project.image_url}" /></div>
+                                
                             </div>
                         </div>
                     `;

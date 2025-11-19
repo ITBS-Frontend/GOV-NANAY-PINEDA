@@ -6,7 +6,7 @@
 
 return [
     "Databases" => [
-        "DB" => ["id" => "DB", "type" => "POSTGRESQL", "qs" => "\"", "qe" => "\"", "host" => "localhost", "port" => "5432", "user" => "postgres", "password" => "0yq5h3to9", "dbname" => "Gov_Lilia_Pineda", "schema" => ""]
+        "DB" => ["id" => "DB", "type" => "POSTGRESQL", "qs" => "\"", "qe" => "\"", "host" => "localhost", "port" => "5432", "user" => "itbsvanguard", "password" => "jdf3MrRp&3asP3k", "dbname" => "ITBS_nanay", "schema" => ""]
     ],
     "SMTP" => [
         "PHPMAILER_MAILER" => "smtp", // PHPMailer mailer
@@ -33,8 +33,8 @@ return [
         ]
     ],
 
-    "UPLOAD_TEMP_PATH" => "D:/Projects/PMS-Shopping-Cart/uploads", // Upload temp path (absolute local physical path)
-    "UPLOAD_TEMP_HREF_PATH" => "//pms-shopping.localhost//uploads/", // Upload temp href path (absolute URL path for download)
-    "UPLOAD_DEST_PATH" => "s3://vector-icon-library/PMS_Cart_images/"
+    "UPLOAD_TEMP_PATH" => "/var/www/nanay.smartcountry.ph/public/Admin/uploads", // Upload temp path (absolute local physical path)
+    // "UPLOAD_TEMP_HREF_PATH" => "//pms-shopping.localhost//uploads/", // Upload temp href path (absolute URL path for download)
+    "UPLOAD_DEST_PATH" => "s3://vector-icon-library/gov-pineda-images/"
     // "UPLOAD_DEST_PATH" => "s3://shopitbs/PMS_Cart_images/"
 ];

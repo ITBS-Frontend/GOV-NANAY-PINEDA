@@ -39,7 +39,7 @@
     height: 60vh;
     min-height: 500px;
     background-size: cover;
-    background-position: center;
+    background-position: top;
     background-color: var(--primary-blue);
     display: flex;
     align-items: flex-end;
