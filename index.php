@@ -236,7 +236,7 @@ $additionalCSS = []; // Add any page-specific CSS files here
                         <div class="carousel-slide ${isActive}"
                            ">
                             <div class="slide-content">
-                            <div class="slide-text">
+                            <div class="slide-text" style="background: ${project.color_code || '#3B82F6'}">
                                     <span class="slide-category" style="background: ${project.color_code || '#3B82F6'}">
                                         ${project.category_name || 'Project'}
                                     </span>
