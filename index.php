@@ -8,6 +8,8 @@ $additionalCSS = []; // Add any page-specific CSS files here
 <html lang="en">
 <head>
     <?php include 'components/head.php'; ?>
+        <!-- Scripts -->
+    <?php include 'components/scripts.php'; ?>
 </head>
 <body>
     <!-- Header Navigation -->
@@ -110,8 +112,7 @@ $additionalCSS = []; // Add any page-specific CSS files here
         <i class="fas fa-chevron-up"></i>
     </button>
 
-    <!-- Scripts -->
-    <?php include 'components/scripts.php'; ?>
+
     
     <!-- Page Specific JavaScript -->
     <script>

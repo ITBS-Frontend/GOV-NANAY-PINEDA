@@ -28,51 +28,80 @@
 </nav>
 
 <script>
-// Hamburger menu toggle
-$('.hamburger').click(function() {
-    $(this).toggleClass('active');
-    $('.nav-menu').toggleClass('active');
-});
+    
+$(document).ready(function() {
+    // Hamburger menu toggle
+    $('.hamburger').click(function(e) {
+        e.stopPropagation();
+        $(this).toggleClass('active');
+        $('.nav-menu').toggleClass('active');
+        $('body').toggleClass('menu-open');
+    });
 
-// Close menu when clicking nav item
-$('.nav-item').click(function() {
-    $('.hamburger').removeClass('active');
-    $('.nav-menu').removeClass('active');
-});
-
-// Close menu when clicking outside
-$(document).click(function(event) {
-    if (!$(event.target).closest('nav').length) {
+    // Close menu when clicking nav item
+    $('.nav-item').click(function() {
         $('.hamburger').removeClass('active');
         $('.nav-menu').removeClass('active');
-    }
-});
+        $('body').removeClass('menu-open');
+    });
 
-// Navigation handling
-$('.nav-item').click(function() {
-    const section = $(this).data('section');
-    
-    // Handle different navigation based on section
-    if (section === 'about') {
-        window.location.href = 'about.php';
-        return;
-    }
-    
-    // Check if we're on index page
-    if (window.location.pathname.includes('index.php') || window.location.pathname === '/') {
-        // Scroll to section on same page
-        $('.nav-item').removeClass('active');
-        $(this).addClass('active');
-        
-        const target = $('#' + section);
-        if (target.length) {
-            $('html, body').animate({
-                scrollTop: target.offset().top
-            }, 800);
+    // Close menu when clicking outside
+    $(document).click(function(event) {
+        if (!$(event.target).closest('nav').length) {
+            $('.hamburger').removeClass('active');
+            $('.nav-menu').removeClass('active');
+            $('body').removeClass('menu-open');
         }
-    } else {
-        // Navigate to index page with hash
-        window.location.href = 'index.php#' + section;
-    }
+    });
+
+    // Prevent clicks inside nav menu from closing it
+    $('.nav-menu').click(function(e) {
+        e.stopPropagation();
+    });
+
+    // Navigation handling
+    $('.nav-item').click(function() {
+        const section = $(this).data('section');
+        
+        // Handle different navigation based on section
+        if (section === 'about') {
+            window.location.href = 'about.php';
+            return;
+        }
+        
+        // Check if we're on index page
+        const currentPage = window.location.pathname;
+        if (currentPage.includes('index.php') || currentPage === '/' || currentPage.endsWith('/')) {
+            // Scroll to section on same page
+            $('.nav-item').removeClass('active');
+            $(this).addClass('active');
+            
+            const target = $('#' + section);
+            if (target.length) {
+                $('html, body').animate({
+                    scrollTop: target.offset().top - 60
+                }, 800);
+            }
+        } else {
+            // Navigate to index page with hash
+            window.location.href = 'index.php#' + section;
+        }
+    });
+
+    // Scroll spy for active nav item
+    $(window).scroll(function() {
+        const scrollPos = $(document).scrollTop() + 100;
+        
+        $('section').each(function() {
+            const top = $(this).offset().top;
+            const bottom = top + $(this).outerHeight();
+            const id = $(this).attr('id');
+            
+            if (scrollPos >= top && scrollPos <= bottom) {
+                $('.nav-item').removeClass('active');
+                $(`.nav-item[data-section="${id}"]`).addClass('active');
+            }
+        });
+    });
 });
 </script>
