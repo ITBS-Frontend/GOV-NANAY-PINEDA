@@ -402,6 +402,9 @@ class ProjectHighlightsDelete extends ProjectHighlights
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->project_id);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -631,8 +634,27 @@ class ProjectHighlightsDelete extends ProjectHighlights
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // project_id
-            $this->project_id->ViewValue = $this->project_id->CurrentValue;
-            $this->project_id->ViewValue = FormatNumber($this->project_id->ViewValue, $this->project_id->formatPattern());
+            $curVal = strval($this->project_id->CurrentValue);
+            if ($curVal != "") {
+                $this->project_id->ViewValue = $this->project_id->lookupCacheOption($curVal);
+                if ($this->project_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->project_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->project_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->project_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->project_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->project_id->ViewValue = $this->project_id->displayValue($arwrk);
+                    } else {
+                        $this->project_id->ViewValue = FormatNumber($this->project_id->CurrentValue, $this->project_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->project_id->ViewValue = null;
+            }
 
             // display_order
             $this->display_order->ViewValue = $this->display_order->CurrentValue;
@@ -788,6 +810,8 @@ class ProjectHighlightsDelete extends ProjectHighlights
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_project_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

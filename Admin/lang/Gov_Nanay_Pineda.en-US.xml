@@ -1,7 +1,22 @@
-<ew-language date="2025/11/19" id="en-US" author="e.World Technology Limited">
+<ew-language date="2025/11/20" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="Gov. Lilia &quot;Nanay&quot; Pineda" />
     <phrase id="footertext" value="&amp;copy;2023 e.World Technology Limited. All rights reserved." />
+    <menu id="44">
+      <phrase id="menutext" value="News Article" />
+    </menu>
+    <menu id="27">
+      <phrase id="menutext" value="News Posts" />
+    </menu>
+    <menu id="25">
+      <phrase id="menutext" value="News Categories" />
+    </menu>
+    <menu id="26">
+      <phrase id="menutext" value="News Post Tags" />
+    </menu>
+    <menu id="28">
+      <phrase id="menutext" value="News Tags" />
+    </menu>
     <menu id="24">
       <phrase id="menutext" value="Projects" />
     </menu>
@@ -397,6 +412,114 @@
       </field>
       <field id="display_order">
         <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="news_categories">
+      <phrase id="tblcaption" value="news categories" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="slug">
+        <phrase id="fldcaption" value="slug" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="color_code">
+        <phrase id="fldcaption" value="color code" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="news_post_tags">
+      <phrase id="tblcaption" value="news post tags" />
+      <field id="post_id">
+        <phrase id="fldcaption" value="post id" />
+      </field>
+      <field id="tag_id">
+        <phrase id="fldcaption" value="tag id" />
+      </field>
+    </table>
+    <table id="news_posts">
+      <phrase id="tblcaption" value="news posts" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="_title">
+        <phrase id="fldcaption" value="title" />
+      </field>
+      <field id="slug">
+        <phrase id="fldcaption" value="slug" />
+      </field>
+      <field id="excerpt">
+        <phrase id="fldcaption" value="excerpt" />
+      </field>
+      <field id="_content">
+        <phrase id="fldcaption" value="content" />
+      </field>
+      <field id="category_id">
+        <phrase id="fldcaption" value="category id" />
+      </field>
+      <field id="featured_image">
+        <phrase id="fldcaption" value="featured image" />
+      </field>
+      <field id="author_name">
+        <phrase id="fldcaption" value="author name" />
+      </field>
+      <field id="is_featured">
+        <phrase id="fldcaption" value="is featured" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="is_published">
+        <phrase id="fldcaption" value="is published" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="published_date">
+        <phrase id="fldcaption" value="published date" />
+      </field>
+      <field id="views_count">
+        <phrase id="fldcaption" value="views count" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+      <field id="updated_at">
+        <phrase id="fldcaption" value="updated at" />
+      </field>
+    </table>
+    <table id="news_tags">
+      <phrase id="tblcaption" value="news tags" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="slug">
+        <phrase id="fldcaption" value="slug" />
       </field>
       <field id="created_at">
         <phrase id="fldcaption" value="created at" />

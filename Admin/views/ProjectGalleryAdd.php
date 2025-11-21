@@ -22,7 +22,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["project_id", [fields.project_id.visible && fields.project_id.required ? ew.Validators.required(fields.project_id.caption) : null, ew.Validators.integer], fields.project_id.isInvalid],
+            ["project_id", [fields.project_id.visible && fields.project_id.required ? ew.Validators.required(fields.project_id.caption) : null], fields.project_id.isInvalid],
             ["image_path", [fields.image_path.visible && fields.image_path.required ? ew.Validators.fileRequired(fields.image_path.caption) : null], fields.image_path.isInvalid],
             ["caption", [fields.caption.visible && fields.caption.required ? ew.Validators.required(fields.caption.caption) : null], fields.caption.isInvalid],
             ["display_order", [fields.display_order.visible && fields.display_order.required ? ew.Validators.required(fields.display_order.caption) : null, ew.Validators.integer], fields.display_order.isInvalid],
@@ -42,6 +42,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "project_id": <?= $Page->project_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -76,9 +77,43 @@ $Page->showMessage();
         <label id="elh_project_gallery_project_id" for="x_project_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->project_id->caption() ?><?= $Page->project_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->project_id->cellAttributes() ?>>
 <span id="el_project_gallery_project_id">
-<input type="<?= $Page->project_id->getInputTextType() ?>" name="x_project_id" id="x_project_id" data-table="project_gallery" data-field="x_project_id" value="<?= $Page->project_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->project_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->project_id->formatPattern()) ?>"<?= $Page->project_id->editAttributes() ?> aria-describedby="x_project_id_help">
-<?= $Page->project_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->project_id->getErrorMessage() ?></div>
+    <select
+        id="x_project_id"
+        name="x_project_id"
+        class="form-select ew-select<?= $Page->project_id->isInvalidClass() ?>"
+        <?php if (!$Page->project_id->IsNativeSelect) { ?>
+        data-select2-id="fproject_galleryadd_x_project_id"
+        <?php } ?>
+        data-table="project_gallery"
+        data-field="x_project_id"
+        data-value-separator="<?= $Page->project_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->project_id->getPlaceHolder()) ?>"
+        <?= $Page->project_id->editAttributes() ?>>
+        <?= $Page->project_id->selectOptionListHtml("x_project_id") ?>
+    </select>
+    <?= $Page->project_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->project_id->getErrorMessage() ?></div>
+<?= $Page->project_id->Lookup->getParamTag($Page, "p_x_project_id") ?>
+<?php if (!$Page->project_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fproject_galleryadd", function() {
+    var options = { name: "x_project_id", selectId: "fproject_galleryadd_x_project_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fproject_galleryadd.lists.project_id?.lookupOptions.length) {
+        options.data = { id: "x_project_id", form: "fproject_galleryadd" };
+    } else {
+        options.ajax = { id: "x_project_id", form: "fproject_galleryadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.project_gallery.fields.project_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

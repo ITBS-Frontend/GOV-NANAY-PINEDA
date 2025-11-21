@@ -93,6 +93,10 @@ return [
     "profile_images" => \DI\create(ProfileImages::class),
     "project_gallery" => \DI\create(ProjectGallery::class),
     "project_highlights" => \DI\create(ProjectHighlights::class),
+    "news_categories" => \DI\create(NewsCategories::class),
+    "news_post_tags" => \DI\create(NewsPostTags::class),
+    "news_posts" => \DI\create(NewsPosts::class),
+    "news_tags" => \DI\create(NewsTags::class),
 
     // User table
     "usertable" => \DI\get("users"),

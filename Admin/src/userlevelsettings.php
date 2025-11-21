@@ -49,7 +49,15 @@ $USER_LEVEL_PRIVS = [["{05BA416D-6E12-4581-9EFA-04B8838F18C5}categories","-2","0
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_gallery","-2","0"],
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_gallery","0","0"],
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_highlights","-2","0"],
-    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_highlights","0","0"]];
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_highlights","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_categories","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_categories","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_post_tags","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_post_tags","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_posts","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_posts","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_tags","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_tags","0","0"]];
 
 /**
  * Tables
@@ -75,4 +83,8 @@ $USER_LEVEL_TABLES = [["categories","categories","categories",true,"{05BA416D-6E
     ["profile_details","profile_details","profile details",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProfileDetailsList"],
     ["profile_images","profile_images","profile images",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProfileImagesList"],
     ["project_gallery","project_gallery","project gallery",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProjectGalleryList"],
-    ["project_highlights","project_highlights","project highlights",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProjectHighlightsList"]];
+    ["project_highlights","project_highlights","project highlights",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProjectHighlightsList"],
+    ["news_categories","news_categories","news categories",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","NewsCategoriesList"],
+    ["news_post_tags","news_post_tags","news post tags",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","NewsPostTagsList"],
+    ["news_posts","news_posts","news posts",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","NewsPostsList"],
+    ["news_tags","news_tags","news tags",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","NewsTagsList"]];

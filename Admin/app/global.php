@@ -21,6 +21,7 @@ $s3client->registerStreamWrapper();
 
 
 include_once(dirname(__DIR__, 1) . "/app/lib/ProjectService.php");
+include_once(dirname(__DIR__, 1) . "/app/lib/NewsService.php");
 
 
 function appConfig($option)

@@ -8,6 +8,11 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(44, "mci_News_Article", $Language->menuPhrase("44", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
+$sideMenu->addMenuItem(27, "mi_news_posts", $Language->menuPhrase("27", "MenuText"), "NewsPostsList", 44, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_posts'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(25, "mi_news_categories", $Language->menuPhrase("25", "MenuText"), "NewsCategoriesList", 44, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_categories'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(26, "mi_news_post_tags", $Language->menuPhrase("26", "MenuText"), "NewsPostTagsList", 44, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_post_tags'), false, false, "", "", false, true);
+$sideMenu->addMenuItem(28, "mi_news_tags", $Language->menuPhrase("28", "MenuText"), "NewsTagsList", 44, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}news_tags'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(24, "mci_Projects", $Language->menuPhrase("24", "MenuText"), "", -1, "", true, false, true, "", "", false, true);
 $sideMenu->addMenuItem(4, "mi_projects", $Language->menuPhrase("4", "MenuText"), "ProjectsList", 24, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}projects'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(14, "mi_project_gallery", $Language->menuPhrase("14", "MenuText"), "ProjectGalleryList", 24, "", AllowListMenu('{05BA416D-6E12-4581-9EFA-04B8838F18C5}project_gallery'), false, false, "", "", false, true);

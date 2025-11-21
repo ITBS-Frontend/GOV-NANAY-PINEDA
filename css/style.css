@@ -610,6 +610,10 @@ section{
     align-items: center;
 }
 
+.about-content{
+    z-index: 2;
+}
+
 .about-content h2 {
     font-size: 3rem;
     font-weight: 800;
@@ -631,6 +635,17 @@ section{
     width: 400px;
     height: 400px;
     margin: 0 auto;
+}
+
+.img-container{
+    position: relative;
+}
+
+.img-container > img {
+    position: absolute;
+   right: -100px;
+    top: -158px;
+    z-index: 1;
 }
 
 .about-shape {
@@ -690,6 +705,7 @@ section{
 
 /* Political Journey Section */
 .journey-section {
+    margin-top: 100px;
     padding: 5rem 5%;
     background: var(--bg-secondary);
 }

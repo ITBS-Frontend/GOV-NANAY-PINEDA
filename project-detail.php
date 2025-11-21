@@ -46,9 +46,9 @@ $additionalCSS = ['css/project-detail.css'];
                     </section>
 
                     <!-- Stats Section -->
-                    <section class="detail-section">
+                    <!-- <section class="detail-section">
                         <div class="stats-grid" id="statsGrid"></div>
-                    </section>
+                    </section> -->
 
                     <!-- Objectives Section -->
                     <section class="detail-section">

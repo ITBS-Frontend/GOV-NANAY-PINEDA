@@ -36,6 +36,7 @@
                 <h4 class="footer-title">Quick Links</h4>
                 <ul class="footer-links">
                     <li><a href="index.php#hero"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="news.php"><i class="fas fa-chevron-right"></i> News</a></li>
                     <li><a href="index.php#projects"><i class="fas fa-chevron-right"></i> Projects</a></li>
                     <li><a href="about.php"><i class="fas fa-chevron-right"></i> About</a></li>
                     <li><a href="index.php#journey"><i class="fas fa-chevron-right"></i> Political Journey</a></li>

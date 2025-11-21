@@ -33,4 +33,5 @@ $jwtMiddleware = function (Request $request, RequestHandler $handler): Response 
 
 
 include_once(dirname(__DIR__, 1) . "/app/api/ProjectApi.php");
+include_once(dirname(__DIR__, 1) . "/app/api/NewsApi.php");
 

@@ -73,14 +73,17 @@ $additionalCSS = []; // Add any page-specific CSS files here
                     </a>
                 </div>
                 <div class="about-visual">
-                    <div class="about-image-container">
+                    <div class="img-container">
+                        <img src="assets/about-photo-full.jpg" alt="">
+                    </div>
+                    <!-- <div class="about-image-container">
                         <div class="about-shape shape-1"></div>
                         <div class="about-shape shape-2"></div>
                         <div class="about-shape shape-3"></div>
                         <div class="about-avatar">
                             <img id="aboutProfileImage" src="assets/profile.jpg" alt="Gov. Lilia Pineda">
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </section>

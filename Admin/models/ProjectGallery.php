@@ -141,12 +141,16 @@ class ProjectGallery extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->project_id->InputTextType = "text";
         $this->project_id->Raw = true;
+        $this->project_id->setSelectMultiple(false); // Select one
+        $this->project_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->project_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->project_id->Lookup = new Lookup($this->project_id, 'projects', false, 'id', ["title","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"title\"");
         $this->project_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->project_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->project_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['project_id'] = &$this->project_id;
 
         // image_path
@@ -1184,8 +1188,27 @@ class ProjectGallery extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // project_id
-        $this->project_id->ViewValue = $this->project_id->CurrentValue;
-        $this->project_id->ViewValue = FormatNumber($this->project_id->ViewValue, $this->project_id->formatPattern());
+        $curVal = strval($this->project_id->CurrentValue);
+        if ($curVal != "") {
+            $this->project_id->ViewValue = $this->project_id->lookupCacheOption($curVal);
+            if ($this->project_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->project_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->project_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->project_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->project_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->project_id->ViewValue = $this->project_id->displayValue($arwrk);
+                } else {
+                    $this->project_id->ViewValue = FormatNumber($this->project_id->CurrentValue, $this->project_id->formatPattern());
+                }
+            }
+        } else {
+            $this->project_id->ViewValue = null;
+        }
 
         // image_path
         $this->image_path->UploadPath = $this->image_path->getUploadPath(); // PHP
@@ -1270,11 +1293,7 @@ class ProjectGallery extends DbTable
 
         // project_id
         $this->project_id->setupEditAttributes();
-        $this->project_id->EditValue = $this->project_id->CurrentValue;
         $this->project_id->PlaceHolder = RemoveHtml($this->project_id->caption());
-        if (strval($this->project_id->EditValue) != "" && is_numeric($this->project_id->EditValue)) {
-            $this->project_id->EditValue = FormatNumber($this->project_id->EditValue, null);
-        }
 
         // image_path
         $this->image_path->setupEditAttributes();

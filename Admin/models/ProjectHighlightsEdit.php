@@ -513,6 +513,9 @@ class ProjectHighlightsEdit extends ProjectHighlights
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->project_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -706,7 +709,7 @@ class ProjectHighlightsEdit extends ProjectHighlights
             if (IsApi() && $val === null) {
                 $this->project_id->Visible = false; // Disable update for API request
             } else {
-                $this->project_id->setFormValue($val, true, $validate);
+                $this->project_id->setFormValue($val);
             }
         }
 
@@ -863,8 +866,27 @@ class ProjectHighlightsEdit extends ProjectHighlights
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // project_id
-            $this->project_id->ViewValue = $this->project_id->CurrentValue;
-            $this->project_id->ViewValue = FormatNumber($this->project_id->ViewValue, $this->project_id->formatPattern());
+            $curVal = strval($this->project_id->CurrentValue);
+            if ($curVal != "") {
+                $this->project_id->ViewValue = $this->project_id->lookupCacheOption($curVal);
+                if ($this->project_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->project_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->project_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->project_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->project_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->project_id->ViewValue = $this->project_id->displayValue($arwrk);
+                    } else {
+                        $this->project_id->ViewValue = FormatNumber($this->project_id->CurrentValue, $this->project_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->project_id->ViewValue = null;
+            }
 
             // highlight_text
             $this->highlight_text->ViewValue = $this->highlight_text->CurrentValue;
@@ -898,11 +920,30 @@ class ProjectHighlightsEdit extends ProjectHighlights
 
             // project_id
             $this->project_id->setupEditAttributes();
-            $this->project_id->EditValue = $this->project_id->CurrentValue;
-            $this->project_id->PlaceHolder = RemoveHtml($this->project_id->caption());
-            if (strval($this->project_id->EditValue) != "" && is_numeric($this->project_id->EditValue)) {
-                $this->project_id->EditValue = FormatNumber($this->project_id->EditValue, null);
+            $curVal = trim(strval($this->project_id->CurrentValue));
+            if ($curVal != "") {
+                $this->project_id->ViewValue = $this->project_id->lookupCacheOption($curVal);
+            } else {
+                $this->project_id->ViewValue = $this->project_id->Lookup !== null && is_array($this->project_id->lookupOptions()) && count($this->project_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->project_id->ViewValue !== null) { // Load from cache
+                $this->project_id->EditValue = array_values($this->project_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->project_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->project_id->CurrentValue, $this->project_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->project_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->project_id->EditValue = $arwrk;
+            }
+            $this->project_id->PlaceHolder = RemoveHtml($this->project_id->caption());
 
             // highlight_text
             $this->highlight_text->setupEditAttributes();
@@ -968,9 +1009,6 @@ class ProjectHighlightsEdit extends ProjectHighlights
                 if (!$this->project_id->IsDetailKey && EmptyValue($this->project_id->FormValue)) {
                     $this->project_id->addErrorMessage(str_replace("%s", $this->project_id->caption(), $this->project_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->project_id->FormValue)) {
-                $this->project_id->addErrorMessage($this->project_id->getErrorMessage(false));
             }
             if ($this->highlight_text->Visible && $this->highlight_text->Required) {
                 if (!$this->highlight_text->IsDetailKey && EmptyValue($this->highlight_text->FormValue)) {
@@ -1140,6 +1178,8 @@ class ProjectHighlightsEdit extends ProjectHighlights
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_project_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

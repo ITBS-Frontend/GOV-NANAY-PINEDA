@@ -1,6 +1,6 @@
 <!-- Header Navigation Component -->
 <nav>
-     <div class="logo-icon"><img src="assets/profile.jpg" alt=""></div>
+    <div class="logo-icon"><img src="assets/profile.jpg" alt=""></div>
     <button class="hamburger" aria-label="Toggle menu">
         <span></span>
         <span></span>
@@ -10,6 +10,10 @@
         <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>" data-section="hero">
             <i class="fas fa-home"></i>
             <span class="nav-tooltip">Home</span>
+        </div>
+        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'news.php' || basename($_SERVER['PHP_SELF']) == 'news-detail.php' ? 'active' : ''; ?>" data-section="news">
+            <i class="fas fa-newspaper"></i>
+            <span class="nav-tooltip">News</span>
         </div>
         <div class="nav-item" data-section="projects">
             <i class="fas fa-briefcase"></i>
@@ -28,7 +32,6 @@
 </nav>
 
 <script>
-    
 $(document).ready(function() {
     // Hamburger menu toggle
     $('.hamburger').click(function(e) {
@@ -69,6 +72,11 @@ $(document).ready(function() {
             return;
         }
         
+        if (section === 'news') {
+            window.location.href = 'news.php';
+            return;
+        }
+        
         // Check if we're on index page
         const currentPage = window.location.pathname;
         if (currentPage.includes('index.php') || currentPage === '/' || currentPage.endsWith('/')) {
@@ -88,20 +96,23 @@ $(document).ready(function() {
         }
     });
 
-    // Scroll spy for active nav item
-    $(window).scroll(function() {
-        const scrollPos = $(document).scrollTop() + 100;
-        
-        $('section').each(function() {
-            const top = $(this).offset().top;
-            const bottom = top + $(this).outerHeight();
-            const id = $(this).attr('id');
+    // Scroll spy for active nav item (only on index page)
+    const currentPage = window.location.pathname;
+    if (currentPage.includes('index.php') || currentPage === '/' || currentPage.endsWith('/')) {
+        $(window).scroll(function() {
+            const scrollPos = $(document).scrollTop() + 100;
             
-            if (scrollPos >= top && scrollPos <= bottom) {
-                $('.nav-item').removeClass('active');
-                $(`.nav-item[data-section="${id}"]`).addClass('active');
-            }
+            $('section').each(function() {
+                const top = $(this).offset().top;
+                const bottom = top + $(this).outerHeight();
+                const id = $(this).attr('id');
+                
+                if (scrollPos >= top && scrollPos <= bottom) {
+                    $('.nav-item').removeClass('active');
+                    $(`.nav-item[data-section="${id}"]`).addClass('active');
+                }
+            });
         });
-    });
+    }
 });
 </script>
