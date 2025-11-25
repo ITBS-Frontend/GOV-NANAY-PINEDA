@@ -3,6 +3,35 @@ namespace PHPMaker2024\Gov_Nanay_Pineda;
 
 class ProjectService
 {
+
+        /**
+     * Truncate HTML content while preserving tags
+     */
+    private function truncateHtml($html, $maxLength = 500, $ending = '...') 
+    {
+        if (strlen(strip_tags($html)) <= $maxLength) {
+            return $html;
+        }
+        
+        // Strip tags for length calculation
+        $plainText = strip_tags($html);
+        
+        if (strlen($plainText) <= $maxLength) {
+            return $html;
+        }
+        
+        // Truncate plain text
+        $truncated = substr($plainText, 0, $maxLength);
+        
+        // Find last complete word
+        $lastSpace = strrpos($truncated, ' ');
+        if ($lastSpace !== false) {
+            $truncated = substr($truncated, 0, $lastSpace);
+        }
+        
+        return $truncated . $ending;
+    }
+    
     /**
      * Get featured projects for carousel
      */
@@ -400,52 +429,72 @@ public function getProfileImage()
 /**
  * Get about preview (first 2 paragraphs + image)
  */
-public function getAboutPreview() 
-{
-    try {
-        $conn = Conn();
-        
-        // Get first 2 paragraphs
-        $sql = "
-            SELECT content
-            FROM about_content
-            WHERE is_active = true
-            AND section_type = 'main'
-            ORDER BY display_order ASC
-            LIMIT 2
-        ";
-        
-        $content = $conn->executeQuery($sql)->fetchAllAssociative();
-        
-        // Get profile image
-        $imgSql = "
-            SELECT image_path
-            FROM profile_images
-            WHERE is_primary = true
-            AND image_type = 'profile'
-            LIMIT 1
-        ";
-        
-        $imgResult = $conn->executeQuery($imgSql)->fetchAssociative();
-        
-        $imageUrl = null;
-        if ($imgResult && !empty($imgResult['image_path'])) {
-            $imageUrl = getPresignedUrl($imgResult['image_path']);
+ public function getAboutPreview() 
+    {
+        try {
+            $conn = Conn();
+            
+            // Get first 2 paragraphs only
+            $sql = "
+                SELECT content
+                FROM about_content
+                WHERE is_active = true
+                AND section_type = 'main'
+                ORDER BY display_order ASC
+                LIMIT 2
+            ";
+            
+            $content = $conn->executeQuery($sql)->fetchAllAssociative();
+            
+            // Truncate each paragraph
+            $truncatedContent = [];
+            $totalLength = 0;
+            $maxTotalLength = 600; // Maximum total characters for homepage
+            
+            foreach ($content as $item) {
+                $remaining = $maxTotalLength - $totalLength;
+                
+                if ($remaining <= 0) {
+                    break;
+                }
+                
+                // Truncate this paragraph if needed
+                $truncated = $this->truncateHtml($item['content'], $remaining);
+                $truncatedContent[] = ['content' => $truncated];
+                
+                $totalLength += strlen(strip_tags($truncated));
+            }
+            
+            // Get profile image
+            $imgSql = "
+                SELECT image_path
+                FROM profile_images
+                WHERE is_primary = true
+                AND image_type = 'profile'
+                LIMIT 1
+            ";
+            
+            $imgResult = $conn->executeQuery($imgSql)->fetchAssociative();
+            
+            $imageUrl = null;
+            if ($imgResult && !empty($imgResult['image_path'])) {
+                $imageUrl = getPresignedUrl('gov-pineda-images/' . $imgResult['image_path']);
+            }
+            
+            return [
+                'success' => true,
+                'data' => [
+                    'content' => $truncatedContent,
+                    'image_url' => $imageUrl,
+                    'is_preview' => true // Flag to indicate this is truncated
+                ]
+            ];
+            
+        } catch (\Exception $e) {
+            error_log('Get about preview error: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'Failed to fetch about preview'];
         }
-        
-        return [
-            'success' => true,
-            'data' => [
-                'content' => $content,
-                'image_url' => $imageUrl
-            ]
-        ];
-        
-    } catch (\Exception $e) {
-        error_log('Get about preview error: ' . $e->getMessage());
-        return ['success' => false, 'message' => 'Failed to fetch about preview'];
     }
-}
 
 /**
  * Get single project details
