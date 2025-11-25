@@ -8,13 +8,16 @@ $additionalCSS = ['css/about.css'];
 <html lang="en">
 <head>
     <?php include 'components/head.php'; ?>
+     <?php include 'components/scripts.php'; ?>
 </head>
 <body>
+    <!-- Header Navigation -->
+    <?php include 'components/header.php'; ?>
     <div class="about-page">
         <!-- Back Button -->
-        <a href="index.php" class="back-button" title="Back to Home">
+        <!-- <a href="index.php" class="back-button" title="Back to Home">
             <i class="fas fa-arrow-left"></i>
-        </a>
+        </a> -->
 
         <div class="about-page-content">
             <!-- Header -->

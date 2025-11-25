@@ -644,7 +644,7 @@ section{
 .img-container > img {
     position: absolute;
    right: -100px;
-    top: -158px;
+    top: -185px;
     z-index: 1;
 }
 
@@ -1165,6 +1165,232 @@ section{
 
 .separator {
     color: #475569;
+}
+
+/* Category Tabs Container with Scroll */
+.category-tabs-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 3rem;
+}
+
+.category-tabs-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    padding: 0.5rem 0;
+    flex-wrap: nowrap;
+}
+
+/* Hide scrollbar for Chrome, Safari */
+.category-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+/* Scroll Buttons */
+.category-scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+}
+
+.category-scroll-btn:hover {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.category-scroll-btn.show {
+    display: flex;
+}
+
+.scroll-left {
+    left: -15px;
+}
+
+.scroll-right {
+    right: -15px;
+}
+
+/* Gradient Overlays for Visual Scroll Indication */
+.category-tabs-wrapper::before,
+.category-tabs-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.category-tabs-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-secondary), transparent);
+}
+
+.category-tabs-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-secondary), transparent);
+}
+
+.category-tabs-wrapper.show-left-gradient::before {
+    opacity: 1;
+}
+
+.category-tabs-wrapper.show-right-gradient::after {
+    opacity: 1;
+}
+
+/* Enhanced Category Tab Styles */
+.category-tab {
+    flex-shrink: 0;
+    padding: 0.75rem 2rem;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 500;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.category-tab:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.category-tab.active {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-md);
+}
+
+.category-count {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.category-tab:not(.active) .category-count {
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
+}
+
+.category-tab.active .category-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+}
+
+/* Loading State */
+.category-tabs .loading-spinner {
+    margin: 0 auto;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+    .category-tabs {
+        justify-content: flex-start;
+        padding: 0.5rem 1rem;
+    }
+    
+    .category-tabs-wrapper::before,
+    .category-tabs-wrapper::after {
+        width: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .category-tabs-container {
+        margin-bottom: 2rem;
+    }
+    
+    .category-tab {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.9375rem;
+    }
+    
+    .category-scroll-btn {
+        width: 40px;
+        height: 40px;
+        display: none !important; /* Hide scroll buttons on mobile, use touch */
+    }
+    
+    .category-tabs-wrapper::before,
+    .category-tabs-wrapper::after {
+        display: none; /* Hide gradients on mobile */
+    }
+    
+    /* Show scrollbar on mobile for better UX */
+    .category-tabs {
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-blue) var(--bg-tertiary);
+    }
+    
+    .category-tabs::-webkit-scrollbar {
+        display: block;
+        height: 6px;
+    }
+    
+    .category-tabs::-webkit-scrollbar-track {
+        background: var(--bg-tertiary);
+        border-radius: 10px;
+    }
+    
+    .category-tabs::-webkit-scrollbar-thumb {
+        background: var(--primary-blue);
+        border-radius: 10px;
+    }
+}
+
+/* Smooth Animation for Category Change */
+.projects-grid {
+    animation: fadeInUp 0.4s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Responsive Design */

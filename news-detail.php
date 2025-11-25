@@ -7,12 +7,14 @@ $additionalCSS = ['css/news-detail.css'];
 <html lang="en">
 <head>
     <?php include 'components/head.php'; ?>
+    <?php include 'components/scripts.php'; ?>
 </head>
 <body>
+     <?php include 'components/header.php'; ?>
     <!-- Back Button -->
-    <a href="news.php" class="back-button" title="Back to News">
+    <!-- <a href="news.php" class="back-button" title="Back to News">
         <i class="fas fa-arrow-left"></i>
-    </a>
+    </a> -->
 
     <!-- Loading State -->
     <div id="loadingState" class="loading-container" style="min-height: 100vh;">

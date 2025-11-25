@@ -7,13 +7,15 @@ $additionalCSS = ['css/project-detail.css'];
 <html lang="en">
 <head>
     <?php include 'components/head.php'; ?>
+     <?php include 'components/scripts.php'; ?>
 </head>
 <body>
+    <?php include 'components/header.php'; ?>
     <div class="project-detail-page">
         <!-- Back Button -->
-        <a href="index.php#projects" class="back-button" title="Back to Projects">
+        <!-- <a href="index.php#projects" class="back-button" title="Back to Projects">
             <i class="fas fa-arrow-left"></i>
-        </a>
+        </a> -->
 
         <!-- Loading State -->
         <div id="loadingState" class="loading-container" style="min-height: 100vh;">

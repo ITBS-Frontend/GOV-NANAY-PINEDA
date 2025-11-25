@@ -261,19 +261,13 @@
     color: var(--text-tertiary);
 }
 
-/* What's New Section */
-.whats-new-section {
-    padding: 3rem 0 5rem;
-    background: var(--bg-primary);
-}
+/* Enhanced Category Tabs - Scrollable Horizontal Design */
 
 .section-header-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 1.5rem;
     margin-bottom: 2.5rem;
-    gap: 2rem;
-    flex-wrap: wrap;
 }
 
 .whats-new-title {
@@ -282,47 +276,209 @@
     color: var(--text-primary);
 }
 
-/* Inline Category Tabs */
-.category-tabs-inline {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+/* Category Tabs Container with Scroll */
+.category-tabs-container {
+    position: relative;
+    width: 100%;
 }
 
+.category-tabs-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.category-tabs-inline {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    padding: 0.5rem 0;
+}
+
+/* Hide scrollbar for Chrome, Safari */
+.category-tabs-inline::-webkit-scrollbar {
+    display: none;
+}
+
+/* Scroll Buttons */
+.category-scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+}
+
+.category-scroll-btn:hover {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+}
+
+.category-scroll-btn.show {
+    display: flex;
+}
+
+.scroll-left {
+    left: -10px;
+}
+
+.scroll-right {
+    right: -10px;
+}
+
+/* Gradient Overlays for Visual Scroll Indication */
+.category-tabs-wrapper::before,
+.category-tabs-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.category-tabs-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-primary), transparent);
+}
+
+.category-tabs-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-primary), transparent);
+}
+
+.category-tabs-wrapper.show-left-gradient::before {
+    opacity: 1;
+}
+
+.category-tabs-wrapper.show-right-gradient::after {
+    opacity: 1;
+}
+
+/* Category Tab Button */
 .category-tab-inline {
-    padding: 0.5rem 1.5rem;
-    background: transparent;
-    border: none;
+    flex-shrink: 0;
+    padding: 0.625rem 1.5rem;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 50px;
     color: var(--text-secondary);
-    font-size: 1rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    white-space: nowrap;
     position: relative;
 }
 
-.category-tab-inline::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--primary-blue);
-    transform: scaleX(0);
-    transition: var(--transition);
-}
-
 .category-tab-inline:hover {
+    border-color: var(--primary-blue);
     color: var(--primary-blue);
+    transform: translateY(-2px);
 }
 
 .category-tab-inline.active {
-    color: var(--primary-blue);
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-md);
 }
 
-.category-tab-inline.active::after {
-    transform: scaleX(1);
+/* Category Count Badge */
+.category-count {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.125rem 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.category-tab-inline:not(.active) .category-count {
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
+}
+
+/* Loading State */
+.category-tabs-inline .loading-spinner {
+    margin: 0 auto;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .section-header-row {
+        gap: 1rem;
+    }
+
+    .whats-new-title {
+        font-size: 2rem;
+    }
+
+    .category-tab-inline {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.875rem;
+    }
+
+    .category-scroll-btn {
+        width: 35px;
+        height: 35px;
+    }
+
+    .scroll-left {
+        left: -5px;
+    }
+
+    .scroll-right {
+        right: -5px;
+    }
+}
+
+/* Alternative: Compact Pills Design */
+.category-pills-compact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    max-width: 100%;
+}
+
+.category-pill {
+    padding: 0.5rem 1rem;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+}
+
+.category-pill:hover {
+    background: var(--primary-blue-light);
+    color: white;
+}
+
+.category-pill.active {
+    background: var(--primary-blue);
+    color: white;
 }
 
 /* News Content Layout */

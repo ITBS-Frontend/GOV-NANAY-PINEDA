@@ -7,12 +7,10 @@ $additionalCSS = ['css/news.css'];
 <html lang="en">
 <head>
     <?php include 'components/head.php'; ?>
+    <?php include 'components/scripts.php'; ?>
 </head>
 <body>
-    <!-- Back Button -->
-    <a href="index.php" class="back-button" title="Back to Home">
-        <i class="fas fa-arrow-left"></i>
-    </a>
+    <?php include 'components/header.php'; ?>
 
     <main class="news-page">
         <!-- Page Header with Search -->
@@ -50,8 +48,22 @@ $additionalCSS = ['css/news.css'];
             <div class="container">
                 <div class="section-header-row">
                     <h2 class="whats-new-title">What's New</h2>
-                    <div class="category-tabs-inline" id="categoryTabsInline">
-                        <div class="loading-spinner"></div>
+                    
+                    <!-- Enhanced Category Filter with Scroll -->
+                    <div class="category-tabs-container">
+                        <button class="category-scroll-btn scroll-left" id="scrollLeft">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div class="category-tabs-wrapper" id="categoryTabsWrapper">
+                            <div class="category-tabs-inline" id="categoryTabsInline">
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </div>
+                        
+                        <button class="category-scroll-btn scroll-right" id="scrollRight">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -137,6 +149,51 @@ $additionalCSS = ['css/news.css'];
                 loadNews(1);
             });
             
+            // Category Scroll Functionality
+            function updateScrollButtons() {
+                const container = $('#categoryTabsInline')[0];
+                const wrapper = $('#categoryTabsWrapper');
+                
+                if (!container) return;
+                
+                const isScrollable = container.scrollWidth > container.clientWidth;
+                const isAtStart = container.scrollLeft <= 10;
+                const isAtEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth - 10;
+                
+                // Show/hide scroll buttons
+                if (isScrollable) {
+                    $('#scrollLeft').toggleClass('show', !isAtStart);
+                    $('#scrollRight').toggleClass('show', !isAtEnd);
+                    
+                    // Add gradient overlays
+                    wrapper.toggleClass('show-left-gradient', !isAtStart);
+                    wrapper.toggleClass('show-right-gradient', !isAtEnd);
+                } else {
+                    $('#scrollLeft, #scrollRight').removeClass('show');
+                    wrapper.removeClass('show-left-gradient show-right-gradient');
+                }
+            }
+            
+            $('#scrollLeft').click(function() {
+                const container = $('#categoryTabsInline')[0];
+                container.scrollBy({ left: -200, behavior: 'smooth' });
+                setTimeout(updateScrollButtons, 300);
+            });
+            
+            $('#scrollRight').click(function() {
+                const container = $('#categoryTabsInline')[0];
+                container.scrollBy({ left: 200, behavior: 'smooth' });
+                setTimeout(updateScrollButtons, 300);
+            });
+            
+            $('#categoryTabsInline').on('scroll', function() {
+                updateScrollButtons();
+            });
+            
+            $(window).on('resize', function() {
+                updateScrollButtons();
+            });
+            
             function loadFeaturedHero() {
                 $.ajax({
                     url: `${API_BASE}/Admin/api/news/featured?limit=3`,
@@ -145,6 +202,9 @@ $additionalCSS = ['css/news.css'];
                         if (response.success && response.data) {
                             renderHeroGrid(response.data);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading featured news:', error);
                     }
                 });
             }
@@ -156,7 +216,11 @@ $additionalCSS = ['css/news.css'];
                     success: function(response) {
                         if (response.success && response.data) {
                             renderInlineCategories(response.data);
+                            setTimeout(updateScrollButtons, 100);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading categories:', error);
                     }
                 });
             }
@@ -179,6 +243,10 @@ $additionalCSS = ['css/news.css'];
                             renderNewsList(response.data);
                             renderPagination(response.pagination);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading news:', error);
+                        $('#newsList').html('<p class="no-results">Error loading articles</p>');
                     }
                 });
             }
@@ -208,7 +276,10 @@ $additionalCSS = ['css/news.css'];
             }
             
             function renderHeroGrid(posts) {
-                if (posts.length === 0) return;
+                if (posts.length === 0) {
+                    $('#heroGrid').html('<p>No featured news available</p>');
+                    return;
+                }
                 
                 const mainPost = posts[0];
                 const sidePosts = posts.slice(1, 3);
@@ -217,13 +288,14 @@ $additionalCSS = ['css/news.css'];
                     <div class="hero-main">
                         <a href="news-detail.php?slug=${mainPost.slug}" class="hero-main-link">
                             <div class="hero-main-image" style="background-image: url('${mainPost.image_url || 'assets/placeholder.jpg'}')">
-                                <span class="hero-badge" style="background: ${mainPost.color_code}">${mainPost.category_name}</span>
+                                <span class="hero-badge" style="background: ${mainPost.color_code || '#3B82F6'}">${mainPost.category_name}</span>
                             </div>
                             <div class="hero-main-content">
                                 <h2 class="hero-main-title">${mainPost.title}</h2>
                                 <div class="hero-meta">
-                                    <span>by ${mainPost.author_name || 'Admin'}</span>
-                                    <span>${mainPost.formatted_date}</span>
+                                    <span><i class="fas fa-user"></i> ${mainPost.author_name || 'Admin'}</span>
+                                    <span><i class="fas fa-calendar"></i> ${mainPost.formatted_date}</span>
+                                    <span><i class="fas fa-clock"></i> ${mainPost.reading_time}</span>
                                 </div>
                             </div>
                         </a>
@@ -235,13 +307,12 @@ $additionalCSS = ['css/news.css'];
                     html += `
                         <a href="news-detail.php?slug=${post.slug}" class="hero-side-card">
                             <div class="hero-side-image" style="background-image: url('${post.image_url || 'assets/placeholder.jpg'}')">
-                                <span class="hero-badge" style="background: ${post.color_code}">${post.category_name}</span>
+                                <span class="hero-badge" style="background: ${post.color_code || '#3B82F6'}">${post.category_name}</span>
                             </div>
                             <div class="hero-side-content">
                                 <h3 class="hero-side-title">${post.title}</h3>
                                 <div class="hero-meta">
-                                    <span>by ${post.author_name || 'Admin'}</span>
-                                    <span>${post.formatted_date}</span>
+                                    <span><i class="fas fa-calendar"></i> ${post.formatted_date}</span>
                                 </div>
                             </div>
                         </a>
@@ -253,10 +324,13 @@ $additionalCSS = ['css/news.css'];
             }
             
             function renderInlineCategories(categories) {
-                let html = '<button class="category-tab-inline active" data-category="all">Lifestyle</button>';
+                let html = '<button class="category-tab-inline active" data-category="all">All News</button>';
+                
                 categories.forEach(cat => {
-                    html += `<button class="category-tab-inline" data-category="${cat.id}">${cat.name}</button>`;
+                    const count = cat.post_count > 0 ? `<span class="category-count">${cat.post_count}</span>` : '';
+                    html += `<button class="category-tab-inline" data-category="${cat.id}">${cat.name}${count}</button>`;
                 });
+                
                 $('#categoryTabsInline').html(html);
             }
             
@@ -273,10 +347,11 @@ $additionalCSS = ['css/news.css'];
                             <a href="news-detail.php?slug=${post.slug}" class="news-list-link">
                                 <div class="news-list-image" style="background-image: url('${post.image_url || 'assets/placeholder.jpg'}')"></div>
                                 <div class="news-list-content">
-                                    <span class="news-list-category" style="color: ${post.color_code}">${post.category_name}</span>
+                                    <span class="news-list-category" style="color: ${post.color_code || '#3B82F6'}">${post.category_name}</span>
                                     <h3 class="news-list-title">${post.title}</h3>
                                     <div class="news-list-meta">
-                                        <span>${post.formatted_date}</span>
+                                        <span><i class="fas fa-calendar"></i> ${post.formatted_date}</span>
+                                        <span><i class="fas fa-clock"></i> ${post.reading_time}</span>
                                     </div>
                                     <p class="news-list-excerpt">${post.excerpt || ''}</p>
                                 </div>
@@ -294,7 +369,7 @@ $additionalCSS = ['css/news.css'];
                         <a href="news-detail.php?slug=${post.slug}" class="sidebar-post">
                             <div class="sidebar-post-image" style="background-image: url('${post.image_url || 'assets/placeholder.jpg'}')"></div>
                             <div class="sidebar-post-content">
-                                <span class="sidebar-post-category" style="color: ${post.color_code}">${post.category_name}</span>
+                                <span class="sidebar-post-category" style="color: ${post.color_code || '#3B82F6'}">${post.category_name}</span>
                                 <h4 class="sidebar-post-title">${post.title}</h4>
                                 <span class="sidebar-post-date">${post.formatted_date}</span>
                             </div>

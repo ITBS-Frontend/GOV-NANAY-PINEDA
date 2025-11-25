@@ -8,7 +8,6 @@ $additionalCSS = []; // Add any page-specific CSS files here
 <html lang="en">
 <head>
     <?php include 'components/head.php'; ?>
-        <!-- Scripts -->
     <?php include 'components/scripts.php'; ?>
 </head>
 <body>
@@ -46,8 +45,21 @@ $additionalCSS = []; // Add any page-specific CSS files here
                 </p>
             </div>
 
-            <div class="category-tabs" id="categoryTabs">
-                <div class="loading-spinner"></div>
+            <!-- Enhanced Category Filter with Scroll -->
+            <div class="category-tabs-container">
+                <button class="category-scroll-btn scroll-left" id="projectScrollLeft">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="category-tabs-wrapper" id="projectTabsWrapper">
+                    <div class="category-tabs" id="categoryTabs">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                
+                <button class="category-scroll-btn scroll-right" id="projectScrollRight">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
 
             <div class="projects-grid" id="projectsGrid">
@@ -76,14 +88,6 @@ $additionalCSS = []; // Add any page-specific CSS files here
                     <div class="img-container">
                         <img src="assets/about-photo-full.jpg" alt="">
                     </div>
-                    <!-- <div class="about-image-container">
-                        <div class="about-shape shape-1"></div>
-                        <div class="about-shape shape-2"></div>
-                        <div class="about-shape shape-3"></div>
-                        <div class="about-avatar">
-                            <img id="aboutProfileImage" src="assets/profile.jpg" alt="Gov. Lilia Pineda">
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </section>
@@ -114,8 +118,6 @@ $additionalCSS = []; // Add any page-specific CSS files here
     <button class="scroll-top" aria-label="Scroll to top">
         <i class="fas fa-chevron-up"></i>
     </button>
-
-
     
     <!-- Page Specific JavaScript -->
     <script>
@@ -134,6 +136,51 @@ $additionalCSS = []; // Add any page-specific CSS files here
             loadProjects();
             loadPoliticalJourney();
             loadAboutPreview();
+
+            // Project Category Scroll Functionality
+            function updateProjectScrollButtons() {
+                const container = $('#categoryTabs')[0];
+                const wrapper = $('#projectTabsWrapper');
+                
+                if (!container) return;
+                
+                const isScrollable = container.scrollWidth > container.clientWidth;
+                const isAtStart = container.scrollLeft <= 10;
+                const isAtEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth - 10;
+                
+                // Show/hide scroll buttons
+                if (isScrollable) {
+                    $('#projectScrollLeft').toggleClass('show', !isAtStart);
+                    $('#projectScrollRight').toggleClass('show', !isAtEnd);
+                    
+                    // Add gradient overlays
+                    wrapper.toggleClass('show-left-gradient', !isAtStart);
+                    wrapper.toggleClass('show-right-gradient', !isAtEnd);
+                } else {
+                    $('#projectScrollLeft, #projectScrollRight').removeClass('show');
+                    wrapper.removeClass('show-left-gradient show-right-gradient');
+                }
+            }
+            
+            $('#projectScrollLeft').click(function() {
+                const container = $('#categoryTabs')[0];
+                container.scrollBy({ left: -200, behavior: 'smooth' });
+                setTimeout(updateProjectScrollButtons, 300);
+            });
+            
+            $('#projectScrollRight').click(function() {
+                const container = $('#categoryTabs')[0];
+                container.scrollBy({ left: 200, behavior: 'smooth' });
+                setTimeout(updateProjectScrollButtons, 300);
+            });
+            
+            $('#categoryTabs').on('scroll', function() {
+                updateProjectScrollButtons();
+            });
+            
+            $(window).on('resize', function() {
+                updateProjectScrollButtons();
+            });
 
             // API Functions
             function loadFeaturedProjects() {
@@ -160,6 +207,7 @@ $additionalCSS = []; // Add any page-specific CSS files here
                         if (response.success && response.data) {
                             categories = response.data;
                             renderCategoryTabs();
+                            setTimeout(updateProjectScrollButtons, 100);
                         }
                     },
                     error: function(xhr, status, error) {
@@ -184,6 +232,7 @@ $additionalCSS = []; // Add any page-specific CSS files here
                     },
                     error: function(xhr, status, error) {
                         console.error('Error loading projects:', error);
+                        $('#projectsGrid').html('<p class="text-center">Error loading projects</p>');
                     }
                 });
             }
@@ -204,30 +253,42 @@ $additionalCSS = []; // Add any page-specific CSS files here
             }
 
             function loadAboutPreview() {
-                $.ajax({
-                    url: `${API_BASE}/Admin/api/about/image`,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data.image_url) {
-                            $('#aboutProfileImage').attr('src', response.data.image_url);
-                        }
-                    }
-                });
-                
-                $.ajax({
-                    url: `${API_BASE}/Admin/api/about/content`,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            renderAboutPreview(response.data);
-                        }
-                    }
-                });
+    // Load profile image
+    $.ajax({
+        url: `${API_BASE}/Admin/api/about/image`,
+        method: 'GET',
+        success: function(response) {
+            if (response.success && response.data.image_url) {
+                $('#aboutProfileImage').attr('src', response.data.image_url);
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading profile image:', error);
+        }
+    });
+    
+    // Load truncated about preview (max 600 characters)
+    $.ajax({
+        url: `${API_BASE}/Admin/api/about/preview`,
+        method: 'GET',
+        success: function(response) {
+            if (response.success && response.data) {
+                renderAboutPreview(response.data);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading about preview:', error);
+            $('#aboutPreview').html('<p class="about-text">Content coming soon...</p>');
+        }
+    });
+}
 
             // Render Functions
             function renderCarousel() {
-                if (featuredProjects.length === 0) return;
+                if (featuredProjects.length === 0) {
+                    $('#carouselContainer').html('<p class="text-center">No featured projects available</p>');
+                    return;
+                }
                 
                 let slidesHtml = '';
                 let dotsHtml = '';
@@ -236,18 +297,18 @@ $additionalCSS = []; // Add any page-specific CSS files here
                     const isActive = index === 0 ? 'active' : '';
                     
                     slidesHtml += `
-                        <div class="carousel-slide ${isActive}"
-                           ">
+                        <div class="carousel-slide ${isActive}">
                             <div class="slide-content">
-                            <div class="slide-text" style="background: ${project.color_code || '#3B82F6'}">
+                                <div class="slide-text" style="background: ${project.color_code || '#3B82F6'}">
                                     <span class="slide-category" style="background: ${project.color_code || '#3B82F6'}">
                                         ${project.category_name || 'Project'}
                                     </span>
                                     <h1 class="slide-title">${project.title}</h1>
                                     <p class="slide-description">${project.description}</p>
                                 </div>
-                                <div class="slide-picture"><img src="${project.image_url}" /></div>
-                                
+                                <div class="slide-picture">
+                                    <img src="${project.image_url || 'assets/placeholder.jpg'}" alt="${project.title}" />
+                                </div>
                             </div>
                         </div>
                     `;
@@ -266,10 +327,10 @@ $additionalCSS = []; // Add any page-specific CSS files here
                 let tabsHtml = '<div class="category-tab active" data-category="all">All Projects</div>';
                 
                 categories.forEach(category => {
+                    const count = category.project_count > 0 ? `<span class="category-count">${category.project_count}</span>` : '';
                     tabsHtml += `
                         <div class="category-tab" data-category="${category.id}">
-                            ${category.name}
-                            ${category.project_count > 0 ? `<span class="category-count">${category.project_count}</span>` : ''}
+                            ${category.name}${count}
                         </div>
                     `;
                 });
@@ -311,7 +372,10 @@ $additionalCSS = []; // Add any page-specific CSS files here
             }
 
             function renderTimeline(journeyData) {
-                if (journeyData.length === 0) return;
+                if (journeyData.length === 0) {
+                    $('#timelineContainer').html('<p class="text-center">No timeline data available</p>');
+                    return;
+                }
                 
                 let timelineHtml = '<div class="timeline-line"></div>';
                 
@@ -339,18 +403,27 @@ $additionalCSS = []; // Add any page-specific CSS files here
                 $('#timelineContainer').html(timelineHtml);
             }
 
-            function renderAboutPreview(contentData) {
-                let html = '';
-                
-                if (contentData.main && contentData.main.length > 0) {
-                    const previewItems = contentData.main.slice(0, 2);
-                    previewItems.forEach(item => {
-                        html += `<p class="about-text">${item.content}</p>`;
-                    });
-                }
-                
-                $('#aboutPreview').html(html);
-            }
+            function renderAboutPreview(data) {
+    let html = '';
+    
+    if (data.content && data.content.length > 0) {
+        data.content.forEach(item => {
+            html += `<p class="about-text">${item.content}</p>`;
+        });
+        
+        // Add "..." indicator if content is truncated
+        if (data.is_preview) {
+            // Remove any existing "..." at the end
+            html = html.replace(/\.\.\.(<\/p>)$/, '$1');
+            // Ensure the last paragraph ends with "..."
+            html = html.replace(/(<\/p>)$/, '...$1');
+        }
+    } else {
+        html = '<p class="about-text">Content coming soon...</p>';
+    }
+    
+    $('#aboutPreview').html(html);
+}
 
             // Carousel functions
             function showSlide(index) {
@@ -372,7 +445,9 @@ $additionalCSS = []; // Add any page-specific CSS files here
 
             function startCarousel() {
                 stopCarousel();
-                slideInterval = setInterval(nextSlide, 5000);
+                if (featuredProjects.length > 1) {
+                    slideInterval = setInterval(nextSlide, 5000);
+                }
             }
 
             function stopCarousel() {
@@ -380,8 +455,18 @@ $additionalCSS = []; // Add any page-specific CSS files here
             }
 
             // Event handlers
-            $(document).on('click', '.carousel-next', nextSlide);
-            $(document).on('click', '.carousel-prev', prevSlide);
+            $(document).on('click', '.carousel-next', function(e) {
+                e.preventDefault();
+                nextSlide();
+                startCarousel();
+            });
+            
+            $(document).on('click', '.carousel-prev', function(e) {
+                e.preventDefault();
+                prevSlide();
+                startCarousel();
+            });
+            
             $(document).on('click', '.carousel-dot', function() {
                 currentSlide = parseInt($(this).data('slide'));
                 showSlide(currentSlide);

@@ -114,12 +114,18 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if ($Page->_content->Visible) { // content ?>
     <div id="r__content"<?= $Page->_content->rowAttributes() ?>>
-        <label id="elh_about_content__content" for="x__content" class="<?= $Page->LeftColumnClass ?>"><?= $Page->_content->caption() ?><?= $Page->_content->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_about_content__content" class="<?= $Page->LeftColumnClass ?>"><?= $Page->_content->caption() ?><?= $Page->_content->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->_content->cellAttributes() ?>>
 <span id="el_about_content__content">
+<?php $Page->_content->EditAttrs->appendClass("editor"); ?>
 <textarea data-table="about_content" data-field="x__content" name="x__content" id="x__content" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->_content->getPlaceHolder()) ?>"<?= $Page->_content->editAttributes() ?> aria-describedby="x__content_help"><?= $Page->_content->EditValue ?></textarea>
 <?= $Page->_content->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->_content->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fabout_contentedit", "editor"], function() {
+    ew.createEditor("fabout_contentedit", "x__content", 35, 4, <?= $Page->_content->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 </div></div>
     </div>
