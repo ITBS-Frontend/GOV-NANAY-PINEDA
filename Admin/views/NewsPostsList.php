@@ -183,6 +183,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->updated_at->Visible) { // updated_at ?>
         <th data-name="updated_at" class="<?= $Page->updated_at->headerCellClass() ?>"><div id="elh_news_posts_updated_at" class="news_posts_updated_at"><?= $Page->renderFieldHeader($Page->updated_at) ?></div></th>
 <?php } ?>
+<?php if ($Page->news_type->Visible) { // news_type ?>
+        <th data-name="news_type" class="<?= $Page->news_type->headerCellClass() ?>"><div id="elh_news_posts_news_type" class="news_posts_news_type"><?= $Page->renderFieldHeader($Page->news_type) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -306,6 +309,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_news_posts_updated_at" class="el_news_posts_updated_at">
 <span<?= $Page->updated_at->viewAttributes() ?>>
 <?= $Page->updated_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->news_type->Visible) { // news_type ?>
+        <td data-name="news_type"<?= $Page->news_type->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_news_posts_news_type" class="el_news_posts_news_type">
+<span<?= $Page->news_type->viewAttributes() ?>>
+<?= $Page->news_type->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

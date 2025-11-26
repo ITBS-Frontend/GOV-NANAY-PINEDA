@@ -208,6 +208,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->news_type->Visible) { // news_type ?>
+    <tr id="r_news_type"<?= $Page->news_type->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_news_posts_news_type"><?= $Page->news_type->caption() ?></span></td>
+        <td data-name="news_type"<?= $Page->news_type->cellAttributes() ?>>
+<span id="el_news_posts_news_type">
+<span<?= $Page->news_type->viewAttributes() ?>>
+<?= $Page->news_type->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 </main>

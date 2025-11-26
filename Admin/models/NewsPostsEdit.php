@@ -135,6 +135,7 @@ class NewsPostsEdit extends NewsPosts
         $this->views_count->setVisibility();
         $this->created_at->setVisibility();
         $this->updated_at->setVisibility();
+        $this->news_type->setVisibility();
     }
 
     // Constructor
@@ -841,6 +842,16 @@ class NewsPostsEdit extends NewsPosts
             }
             $this->updated_at->CurrentValue = UnFormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern());
         }
+
+        // Check field name 'news_type' first before field var 'x_news_type'
+        $val = $CurrentForm->hasValue("news_type") ? $CurrentForm->getValue("news_type") : $CurrentForm->getValue("x_news_type");
+        if (!$this->news_type->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->news_type->Visible = false; // Disable update for API request
+            } else {
+                $this->news_type->setFormValue($val);
+            }
+        }
 		$this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
 		$this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
         $this->getUploadFiles(); // Get upload files
@@ -866,6 +877,7 @@ class NewsPostsEdit extends NewsPosts
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         $this->updated_at->CurrentValue = $this->updated_at->FormValue;
         $this->updated_at->CurrentValue = UnFormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern());
+        $this->news_type->CurrentValue = $this->news_type->FormValue;
     }
 
     /**
@@ -921,6 +933,7 @@ class NewsPostsEdit extends NewsPosts
         $this->views_count->setDbValue($row['views_count']);
         $this->created_at->setDbValue($row['created_at']);
         $this->updated_at->setDbValue($row['updated_at']);
+        $this->news_type->setDbValue($row['news_type']);
     }
 
     // Return a row with default values
@@ -941,6 +954,7 @@ class NewsPostsEdit extends NewsPosts
         $row['views_count'] = $this->views_count->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
         $row['updated_at'] = $this->updated_at->DefaultValue;
+        $row['news_type'] = $this->news_type->DefaultValue;
         return $row;
     }
 
@@ -1016,6 +1030,9 @@ class NewsPostsEdit extends NewsPosts
 
         // updated_at
         $this->updated_at->RowCssClass = "row";
+
+        // news_type
+        $this->news_type->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1102,6 +1119,9 @@ class NewsPostsEdit extends NewsPosts
             $this->updated_at->ViewValue = $this->updated_at->CurrentValue;
             $this->updated_at->ViewValue = FormatDateTime($this->updated_at->ViewValue, $this->updated_at->formatPattern());
 
+            // news_type
+            $this->news_type->ViewValue = $this->news_type->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
 
@@ -1153,6 +1173,9 @@ class NewsPostsEdit extends NewsPosts
 
             // updated_at
             $this->updated_at->HrefValue = "";
+
+            // news_type
+            $this->news_type->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1269,6 +1292,14 @@ class NewsPostsEdit extends NewsPosts
             $this->updated_at->EditValue = HtmlEncode(FormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern()));
             $this->updated_at->PlaceHolder = RemoveHtml($this->updated_at->caption());
 
+            // news_type
+            $this->news_type->setupEditAttributes();
+            if (!$this->news_type->Raw) {
+                $this->news_type->CurrentValue = HtmlDecode($this->news_type->CurrentValue);
+            }
+            $this->news_type->EditValue = HtmlEncode($this->news_type->CurrentValue);
+            $this->news_type->PlaceHolder = RemoveHtml($this->news_type->caption());
+
             // Edit refer script
 
             // id
@@ -1322,6 +1353,9 @@ class NewsPostsEdit extends NewsPosts
 
             // updated_at
             $this->updated_at->HrefValue = "";
+
+            // news_type
+            $this->news_type->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1424,6 +1458,11 @@ class NewsPostsEdit extends NewsPosts
             }
             if (!CheckDate($this->updated_at->FormValue, $this->updated_at->formatPattern())) {
                 $this->updated_at->addErrorMessage($this->updated_at->getErrorMessage(false));
+            }
+            if ($this->news_type->Visible && $this->news_type->Required) {
+                if (!$this->news_type->IsDetailKey && EmptyValue($this->news_type->FormValue)) {
+                    $this->news_type->addErrorMessage(str_replace("%s", $this->news_type->caption(), $this->news_type->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1600,6 +1639,9 @@ class NewsPostsEdit extends NewsPosts
 
         // updated_at
         $this->updated_at->setDbValueDef($rsnew, UnFormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern()), $this->updated_at->ReadOnly);
+
+        // news_type
+        $this->news_type->setDbValueDef($rsnew, $this->news_type->CurrentValue, $this->news_type->ReadOnly);
         return $rsnew;
     }
 
@@ -1647,6 +1689,9 @@ class NewsPostsEdit extends NewsPosts
         }
         if (isset($row['updated_at'])) { // updated_at
             $this->updated_at->CurrentValue = $row['updated_at'];
+        }
+        if (isset($row['news_type'])) { // news_type
+            $this->news_type->CurrentValue = $row['news_type'];
         }
     }
 

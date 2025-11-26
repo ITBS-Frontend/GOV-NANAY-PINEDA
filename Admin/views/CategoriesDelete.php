@@ -62,6 +62,12 @@ $Page->showMessage();
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_categories_created_at" class="categories_created_at"><?= $Page->created_at->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->category_type->Visible) { // category_type ?>
+        <th class="<?= $Page->category_type->headerCellClass() ?>"><span id="elh_categories_category_type" class="categories_category_type"><?= $Page->category_type->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->parent_id->Visible) { // parent_id ?>
+        <th class="<?= $Page->parent_id->headerCellClass() ?>"><span id="elh_categories_parent_id" class="categories_parent_id"><?= $Page->parent_id->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -112,6 +118,22 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->category_type->Visible) { // category_type ?>
+        <td<?= $Page->category_type->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->category_type->viewAttributes() ?>>
+<?= $Page->category_type->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->parent_id->Visible) { // parent_id ?>
+        <td<?= $Page->parent_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->parent_id->viewAttributes() ?>>
+<?= $Page->parent_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

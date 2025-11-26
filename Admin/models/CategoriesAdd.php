@@ -125,6 +125,8 @@ class CategoriesAdd extends Categories
         $this->name->setVisibility();
         $this->color_code->setVisibility();
         $this->created_at->setVisibility();
+        $this->category_type->setVisibility();
+        $this->parent_id->setVisibility();
     }
 
     // Constructor
@@ -658,6 +660,8 @@ class CategoriesAdd extends Categories
     {
         $this->color_code->DefaultValue = $this->color_code->getDefault(); // PHP
         $this->color_code->OldValue = $this->color_code->DefaultValue;
+        $this->category_type->DefaultValue = $this->category_type->getDefault(); // PHP
+        $this->category_type->OldValue = $this->category_type->DefaultValue;
     }
 
     // Load form values
@@ -698,6 +702,26 @@ class CategoriesAdd extends Categories
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         }
 
+        // Check field name 'category_type' first before field var 'x_category_type'
+        $val = $CurrentForm->hasValue("category_type") ? $CurrentForm->getValue("category_type") : $CurrentForm->getValue("x_category_type");
+        if (!$this->category_type->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->category_type->Visible = false; // Disable update for API request
+            } else {
+                $this->category_type->setFormValue($val);
+            }
+        }
+
+        // Check field name 'parent_id' first before field var 'x_parent_id'
+        $val = $CurrentForm->hasValue("parent_id") ? $CurrentForm->getValue("parent_id") : $CurrentForm->getValue("x_parent_id");
+        if (!$this->parent_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->parent_id->Visible = false; // Disable update for API request
+            } else {
+                $this->parent_id->setFormValue($val, true, $validate);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -710,6 +734,8 @@ class CategoriesAdd extends Categories
         $this->color_code->CurrentValue = $this->color_code->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->category_type->CurrentValue = $this->category_type->FormValue;
+        $this->parent_id->CurrentValue = $this->parent_id->FormValue;
     }
 
     /**
@@ -754,6 +780,8 @@ class CategoriesAdd extends Categories
         $this->name->setDbValue($row['name']);
         $this->color_code->setDbValue($row['color_code']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->category_type->setDbValue($row['category_type']);
+        $this->parent_id->setDbValue($row['parent_id']);
     }
 
     // Return a row with default values
@@ -764,6 +792,8 @@ class CategoriesAdd extends Categories
         $row['name'] = $this->name->DefaultValue;
         $row['color_code'] = $this->color_code->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['category_type'] = $this->category_type->DefaultValue;
+        $row['parent_id'] = $this->parent_id->DefaultValue;
         return $row;
     }
 
@@ -810,6 +840,12 @@ class CategoriesAdd extends Categories
         // created_at
         $this->created_at->RowCssClass = "row";
 
+        // category_type
+        $this->category_type->RowCssClass = "row";
+
+        // parent_id
+        $this->parent_id->RowCssClass = "row";
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
@@ -825,6 +861,13 @@ class CategoriesAdd extends Categories
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // category_type
+            $this->category_type->ViewValue = $this->category_type->CurrentValue;
+
+            // parent_id
+            $this->parent_id->ViewValue = $this->parent_id->CurrentValue;
+            $this->parent_id->ViewValue = FormatNumber($this->parent_id->ViewValue, $this->parent_id->formatPattern());
+
             // name
             $this->name->HrefValue = "";
 
@@ -833,6 +876,12 @@ class CategoriesAdd extends Categories
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // category_type
+            $this->category_type->HrefValue = "";
+
+            // parent_id
+            $this->parent_id->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // name
             $this->name->setupEditAttributes();
@@ -855,6 +904,22 @@ class CategoriesAdd extends Categories
             $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
             $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
 
+            // category_type
+            $this->category_type->setupEditAttributes();
+            if (!$this->category_type->Raw) {
+                $this->category_type->CurrentValue = HtmlDecode($this->category_type->CurrentValue);
+            }
+            $this->category_type->EditValue = HtmlEncode($this->category_type->CurrentValue);
+            $this->category_type->PlaceHolder = RemoveHtml($this->category_type->caption());
+
+            // parent_id
+            $this->parent_id->setupEditAttributes();
+            $this->parent_id->EditValue = $this->parent_id->CurrentValue;
+            $this->parent_id->PlaceHolder = RemoveHtml($this->parent_id->caption());
+            if (strval($this->parent_id->EditValue) != "" && is_numeric($this->parent_id->EditValue)) {
+                $this->parent_id->EditValue = FormatNumber($this->parent_id->EditValue, null);
+            }
+
             // Add refer script
 
             // name
@@ -865,6 +930,12 @@ class CategoriesAdd extends Categories
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // category_type
+            $this->category_type->HrefValue = "";
+
+            // parent_id
+            $this->parent_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -903,6 +974,19 @@ class CategoriesAdd extends Categories
             }
             if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
                 $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
+            }
+            if ($this->category_type->Visible && $this->category_type->Required) {
+                if (!$this->category_type->IsDetailKey && EmptyValue($this->category_type->FormValue)) {
+                    $this->category_type->addErrorMessage(str_replace("%s", $this->category_type->caption(), $this->category_type->RequiredErrorMessage));
+                }
+            }
+            if ($this->parent_id->Visible && $this->parent_id->Required) {
+                if (!$this->parent_id->IsDetailKey && EmptyValue($this->parent_id->FormValue)) {
+                    $this->parent_id->addErrorMessage(str_replace("%s", $this->parent_id->caption(), $this->parent_id->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->parent_id->FormValue)) {
+                $this->parent_id->addErrorMessage($this->parent_id->getErrorMessage(false));
             }
 
         // Return validate result
@@ -983,6 +1067,12 @@ class CategoriesAdd extends Categories
 
         // created_at
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), false);
+
+        // category_type
+        $this->category_type->setDbValueDef($rsnew, $this->category_type->CurrentValue, strval($this->category_type->CurrentValue) == "");
+
+        // parent_id
+        $this->parent_id->setDbValueDef($rsnew, $this->parent_id->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1000,6 +1090,12 @@ class CategoriesAdd extends Categories
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->setFormValue($row['created_at']);
+        }
+        if (isset($row['category_type'])) { // category_type
+            $this->category_type->setFormValue($row['category_type']);
+        }
+        if (isset($row['parent_id'])) { // parent_id
+            $this->parent_id->setFormValue($row['parent_id']);
         }
     }
 

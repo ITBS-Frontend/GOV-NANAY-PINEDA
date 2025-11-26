@@ -138,6 +138,10 @@ class ProjectsDelete extends Projects
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
         $this->status->setVisibility();
+        $this->project_type->setVisibility();
+        $this->municipality->setVisibility();
+        $this->coordinates->setVisibility();
+        $this->economic_impact->Visible = false;
     }
 
     // Constructor
@@ -620,6 +624,10 @@ class ProjectsDelete extends Projects
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->status->setDbValue($row['status']);
+        $this->project_type->setDbValue($row['project_type']);
+        $this->municipality->setDbValue($row['municipality']);
+        $this->coordinates->setDbValue($row['coordinates']);
+        $this->economic_impact->setDbValue($row['economic_impact']);
     }
 
     // Return a row with default values
@@ -643,6 +651,10 @@ class ProjectsDelete extends Projects
         $row['start_date'] = $this->start_date->DefaultValue;
         $row['end_date'] = $this->end_date->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
+        $row['project_type'] = $this->project_type->DefaultValue;
+        $row['municipality'] = $this->municipality->DefaultValue;
+        $row['coordinates'] = $this->coordinates->DefaultValue;
+        $row['economic_impact'] = $this->economic_impact->DefaultValue;
         return $row;
     }
 
@@ -691,6 +703,14 @@ class ProjectsDelete extends Projects
         // end_date
 
         // status
+
+        // project_type
+
+        // municipality
+
+        // coordinates
+
+        // economic_impact
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -772,6 +792,15 @@ class ProjectsDelete extends Projects
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
+            // project_type
+            $this->project_type->ViewValue = $this->project_type->CurrentValue;
+
+            // municipality
+            $this->municipality->ViewValue = $this->municipality->CurrentValue;
+
+            // coordinates
+            $this->coordinates->ViewValue = $this->coordinates->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -836,6 +865,18 @@ class ProjectsDelete extends Projects
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
+
+            // project_type
+            $this->project_type->HrefValue = "";
+            $this->project_type->TooltipValue = "";
+
+            // municipality
+            $this->municipality->HrefValue = "";
+            $this->municipality->TooltipValue = "";
+
+            // coordinates
+            $this->coordinates->HrefValue = "";
+            $this->coordinates->TooltipValue = "";
         }
 
         // Call Row Rendered event

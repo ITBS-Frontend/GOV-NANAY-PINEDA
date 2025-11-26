@@ -143,6 +143,8 @@ class CategoriesView extends Categories
         $this->name->setVisibility();
         $this->color_code->setVisibility();
         $this->created_at->setVisibility();
+        $this->category_type->setVisibility();
+        $this->parent_id->setVisibility();
     }
 
     // Constructor
@@ -733,6 +735,8 @@ class CategoriesView extends Categories
         $this->name->setDbValue($row['name']);
         $this->color_code->setDbValue($row['color_code']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->category_type->setDbValue($row['category_type']);
+        $this->parent_id->setDbValue($row['parent_id']);
     }
 
     // Return a row with default values
@@ -743,6 +747,8 @@ class CategoriesView extends Categories
         $row['name'] = $this->name->DefaultValue;
         $row['color_code'] = $this->color_code->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['category_type'] = $this->category_type->DefaultValue;
+        $row['parent_id'] = $this->parent_id->DefaultValue;
         return $row;
     }
 
@@ -772,6 +778,10 @@ class CategoriesView extends Categories
 
         // created_at
 
+        // category_type
+
+        // parent_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
@@ -786,6 +796,13 @@ class CategoriesView extends Categories
             // created_at
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
+
+            // category_type
+            $this->category_type->ViewValue = $this->category_type->CurrentValue;
+
+            // parent_id
+            $this->parent_id->ViewValue = $this->parent_id->CurrentValue;
+            $this->parent_id->ViewValue = FormatNumber($this->parent_id->ViewValue, $this->parent_id->formatPattern());
 
             // id
             $this->id->HrefValue = "";
@@ -802,6 +819,14 @@ class CategoriesView extends Categories
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // category_type
+            $this->category_type->HrefValue = "";
+            $this->category_type->TooltipValue = "";
+
+            // parent_id
+            $this->parent_id->HrefValue = "";
+            $this->parent_id->TooltipValue = "";
         }
 
         // Call Row Rendered event

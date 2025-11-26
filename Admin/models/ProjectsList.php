@@ -162,6 +162,10 @@ class ProjectsList extends Projects
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
         $this->status->setVisibility();
+        $this->project_type->setVisibility();
+        $this->municipality->setVisibility();
+        $this->coordinates->setVisibility();
+        $this->economic_impact->Visible = false;
     }
 
     // Constructor
@@ -1061,6 +1065,10 @@ class ProjectsList extends Projects
         $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
         $filterList = Concat($filterList, $this->end_date->AdvancedSearch->toJson(), ","); // Field end_date
         $filterList = Concat($filterList, $this->status->AdvancedSearch->toJson(), ","); // Field status
+        $filterList = Concat($filterList, $this->project_type->AdvancedSearch->toJson(), ","); // Field project_type
+        $filterList = Concat($filterList, $this->municipality->AdvancedSearch->toJson(), ","); // Field municipality
+        $filterList = Concat($filterList, $this->coordinates->AdvancedSearch->toJson(), ","); // Field coordinates
+        $filterList = Concat($filterList, $this->economic_impact->AdvancedSearch->toJson(), ","); // Field economic_impact
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1235,6 +1243,38 @@ class ProjectsList extends Projects
         $this->status->AdvancedSearch->SearchValue2 = @$filter["y_status"];
         $this->status->AdvancedSearch->SearchOperator2 = @$filter["w_status"];
         $this->status->AdvancedSearch->save();
+
+        // Field project_type
+        $this->project_type->AdvancedSearch->SearchValue = @$filter["x_project_type"];
+        $this->project_type->AdvancedSearch->SearchOperator = @$filter["z_project_type"];
+        $this->project_type->AdvancedSearch->SearchCondition = @$filter["v_project_type"];
+        $this->project_type->AdvancedSearch->SearchValue2 = @$filter["y_project_type"];
+        $this->project_type->AdvancedSearch->SearchOperator2 = @$filter["w_project_type"];
+        $this->project_type->AdvancedSearch->save();
+
+        // Field municipality
+        $this->municipality->AdvancedSearch->SearchValue = @$filter["x_municipality"];
+        $this->municipality->AdvancedSearch->SearchOperator = @$filter["z_municipality"];
+        $this->municipality->AdvancedSearch->SearchCondition = @$filter["v_municipality"];
+        $this->municipality->AdvancedSearch->SearchValue2 = @$filter["y_municipality"];
+        $this->municipality->AdvancedSearch->SearchOperator2 = @$filter["w_municipality"];
+        $this->municipality->AdvancedSearch->save();
+
+        // Field coordinates
+        $this->coordinates->AdvancedSearch->SearchValue = @$filter["x_coordinates"];
+        $this->coordinates->AdvancedSearch->SearchOperator = @$filter["z_coordinates"];
+        $this->coordinates->AdvancedSearch->SearchCondition = @$filter["v_coordinates"];
+        $this->coordinates->AdvancedSearch->SearchValue2 = @$filter["y_coordinates"];
+        $this->coordinates->AdvancedSearch->SearchOperator2 = @$filter["w_coordinates"];
+        $this->coordinates->AdvancedSearch->save();
+
+        // Field economic_impact
+        $this->economic_impact->AdvancedSearch->SearchValue = @$filter["x_economic_impact"];
+        $this->economic_impact->AdvancedSearch->SearchOperator = @$filter["z_economic_impact"];
+        $this->economic_impact->AdvancedSearch->SearchCondition = @$filter["v_economic_impact"];
+        $this->economic_impact->AdvancedSearch->SearchValue2 = @$filter["y_economic_impact"];
+        $this->economic_impact->AdvancedSearch->SearchOperator2 = @$filter["w_economic_impact"];
+        $this->economic_impact->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1282,6 +1322,10 @@ class ProjectsList extends Projects
         $searchFlds[] = &$this->impact;
         $searchFlds[] = &$this->location;
         $searchFlds[] = &$this->status;
+        $searchFlds[] = &$this->project_type;
+        $searchFlds[] = &$this->municipality;
+        $searchFlds[] = &$this->coordinates;
+        $searchFlds[] = &$this->economic_impact;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1372,6 +1416,9 @@ class ProjectsList extends Projects
             $this->updateSort($this->start_date); // start_date
             $this->updateSort($this->end_date); // end_date
             $this->updateSort($this->status); // status
+            $this->updateSort($this->project_type); // project_type
+            $this->updateSort($this->municipality); // municipality
+            $this->updateSort($this->coordinates); // coordinates
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1413,6 +1460,10 @@ class ProjectsList extends Projects
                 $this->start_date->setSort("");
                 $this->end_date->setSort("");
                 $this->status->setSort("");
+                $this->project_type->setSort("");
+                $this->municipality->setSort("");
+                $this->coordinates->setSort("");
+                $this->economic_impact->setSort("");
             }
 
             // Reset start position
@@ -1659,6 +1710,9 @@ class ProjectsList extends Projects
             $this->createColumnOption($option, "start_date");
             $this->createColumnOption($option, "end_date");
             $this->createColumnOption($option, "status");
+            $this->createColumnOption($option, "project_type");
+            $this->createColumnOption($option, "municipality");
+            $this->createColumnOption($option, "coordinates");
         }
 
         // Set up custom actions
@@ -2115,6 +2169,10 @@ class ProjectsList extends Projects
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->status->setDbValue($row['status']);
+        $this->project_type->setDbValue($row['project_type']);
+        $this->municipality->setDbValue($row['municipality']);
+        $this->coordinates->setDbValue($row['coordinates']);
+        $this->economic_impact->setDbValue($row['economic_impact']);
     }
 
     // Return a row with default values
@@ -2138,6 +2196,10 @@ class ProjectsList extends Projects
         $row['start_date'] = $this->start_date->DefaultValue;
         $row['end_date'] = $this->end_date->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
+        $row['project_type'] = $this->project_type->DefaultValue;
+        $row['municipality'] = $this->municipality->DefaultValue;
+        $row['coordinates'] = $this->coordinates->DefaultValue;
+        $row['economic_impact'] = $this->economic_impact->DefaultValue;
         return $row;
     }
 
@@ -2211,6 +2273,14 @@ class ProjectsList extends Projects
         // end_date
 
         // status
+
+        // project_type
+
+        // municipality
+
+        // coordinates
+
+        // economic_impact
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2292,6 +2362,15 @@ class ProjectsList extends Projects
             // status
             $this->status->ViewValue = $this->status->CurrentValue;
 
+            // project_type
+            $this->project_type->ViewValue = $this->project_type->CurrentValue;
+
+            // municipality
+            $this->municipality->ViewValue = $this->municipality->CurrentValue;
+
+            // coordinates
+            $this->coordinates->ViewValue = $this->coordinates->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2356,6 +2435,18 @@ class ProjectsList extends Projects
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
+
+            // project_type
+            $this->project_type->HrefValue = "";
+            $this->project_type->TooltipValue = "";
+
+            // municipality
+            $this->municipality->HrefValue = "";
+            $this->municipality->TooltipValue = "";
+
+            // coordinates
+            $this->coordinates->HrefValue = "";
+            $this->coordinates->TooltipValue = "";
         }
 
         // Call Row Rendered event

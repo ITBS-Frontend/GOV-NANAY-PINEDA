@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "NewsTagsDelete";
+    public $CurrentPageName = "TourismFacilitiesDelete";
 
     // Page headings
     public $Heading = "";

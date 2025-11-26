@@ -34,7 +34,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["published_date", [fields.published_date.visible && fields.published_date.required ? ew.Validators.required(fields.published_date.caption) : null, ew.Validators.datetime(fields.published_date.clientFormatPattern)], fields.published_date.isInvalid],
             ["views_count", [fields.views_count.visible && fields.views_count.required ? ew.Validators.required(fields.views_count.caption) : null, ew.Validators.integer], fields.views_count.isInvalid],
             ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid],
-            ["updated_at", [fields.updated_at.visible && fields.updated_at.required ? ew.Validators.required(fields.updated_at.caption) : null, ew.Validators.datetime(fields.updated_at.clientFormatPattern)], fields.updated_at.isInvalid]
+            ["updated_at", [fields.updated_at.visible && fields.updated_at.required ? ew.Validators.required(fields.updated_at.caption) : null, ew.Validators.datetime(fields.updated_at.clientFormatPattern)], fields.updated_at.isInvalid],
+            ["news_type", [fields.news_type.visible && fields.news_type.required ? ew.Validators.required(fields.news_type.caption) : null], fields.news_type.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -382,6 +383,18 @@ loadjs.ready(["fnews_postsadd", "datetimepicker"], function () {
 });
 </script>
 <?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->news_type->Visible) { // news_type ?>
+    <div id="r_news_type"<?= $Page->news_type->rowAttributes() ?>>
+        <label id="elh_news_posts_news_type" for="x_news_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->news_type->caption() ?><?= $Page->news_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->news_type->cellAttributes() ?>>
+<span id="el_news_posts_news_type">
+<input type="<?= $Page->news_type->getInputTextType() ?>" name="x_news_type" id="x_news_type" data-table="news_posts" data-field="x_news_type" value="<?= $Page->news_type->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->news_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->news_type->formatPattern()) ?>"<?= $Page->news_type->editAttributes() ?> aria-describedby="x_news_type_help">
+<?= $Page->news_type->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->news_type->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

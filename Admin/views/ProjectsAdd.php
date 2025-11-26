@@ -36,7 +36,11 @@ loadjs.ready(["wrapper", "head"], function () {
             ["location", [fields.location.visible && fields.location.required ? ew.Validators.required(fields.location.caption) : null], fields.location.isInvalid],
             ["start_date", [fields.start_date.visible && fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(fields.start_date.clientFormatPattern)], fields.start_date.isInvalid],
             ["end_date", [fields.end_date.visible && fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(fields.end_date.clientFormatPattern)], fields.end_date.isInvalid],
-            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid]
+            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
+            ["project_type", [fields.project_type.visible && fields.project_type.required ? ew.Validators.required(fields.project_type.caption) : null], fields.project_type.isInvalid],
+            ["municipality", [fields.municipality.visible && fields.municipality.required ? ew.Validators.required(fields.municipality.caption) : null], fields.municipality.isInvalid],
+            ["coordinates", [fields.coordinates.visible && fields.coordinates.required ? ew.Validators.required(fields.coordinates.caption) : null], fields.coordinates.isInvalid],
+            ["economic_impact", [fields.economic_impact.visible && fields.economic_impact.required ? ew.Validators.required(fields.economic_impact.caption) : null], fields.economic_impact.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -434,6 +438,54 @@ loadjs.ready(["fprojectsadd", "datetimepicker"], function () {
 <input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="projects" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
 <?= $Page->status->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->project_type->Visible) { // project_type ?>
+    <div id="r_project_type"<?= $Page->project_type->rowAttributes() ?>>
+        <label id="elh_projects_project_type" for="x_project_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->project_type->caption() ?><?= $Page->project_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->project_type->cellAttributes() ?>>
+<span id="el_projects_project_type">
+<input type="<?= $Page->project_type->getInputTextType() ?>" name="x_project_type" id="x_project_type" data-table="projects" data-field="x_project_type" value="<?= $Page->project_type->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->project_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->project_type->formatPattern()) ?>"<?= $Page->project_type->editAttributes() ?> aria-describedby="x_project_type_help">
+<?= $Page->project_type->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->project_type->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->municipality->Visible) { // municipality ?>
+    <div id="r_municipality"<?= $Page->municipality->rowAttributes() ?>>
+        <label id="elh_projects_municipality" for="x_municipality" class="<?= $Page->LeftColumnClass ?>"><?= $Page->municipality->caption() ?><?= $Page->municipality->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->municipality->cellAttributes() ?>>
+<span id="el_projects_municipality">
+<input type="<?= $Page->municipality->getInputTextType() ?>" name="x_municipality" id="x_municipality" data-table="projects" data-field="x_municipality" value="<?= $Page->municipality->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->municipality->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->municipality->formatPattern()) ?>"<?= $Page->municipality->editAttributes() ?> aria-describedby="x_municipality_help">
+<?= $Page->municipality->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->municipality->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->coordinates->Visible) { // coordinates ?>
+    <div id="r_coordinates"<?= $Page->coordinates->rowAttributes() ?>>
+        <label id="elh_projects_coordinates" for="x_coordinates" class="<?= $Page->LeftColumnClass ?>"><?= $Page->coordinates->caption() ?><?= $Page->coordinates->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->coordinates->cellAttributes() ?>>
+<span id="el_projects_coordinates">
+<input type="<?= $Page->coordinates->getInputTextType() ?>" name="x_coordinates" id="x_coordinates" data-table="projects" data-field="x_coordinates" value="<?= $Page->coordinates->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->coordinates->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->coordinates->formatPattern()) ?>"<?= $Page->coordinates->editAttributes() ?> aria-describedby="x_coordinates_help">
+<?= $Page->coordinates->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->coordinates->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->economic_impact->Visible) { // economic_impact ?>
+    <div id="r_economic_impact"<?= $Page->economic_impact->rowAttributes() ?>>
+        <label id="elh_projects_economic_impact" for="x_economic_impact" class="<?= $Page->LeftColumnClass ?>"><?= $Page->economic_impact->caption() ?><?= $Page->economic_impact->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->economic_impact->cellAttributes() ?>>
+<span id="el_projects_economic_impact">
+<textarea data-table="projects" data-field="x_economic_impact" name="x_economic_impact" id="x_economic_impact" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->economic_impact->getPlaceHolder()) ?>"<?= $Page->economic_impact->editAttributes() ?> aria-describedby="x_economic_impact_help"><?= $Page->economic_impact->EditValue ?></textarea>
+<?= $Page->economic_impact->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->economic_impact->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

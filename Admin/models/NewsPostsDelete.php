@@ -135,6 +135,7 @@ class NewsPostsDelete extends NewsPosts
         $this->views_count->setVisibility();
         $this->created_at->setVisibility();
         $this->updated_at->setVisibility();
+        $this->news_type->setVisibility();
     }
 
     // Constructor
@@ -615,6 +616,7 @@ class NewsPostsDelete extends NewsPosts
         $this->views_count->setDbValue($row['views_count']);
         $this->created_at->setDbValue($row['created_at']);
         $this->updated_at->setDbValue($row['updated_at']);
+        $this->news_type->setDbValue($row['news_type']);
     }
 
     // Return a row with default values
@@ -635,6 +637,7 @@ class NewsPostsDelete extends NewsPosts
         $row['views_count'] = $this->views_count->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
         $row['updated_at'] = $this->updated_at->DefaultValue;
+        $row['news_type'] = $this->news_type->DefaultValue;
         return $row;
     }
 
@@ -677,6 +680,8 @@ class NewsPostsDelete extends NewsPosts
         // created_at
 
         // updated_at
+
+        // news_type
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -757,6 +762,9 @@ class NewsPostsDelete extends NewsPosts
             $this->updated_at->ViewValue = $this->updated_at->CurrentValue;
             $this->updated_at->ViewValue = FormatDateTime($this->updated_at->ViewValue, $this->updated_at->formatPattern());
 
+            // news_type
+            $this->news_type->ViewValue = $this->news_type->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -821,6 +829,10 @@ class NewsPostsDelete extends NewsPosts
             // updated_at
             $this->updated_at->HrefValue = "";
             $this->updated_at->TooltipValue = "";
+
+            // news_type
+            $this->news_type->HrefValue = "";
+            $this->news_type->TooltipValue = "";
         }
 
         // Call Row Rendered event

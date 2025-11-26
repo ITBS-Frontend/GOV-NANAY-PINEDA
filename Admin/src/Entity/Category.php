@@ -43,9 +43,16 @@ class Category extends AbstractEntity
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
+    #[Column(name: "category_type", type: "string", nullable: true)]
+    private ?string $categoryType;
+
+    #[Column(name: "parent_id", type: "integer", nullable: true)]
+    private ?int $parentId;
+
     public function __construct()
     {
         $this->colorCode = "#3b82f6";
+        $this->categoryType = "project";
     }
 
     public function getId(): int
@@ -89,6 +96,28 @@ class Category extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getCategoryType(): ?string
+    {
+        return HtmlDecode($this->categoryType);
+    }
+
+    public function setCategoryType(?string $value): static
+    {
+        $this->categoryType = RemoveXss($value);
+        return $this;
+    }
+
+    public function getParentId(): ?int
+    {
+        return $this->parentId;
+    }
+
+    public function setParentId(?int $value): static
+    {
+        $this->parentId = $value;
         return $this;
     }
 }

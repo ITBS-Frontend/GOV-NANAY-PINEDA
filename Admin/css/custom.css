@@ -629,7 +629,7 @@ body > div.wrapper.ew-layout > div.content-wrapper > section > div > section > d
 }
 
 .nav-sidebar.nav-child-indent .nav-treeview{
-  padding: unset !important;
+  /* padding: unset !important; */
 }
 
 /* body > div.wrapper.ew-layout > div.content-wrapper > section > div > div.btn-toolbar.ew-toolbar > div.ew-search-option.d-inline-block.text-nowrap > div > a > i{

@@ -1,7 +1,94 @@
-<ew-language date="2025/11/25" id="en-US" author="e.World Technology Limited">
+<ew-language date="2025/11/26" id="en-US" author="e.World Technology Limited">
   <project>
     <phrase id="bodytitle" value="Gov. Lilia &quot;Nanay&quot; Pineda" />
     <phrase id="footertext" value="&amp;copy;2023 e.World Technology Limited. All rights reserved." />
+    <menu id="88">
+      <phrase id="menutext" value="About Pampanga" />
+    </menu>
+    <menu id="46">
+      <phrase id="menutext" value="Demographics Data" />
+    </menu>
+    <menu id="60">
+      <phrase id="menutext" value="Province History" />
+    </menu>
+    <menu id="53">
+      <phrase id="menutext" value="Geographic Info" />
+    </menu>
+    <menu id="57">
+      <phrase id="menutext" value="Municipalities" />
+    </menu>
+    <menu id="89">
+      <phrase id="menutext" value="Government" />
+    </menu>
+    <menu id="54">
+      <phrase id="menutext" value="Government Facilities" />
+    </menu>
+    <menu id="61">
+      <phrase id="menutext" value="Public Services" />
+    </menu>
+    <menu id="62">
+      <phrase id="menutext" value="Service Categories" />
+    </menu>
+    <menu id="90">
+      <phrase id="menutext" value="Tourism" />
+    </menu>
+    <menu id="64">
+      <phrase id="menutext" value="Tourism Activities" />
+    </menu>
+    <menu id="47">
+      <phrase id="menutext" value="Destination Gallery" />
+    </menu>
+    <menu id="66">
+      <phrase id="menutext" value="Tourism Destinations" />
+    </menu>
+    <menu id="67">
+      <phrase id="menutext" value="Tourism Facilities" />
+    </menu>
+    <menu id="65">
+      <phrase id="menutext" value="Tourism Categories" />
+    </menu>
+    <menu id="91">
+      <phrase id="menutext" value="Program and Service" />
+    </menu>
+    <menu id="63">
+      <phrase id="menutext" value="Social Welfare Programs" />
+    </menu>
+    <menu id="55">
+      <phrase id="menutext" value="Health Programs" />
+    </menu>
+    <menu id="59">
+      <phrase id="menutext" value="Program Statistics" />
+    </menu>
+    <menu id="58">
+      <phrase id="menutext" value="Program Categories" />
+    </menu>
+    <menu id="92">
+      <phrase id="menutext" value="Development" />
+    </menu>
+    <menu id="50">
+      <phrase id="menutext" value="Economic Indicators" />
+    </menu>
+    <menu id="45">
+      <phrase id="menutext" value="Business Sectors" />
+    </menu>
+    <menu id="56">
+      <phrase id="menutext" value="Investment Opportunities" />
+    </menu>
+    <menu id="93">
+      <phrase id="menutext" value="Emergency and Disaster" />
+    </menu>
+    <menu id="51">
+      <phrase id="menutext" value="Emergency Facilities" />
+    </menu>
+    <menu id="52">
+      <phrase id="menutext" value="Environmental Programs" />
+    </menu>
+    <menu id="49">
+      <phrase id="menutext" value="Disaster Preparedness" />
+    </menu>
+    <menu id="48">
+      <phrase id="menutext" value="Disaster Incidents" />
+    </menu>
     <menu id="44">
       <phrase id="menutext" value="News Article" />
     </menu>
@@ -39,7 +126,7 @@
       <phrase id="menutext" value="project stats" />
     </menu>
     <menu id="13">
-      <phrase id="menutext" value="About Section" />
+      <phrase id="menutext" value="About Governor Section" />
     </menu>
     <menu id="11">
       <phrase id="menutext" value="Profile Details" />
@@ -78,6 +165,12 @@
       </field>
       <field id="created_at">
         <phrase id="fldcaption" value="created at" />
+      </field>
+      <field id="category_type">
+        <phrase id="fldcaption" value="category type" />
+      </field>
+      <field id="parent_id">
+        <phrase id="fldcaption" value="parent id" />
       </field>
     </table>
     <table id="political_journey">
@@ -188,6 +281,18 @@
       </field>
       <field id="status">
         <phrase id="fldcaption" value="status" />
+      </field>
+      <field id="project_type">
+        <phrase id="fldcaption" value="project type" />
+      </field>
+      <field id="municipality">
+        <phrase id="fldcaption" value="municipality" />
+      </field>
+      <field id="coordinates">
+        <phrase id="fldcaption" value="coordinates" />
+      </field>
+      <field id="economic_impact">
+        <phrase id="fldcaption" value="economic impact" />
       </field>
     </table>
     <table id="_user_levels">
@@ -509,6 +614,9 @@
       <field id="updated_at">
         <phrase id="fldcaption" value="updated at" />
       </field>
+      <field id="news_type">
+        <phrase id="fldcaption" value="news type" />
+      </field>
     </table>
     <table id="news_tags">
       <phrase id="tblcaption" value="news tags" />
@@ -520,6 +628,794 @@
       </field>
       <field id="slug">
         <phrase id="fldcaption" value="slug" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="business_sectors">
+      <phrase id="tblcaption" value="business sectors" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="sector_name">
+        <phrase id="fldcaption" value="sector name" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="number_of_establishments">
+        <phrase id="fldcaption" value="number of establishments" />
+      </field>
+      <field id="employment_generated">
+        <phrase id="fldcaption" value="employment generated" />
+      </field>
+      <field id="contribution_to_gdp">
+        <phrase id="fldcaption" value="contribution to gdp" />
+      </field>
+      <field id="icon_class">
+        <phrase id="fldcaption" value="icon class" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="demographics_data">
+      <phrase id="tblcaption" value="demographics data" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="data_type">
+        <phrase id="fldcaption" value="data type" />
+      </field>
+      <field id="label">
+        <phrase id="fldcaption" value="label" />
+      </field>
+      <field id="value">
+        <phrase id="fldcaption" value="value" />
+      </field>
+      <field id="year">
+        <phrase id="fldcaption" value="year" />
+      </field>
+      <field id="source">
+        <phrase id="fldcaption" value="source" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="destination_gallery">
+      <phrase id="tblcaption" value="destination gallery" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="destination_id">
+        <phrase id="fldcaption" value="destination id" />
+      </field>
+      <field id="image_path">
+        <phrase id="fldcaption" value="image path" />
+      </field>
+      <field id="caption">
+        <phrase id="fldcaption" value="caption" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="disaster_incidents">
+      <phrase id="tblcaption" value="disaster incidents" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="incident_type">
+        <phrase id="fldcaption" value="incident type" />
+      </field>
+      <field id="incident_name">
+        <phrase id="fldcaption" value="incident name" />
+      </field>
+      <field id="occurrence_date">
+        <phrase id="fldcaption" value="occurrence date" />
+      </field>
+      <field id="affected_areas">
+        <phrase id="fldcaption" value="affected areas" />
+      </field>
+      <field id="casualties">
+        <phrase id="fldcaption" value="casualties" />
+      </field>
+      <field id="damages_estimated">
+        <phrase id="fldcaption" value="damages estimated" />
+      </field>
+      <field id="response_actions">
+        <phrase id="fldcaption" value="response actions" />
+      </field>
+      <field id="lessons_learned">
+        <phrase id="fldcaption" value="lessons learned" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="disaster_preparedness">
+      <phrase id="tblcaption" value="disaster preparedness" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="disaster_type">
+        <phrase id="fldcaption" value="disaster type" />
+      </field>
+      <field id="preparedness_guide">
+        <phrase id="fldcaption" value="preparedness guide" />
+      </field>
+      <field id="emergency_hotlines">
+        <phrase id="fldcaption" value="emergency hotlines" />
+      </field>
+      <field id="evacuation_centers">
+        <phrase id="fldcaption" value="evacuation centers" />
+      </field>
+      <field id="relief_procedures">
+        <phrase id="fldcaption" value="relief procedures" />
+      </field>
+      <field id="featured_image">
+        <phrase id="fldcaption" value="featured image" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="economic_indicators">
+      <phrase id="tblcaption" value="economic indicators" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="indicator_name">
+        <phrase id="fldcaption" value="indicator name" />
+      </field>
+      <field id="value">
+        <phrase id="fldcaption" value="value" />
+      </field>
+      <field id="unit">
+        <phrase id="fldcaption" value="unit" />
+      </field>
+      <field id="year">
+        <phrase id="fldcaption" value="year" />
+      </field>
+      <field id="quarter">
+        <phrase id="fldcaption" value="quarter" />
+      </field>
+      <field id="source">
+        <phrase id="fldcaption" value="source" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="emergency_facilities">
+      <phrase id="tblcaption" value="emergency facilities" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="facility_type">
+        <phrase id="fldcaption" value="facility type" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="municipality">
+        <phrase id="fldcaption" value="municipality" />
+      </field>
+      <field id="address">
+        <phrase id="fldcaption" value="address" />
+      </field>
+      <field id="capacity">
+        <phrase id="fldcaption" value="capacity" />
+      </field>
+      <field id="contact_number">
+        <phrase id="fldcaption" value="contact number" />
+      </field>
+      <field id="coordinates">
+        <phrase id="fldcaption" value="coordinates" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="environmental_programs">
+      <phrase id="tblcaption" value="environmental programs" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="program_name">
+        <phrase id="fldcaption" value="program name" />
+      </field>
+      <field id="program_type">
+        <phrase id="fldcaption" value="program type" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="objectives">
+        <phrase id="fldcaption" value="objectives" />
+      </field>
+      <field id="coverage_area">
+        <phrase id="fldcaption" value="coverage area" />
+      </field>
+      <field id="implementation_date">
+        <phrase id="fldcaption" value="implementation date" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="status" />
+      </field>
+      <field id="featured_image">
+        <phrase id="fldcaption" value="featured image" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="geographic_info">
+      <phrase id="tblcaption" value="geographic info" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="info_type">
+        <phrase id="fldcaption" value="info type" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="coordinates">
+        <phrase id="fldcaption" value="coordinates" />
+      </field>
+      <field id="area_sqkm">
+        <phrase id="fldcaption" value="area sqkm" />
+      </field>
+      <field id="population">
+        <phrase id="fldcaption" value="population" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="government_facilities">
+      <phrase id="tblcaption" value="government facilities" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="facility_type">
+        <phrase id="fldcaption" value="facility type" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="address">
+        <phrase id="fldcaption" value="address" />
+      </field>
+      <field id="municipality">
+        <phrase id="fldcaption" value="municipality" />
+      </field>
+      <field id="contact_number">
+        <phrase id="fldcaption" value="contact number" />
+      </field>
+      <field id="_email">
+        <phrase id="fldcaption" value="email" />
+      </field>
+      <field id="operating_hours">
+        <phrase id="fldcaption" value="operating hours" />
+      </field>
+      <field id="services_offered">
+        <phrase id="fldcaption" value="services offered" />
+      </field>
+      <field id="coordinates">
+        <phrase id="fldcaption" value="coordinates" />
+      </field>
+      <field id="featured_image">
+        <phrase id="fldcaption" value="featured image" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="health_programs">
+      <phrase id="tblcaption" value="health programs" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="program_name">
+        <phrase id="fldcaption" value="program name" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="objectives">
+        <phrase id="fldcaption" value="objectives" />
+      </field>
+      <field id="target_beneficiaries">
+        <phrase id="fldcaption" value="target beneficiaries" />
+      </field>
+      <field id="coverage_area">
+        <phrase id="fldcaption" value="coverage area" />
+      </field>
+      <field id="implementation_date">
+        <phrase id="fldcaption" value="implementation date" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="status" />
+      </field>
+      <field id="contact_info">
+        <phrase id="fldcaption" value="contact info" />
+      </field>
+      <field id="featured_image">
+        <phrase id="fldcaption" value="featured image" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="investment_opportunities">
+      <phrase id="tblcaption" value="investment opportunities" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="opportunity_title">
+        <phrase id="fldcaption" value="opportunity title" />
+      </field>
+      <field id="sector">
+        <phrase id="fldcaption" value="sector" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="location">
+        <phrase id="fldcaption" value="location" />
+      </field>
+      <field id="estimated_investment">
+        <phrase id="fldcaption" value="estimated investment" />
+      </field>
+      <field id="potential_returns">
+        <phrase id="fldcaption" value="potential returns" />
+      </field>
+      <field id="incentives">
+        <phrase id="fldcaption" value="incentives" />
+      </field>
+      <field id="contact_info">
+        <phrase id="fldcaption" value="contact info" />
+      </field>
+      <field id="featured_image">
+        <phrase id="fldcaption" value="featured image" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="municipalities">
+      <phrase id="tblcaption" value="municipalities" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="population">
+        <phrase id="fldcaption" value="population" />
+      </field>
+      <field id="area_sqkm">
+        <phrase id="fldcaption" value="area sqkm" />
+      </field>
+      <field id="coordinates">
+        <phrase id="fldcaption" value="coordinates" />
+      </field>
+      <field id="mayor_name">
+        <phrase id="fldcaption" value="mayor name" />
+      </field>
+      <field id="contact_number">
+        <phrase id="fldcaption" value="contact number" />
+      </field>
+      <field id="_email">
+        <phrase id="fldcaption" value="email" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="program_categories">
+      <phrase id="tblcaption" value="program categories" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="icon_class">
+        <phrase id="fldcaption" value="icon class" />
+      </field>
+      <field id="color_code">
+        <phrase id="fldcaption" value="color code" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="program_statistics">
+      <phrase id="tblcaption" value="program statistics" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="program_id">
+        <phrase id="fldcaption" value="program id" />
+      </field>
+      <field id="program_type">
+        <phrase id="fldcaption" value="program type" />
+      </field>
+      <field id="stat_label">
+        <phrase id="fldcaption" value="stat label" />
+      </field>
+      <field id="stat_value">
+        <phrase id="fldcaption" value="stat value" />
+      </field>
+      <field id="year">
+        <phrase id="fldcaption" value="year" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="province_history">
+      <phrase id="tblcaption" value="province history" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="_title">
+        <phrase id="fldcaption" value="title" />
+      </field>
+      <field id="period">
+        <phrase id="fldcaption" value="period" />
+      </field>
+      <field id="_content">
+        <phrase id="fldcaption" value="content" />
+      </field>
+      <field id="timeline_year">
+        <phrase id="fldcaption" value="timeline year" />
+      </field>
+      <field id="featured_image">
+        <phrase id="fldcaption" value="featured image" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="public_services">
+      <phrase id="tblcaption" value="public services" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="category_id">
+        <phrase id="fldcaption" value="category id" />
+      </field>
+      <field id="service_name">
+        <phrase id="fldcaption" value="service name" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="requirements">
+        <phrase id="fldcaption" value="requirements" />
+      </field>
+      <field id="process_steps">
+        <phrase id="fldcaption" value="process steps" />
+      </field>
+      <field id="processing_time">
+        <phrase id="fldcaption" value="processing time" />
+      </field>
+      <field id="fees">
+        <phrase id="fldcaption" value="fees" />
+      </field>
+      <field id="contact_info">
+        <phrase id="fldcaption" value="contact info" />
+      </field>
+      <field id="online_link">
+        <phrase id="fldcaption" value="online link" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="service_categories">
+      <phrase id="tblcaption" value="service categories" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="icon_class">
+        <phrase id="fldcaption" value="icon class" />
+      </field>
+      <field id="color_code">
+        <phrase id="fldcaption" value="color code" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="social_welfare_programs">
+      <phrase id="tblcaption" value="social welfare programs" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="category_id">
+        <phrase id="fldcaption" value="category id" />
+      </field>
+      <field id="program_name">
+        <phrase id="fldcaption" value="program name" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="eligibility_criteria">
+        <phrase id="fldcaption" value="eligibility criteria" />
+      </field>
+      <field id="benefits">
+        <phrase id="fldcaption" value="benefits" />
+      </field>
+      <field id="how_to_apply">
+        <phrase id="fldcaption" value="how to apply" />
+      </field>
+      <field id="required_documents">
+        <phrase id="fldcaption" value="required documents" />
+      </field>
+      <field id="contact_info">
+        <phrase id="fldcaption" value="contact info" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="tourism_activities">
+      <phrase id="tblcaption" value="tourism activities" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="destination_id">
+        <phrase id="fldcaption" value="destination id" />
+      </field>
+      <field id="activity_name">
+        <phrase id="fldcaption" value="activity name" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="duration">
+        <phrase id="fldcaption" value="duration" />
+      </field>
+      <field id="difficulty_level">
+        <phrase id="fldcaption" value="difficulty level" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="tourism_categories">
+      <phrase id="tblcaption" value="tourism categories" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="icon_class">
+        <phrase id="fldcaption" value="icon class" />
+      </field>
+      <field id="color_code">
+        <phrase id="fldcaption" value="color code" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="tourism_destinations">
+      <phrase id="tblcaption" value="tourism destinations" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="category_id">
+        <phrase id="fldcaption" value="category id" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="full_description">
+        <phrase id="fldcaption" value="full description" />
+      </field>
+      <field id="municipality">
+        <phrase id="fldcaption" value="municipality" />
+      </field>
+      <field id="address">
+        <phrase id="fldcaption" value="address" />
+      </field>
+      <field id="coordinates">
+        <phrase id="fldcaption" value="coordinates" />
+      </field>
+      <field id="entry_fee">
+        <phrase id="fldcaption" value="entry fee" />
+      </field>
+      <field id="operating_hours">
+        <phrase id="fldcaption" value="operating hours" />
+      </field>
+      <field id="best_time_to_visit">
+        <phrase id="fldcaption" value="best time to visit" />
+      </field>
+      <field id="how_to_get_there">
+        <phrase id="fldcaption" value="how to get there" />
+      </field>
+      <field id="featured_image">
+        <phrase id="fldcaption" value="featured image" />
+      </field>
+      <field id="is_featured">
+        <phrase id="fldcaption" value="is featured" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+    </table>
+    <table id="tourism_facilities">
+      <phrase id="tblcaption" value="tourism facilities" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="facility_type">
+        <phrase id="fldcaption" value="facility type" />
+      </field>
+      <field id="ownership">
+        <phrase id="fldcaption" value="ownership" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="name" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="municipality">
+        <phrase id="fldcaption" value="municipality" />
+      </field>
+      <field id="address">
+        <phrase id="fldcaption" value="address" />
+      </field>
+      <field id="contact_number">
+        <phrase id="fldcaption" value="contact number" />
+      </field>
+      <field id="_email">
+        <phrase id="fldcaption" value="email" />
+      </field>
+      <field id="website">
+        <phrase id="fldcaption" value="website" />
+      </field>
+      <field id="price_range">
+        <phrase id="fldcaption" value="price range" />
+      </field>
+      <field id="amenities">
+        <phrase id="fldcaption" value="amenities" />
+      </field>
+      <field id="coordinates">
+        <phrase id="fldcaption" value="coordinates" />
+      </field>
+      <field id="featured_image">
+        <phrase id="fldcaption" value="featured image" />
+      </field>
+      <field id="rating">
+        <phrase id="fldcaption" value="rating" />
+      </field>
+      <field id="is_verified">
+        <phrase id="fldcaption" value="is verified" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
       </field>
       <field id="created_at">
         <phrase id="fldcaption" value="created at" />

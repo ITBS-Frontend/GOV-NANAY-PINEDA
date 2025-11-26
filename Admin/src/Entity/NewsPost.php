@@ -73,10 +73,14 @@ class NewsPost extends AbstractEntity
     #[Column(name: "updated_at", type: "datetime", nullable: true)]
     private ?DateTime $updatedAt;
 
+    #[Column(name: "news_type", type: "string", nullable: true)]
+    private ?string $newsType;
+
     public function __construct()
     {
         $this->authorName = "office of gov. lilia pineda";
         $this->viewsCount = 0;
+        $this->newsType = "general";
     }
 
     public function getId(): int
@@ -230,6 +234,17 @@ class NewsPost extends AbstractEntity
     public function setUpdatedAt(?DateTime $value): static
     {
         $this->updatedAt = $value;
+        return $this;
+    }
+
+    public function getNewsType(): ?string
+    {
+        return HtmlDecode($this->newsType);
+    }
+
+    public function setNewsType(?string $value): static
+    {
+        $this->newsType = RemoveXss($value);
         return $this;
     }
 }

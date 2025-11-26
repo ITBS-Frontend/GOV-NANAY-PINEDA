@@ -159,6 +159,7 @@ class NewsPostsList extends NewsPosts
         $this->views_count->setVisibility();
         $this->created_at->setVisibility();
         $this->updated_at->setVisibility();
+        $this->news_type->setVisibility();
     }
 
     // Constructor
@@ -1056,6 +1057,7 @@ class NewsPostsList extends NewsPosts
         $filterList = Concat($filterList, $this->views_count->AdvancedSearch->toJson(), ","); // Field views_count
         $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
         $filterList = Concat($filterList, $this->updated_at->AdvancedSearch->toJson(), ","); // Field updated_at
+        $filterList = Concat($filterList, $this->news_type->AdvancedSearch->toJson(), ","); // Field news_type
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1206,6 +1208,14 @@ class NewsPostsList extends NewsPosts
         $this->updated_at->AdvancedSearch->SearchValue2 = @$filter["y_updated_at"];
         $this->updated_at->AdvancedSearch->SearchOperator2 = @$filter["w_updated_at"];
         $this->updated_at->AdvancedSearch->save();
+
+        // Field news_type
+        $this->news_type->AdvancedSearch->SearchValue = @$filter["x_news_type"];
+        $this->news_type->AdvancedSearch->SearchOperator = @$filter["z_news_type"];
+        $this->news_type->AdvancedSearch->SearchCondition = @$filter["v_news_type"];
+        $this->news_type->AdvancedSearch->SearchValue2 = @$filter["y_news_type"];
+        $this->news_type->AdvancedSearch->SearchOperator2 = @$filter["w_news_type"];
+        $this->news_type->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1251,6 +1261,7 @@ class NewsPostsList extends NewsPosts
         $searchFlds[] = &$this->_content;
         $searchFlds[] = &$this->featured_image;
         $searchFlds[] = &$this->author_name;
+        $searchFlds[] = &$this->news_type;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1341,6 +1352,7 @@ class NewsPostsList extends NewsPosts
             $this->updateSort($this->views_count); // views_count
             $this->updateSort($this->created_at); // created_at
             $this->updateSort($this->updated_at); // updated_at
+            $this->updateSort($this->news_type); // news_type
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1379,6 +1391,7 @@ class NewsPostsList extends NewsPosts
                 $this->views_count->setSort("");
                 $this->created_at->setSort("");
                 $this->updated_at->setSort("");
+                $this->news_type->setSort("");
             }
 
             // Reset start position
@@ -1625,6 +1638,7 @@ class NewsPostsList extends NewsPosts
             $this->createColumnOption($option, "views_count");
             $this->createColumnOption($option, "created_at");
             $this->createColumnOption($option, "updated_at");
+            $this->createColumnOption($option, "news_type");
         }
 
         // Set up custom actions
@@ -2078,6 +2092,7 @@ class NewsPostsList extends NewsPosts
         $this->views_count->setDbValue($row['views_count']);
         $this->created_at->setDbValue($row['created_at']);
         $this->updated_at->setDbValue($row['updated_at']);
+        $this->news_type->setDbValue($row['news_type']);
     }
 
     // Return a row with default values
@@ -2098,6 +2113,7 @@ class NewsPostsList extends NewsPosts
         $row['views_count'] = $this->views_count->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
         $row['updated_at'] = $this->updated_at->DefaultValue;
+        $row['news_type'] = $this->news_type->DefaultValue;
         return $row;
     }
 
@@ -2165,6 +2181,8 @@ class NewsPostsList extends NewsPosts
         // created_at
 
         // updated_at
+
+        // news_type
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2245,6 +2263,9 @@ class NewsPostsList extends NewsPosts
             $this->updated_at->ViewValue = $this->updated_at->CurrentValue;
             $this->updated_at->ViewValue = FormatDateTime($this->updated_at->ViewValue, $this->updated_at->formatPattern());
 
+            // news_type
+            $this->news_type->ViewValue = $this->news_type->CurrentValue;
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2309,6 +2330,10 @@ class NewsPostsList extends NewsPosts
             // updated_at
             $this->updated_at->HrefValue = "";
             $this->updated_at->TooltipValue = "";
+
+            // news_type
+            $this->news_type->HrefValue = "";
+            $this->news_type->TooltipValue = "";
         }
 
         // Call Row Rendered event

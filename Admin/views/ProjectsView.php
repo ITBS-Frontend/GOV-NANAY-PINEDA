@@ -229,6 +229,50 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->project_type->Visible) { // project_type ?>
+    <tr id="r_project_type"<?= $Page->project_type->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_project_type"><?= $Page->project_type->caption() ?></span></td>
+        <td data-name="project_type"<?= $Page->project_type->cellAttributes() ?>>
+<span id="el_projects_project_type">
+<span<?= $Page->project_type->viewAttributes() ?>>
+<?= $Page->project_type->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->municipality->Visible) { // municipality ?>
+    <tr id="r_municipality"<?= $Page->municipality->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_municipality"><?= $Page->municipality->caption() ?></span></td>
+        <td data-name="municipality"<?= $Page->municipality->cellAttributes() ?>>
+<span id="el_projects_municipality">
+<span<?= $Page->municipality->viewAttributes() ?>>
+<?= $Page->municipality->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->coordinates->Visible) { // coordinates ?>
+    <tr id="r_coordinates"<?= $Page->coordinates->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_coordinates"><?= $Page->coordinates->caption() ?></span></td>
+        <td data-name="coordinates"<?= $Page->coordinates->cellAttributes() ?>>
+<span id="el_projects_coordinates">
+<span<?= $Page->coordinates->viewAttributes() ?>>
+<?= $Page->coordinates->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->economic_impact->Visible) { // economic_impact ?>
+    <tr id="r_economic_impact"<?= $Page->economic_impact->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_economic_impact"><?= $Page->economic_impact->caption() ?></span></td>
+        <td data-name="economic_impact"<?= $Page->economic_impact->cellAttributes() ?>>
+<span id="el_projects_economic_impact">
+<span<?= $Page->economic_impact->viewAttributes() ?>>
+<?= $Page->economic_impact->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 </main>

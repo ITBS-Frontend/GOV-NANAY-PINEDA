@@ -60,6 +60,7 @@ class NewsPosts extends DbTable
     public $views_count;
     public $created_at;
     public $updated_at;
+    public $news_type;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -449,6 +450,29 @@ class NewsPosts extends DbTable
         $this->updated_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->updated_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['updated_at'] = &$this->updated_at;
+
+        // news_type
+        $this->news_type = new DbField(
+            $this, // Table
+            'x_news_type', // Variable name
+            'news_type', // Name
+            '"news_type"', // Expression
+            '"news_type"', // Basic search expression
+            200, // Type
+            50, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"news_type"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->news_type->addMethod("getDefault", fn() => "general");
+        $this->news_type->InputTextType = "text";
+        $this->news_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['news_type'] = &$this->news_type;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -986,6 +1010,7 @@ class NewsPosts extends DbTable
         $this->views_count->DbValue = $row['views_count'];
         $this->created_at->DbValue = $row['created_at'];
         $this->updated_at->DbValue = $row['updated_at'];
+        $this->news_type->DbValue = $row['news_type'];
     }
 
     // Delete uploaded files
@@ -1359,6 +1384,7 @@ class NewsPosts extends DbTable
         $this->views_count->setDbValue($row['views_count']);
         $this->created_at->setDbValue($row['created_at']);
         $this->updated_at->setDbValue($row['updated_at']);
+        $this->news_type->setDbValue($row['news_type']);
     }
 
     // Render list content
@@ -1416,6 +1442,8 @@ class NewsPosts extends DbTable
         // created_at
 
         // updated_at
+
+        // news_type
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1500,6 +1528,9 @@ class NewsPosts extends DbTable
         $this->updated_at->ViewValue = $this->updated_at->CurrentValue;
         $this->updated_at->ViewValue = FormatDateTime($this->updated_at->ViewValue, $this->updated_at->formatPattern());
 
+        // news_type
+        $this->news_type->ViewValue = $this->news_type->CurrentValue;
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
@@ -1572,6 +1603,10 @@ class NewsPosts extends DbTable
         // updated_at
         $this->updated_at->HrefValue = "";
         $this->updated_at->TooltipValue = "";
+
+        // news_type
+        $this->news_type->HrefValue = "";
+        $this->news_type->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1677,6 +1712,14 @@ class NewsPosts extends DbTable
         $this->updated_at->EditValue = FormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern());
         $this->updated_at->PlaceHolder = RemoveHtml($this->updated_at->caption());
 
+        // news_type
+        $this->news_type->setupEditAttributes();
+        if (!$this->news_type->Raw) {
+            $this->news_type->CurrentValue = HtmlDecode($this->news_type->CurrentValue);
+        }
+        $this->news_type->EditValue = $this->news_type->CurrentValue;
+        $this->news_type->PlaceHolder = RemoveHtml($this->news_type->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1719,6 +1762,7 @@ class NewsPosts extends DbTable
                     $doc->exportCaption($this->views_count);
                     $doc->exportCaption($this->created_at);
                     $doc->exportCaption($this->updated_at);
+                    $doc->exportCaption($this->news_type);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->_title);
@@ -1732,6 +1776,7 @@ class NewsPosts extends DbTable
                     $doc->exportCaption($this->views_count);
                     $doc->exportCaption($this->created_at);
                     $doc->exportCaption($this->updated_at);
+                    $doc->exportCaption($this->news_type);
                 }
                 $doc->endExportRow();
             }
@@ -1772,6 +1817,7 @@ class NewsPosts extends DbTable
                         $doc->exportField($this->views_count);
                         $doc->exportField($this->created_at);
                         $doc->exportField($this->updated_at);
+                        $doc->exportField($this->news_type);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->_title);
@@ -1785,6 +1831,7 @@ class NewsPosts extends DbTable
                         $doc->exportField($this->views_count);
                         $doc->exportField($this->created_at);
                         $doc->exportField($this->updated_at);
+                        $doc->exportField($this->news_type);
                     }
                     $doc->endExportRow($rowCnt);
                 }
