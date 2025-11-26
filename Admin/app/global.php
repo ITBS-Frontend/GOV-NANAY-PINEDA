@@ -22,6 +22,12 @@ $s3client->registerStreamWrapper();
 
 include_once(dirname(__DIR__, 1) . "/app/lib/ProjectService.php");
 include_once(dirname(__DIR__, 1) . "/app/lib/NewsService.php");
+include_once(dirname(__DIR__, 1) . "/app/lib/ProvinceService.php");
+include_once(dirname(__DIR__, 1) . "/app/lib/GovernmentService.php");
+include_once(dirname(__DIR__, 1) . "/app/lib/TourismService.php");
+include_once(dirname(__DIR__, 1) . "/app/lib/ProgramsService.php");
+include_once(dirname(__DIR__, 1) . "/app/lib/DevelopmentService.php");
+include_once(dirname(__DIR__, 1) . "/app/lib/EnvironmentService.php");
 
 
 function appConfig($option)

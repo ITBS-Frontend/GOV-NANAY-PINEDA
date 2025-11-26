@@ -34,4 +34,10 @@ $jwtMiddleware = function (Request $request, RequestHandler $handler): Response 
 
 include_once(dirname(__DIR__, 1) . "/app/api/ProjectApi.php");
 include_once(dirname(__DIR__, 1) . "/app/api/NewsApi.php");
+include_once(dirname(__DIR__, 1) . "/app/api/ProvinceApi.php");
+include_once(dirname(__DIR__, 1) . "/app/api/GovernmentApi.php");
+include_once(dirname(__DIR__, 1) . "/app/api/TourismApi.php");
+include_once(dirname(__DIR__, 1) . "/app/api/ProgramsApi.php");
+include_once(dirname(__DIR__, 1) . "/app/api/DevelopmentApi.php");
+include_once(dirname(__DIR__, 1) . "/app/api/EnvironmentApi.php");
 

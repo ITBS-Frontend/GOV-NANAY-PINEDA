@@ -7,25 +7,37 @@
         <span></span>
     </button>
     <div class="nav-menu">
-        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>" data-section="hero">
+        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>" data-section="hero" data-page="index.php">
             <i class="fas fa-home"></i>
-            <span class="nav-tooltip">Home</span>
+            <span class="nav-text">Home</span>
         </div>
-        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'news.php' || basename($_SERVER['PHP_SELF']) == 'news-detail.php' ? 'active' : ''; ?>" data-section="news">
+        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'about-pampanga.php' ? 'active' : ''; ?>" data-page="about-pampanga.php">
+            <i class="fas fa-info-circle"></i>
+            <span class="nav-text">About Pampanga</span>
+        </div>
+        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'government.php' ? 'active' : ''; ?>" data-page="government.php">
+            <i class="fas fa-landmark"></i>
+            <span class="nav-text">Government</span>
+        </div>
+        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'tourism.php' || basename($_SERVER['PHP_SELF']) == 'tourism-detail.php' ? 'active' : ''; ?>" data-page="tourism.php">
+            <i class="fas fa-map-marked-alt"></i>
+            <span class="nav-text">Tourism</span>
+        </div>
+        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'programs.php' ? 'active' : ''; ?>" data-page="programs.php">
+            <i class="fas fa-hands-helping"></i>
+            <span class="nav-text">Programs</span>
+        </div>
+        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'development.php' ? 'active' : ''; ?>" data-page="development.php">
+            <i class="fas fa-chart-line"></i>
+            <span class="nav-text">Development</span>
+        </div>
+        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'environment.php' ? 'active' : ''; ?>" data-page="environment.php">
+            <i class="fas fa-leaf"></i>
+            <span class="nav-text">Environment</span>
+        </div>
+        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'news.php' || basename($_SERVER['PHP_SELF']) == 'news-detail.php' ? 'active' : ''; ?>" data-page="news.php">
             <i class="fas fa-newspaper"></i>
-            <span class="nav-tooltip">News</span>
-        </div>
-        <div class="nav-item" data-section="projects">
-            <i class="fas fa-briefcase"></i>
-            <span class="nav-tooltip">Projects</span>
-        </div>
-        <div class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'about.php' ? 'active' : ''; ?>" data-section="about">
-            <i class="fas fa-user"></i>
-            <span class="nav-tooltip">About</span>
-        </div>
-        <div class="nav-item" data-section="journey">
-            <i class="fas fa-route"></i>
-            <span class="nav-tooltip">Journey</span>
+            <span class="nav-text">News</span>
         </div>
         <div class="indicator"></div>
     </div>
@@ -64,55 +76,26 @@ $(document).ready(function() {
 
     // Navigation handling
     $('.nav-item').click(function() {
+        const page = $(this).data('page');
         const section = $(this).data('section');
         
-        // Handle different navigation based on section
-        if (section === 'about') {
-            window.location.href = 'about.php';
-            return;
-        }
-        
-        if (section === 'news') {
-            window.location.href = 'news.php';
-            return;
-        }
-        
-        // Check if we're on index page
-        const currentPage = window.location.pathname;
-        if (currentPage.includes('index.php') || currentPage === '/' || currentPage.endsWith('/')) {
-            // Scroll to section on same page
-            $('.nav-item').removeClass('active');
-            $(this).addClass('active');
-            
-            const target = $('#' + section);
-            if (target.length) {
-                $('html, body').animate({
-                    scrollTop: target.offset().top - 60
-                }, 800);
+        if (page) {
+            // Navigate to specific page
+            window.location.href = page;
+        } else if (section) {
+            // Scroll to section on homepage
+            const currentPage = window.location.pathname;
+            if (currentPage.includes('index.php') || currentPage === '/' || currentPage.endsWith('/')) {
+                const target = $('#' + section);
+                if (target.length) {
+                    $('html, body').animate({
+                        scrollTop: target.offset().top - 60
+                    }, 800);
+                }
+            } else {
+                window.location.href = 'index.php#' + section;
             }
-        } else {
-            // Navigate to index page with hash
-            window.location.href = 'index.php#' + section;
         }
     });
-
-    // Scroll spy for active nav item (only on index page)
-    const currentPage = window.location.pathname;
-    if (currentPage.includes('index.php') || currentPage === '/' || currentPage.endsWith('/')) {
-        $(window).scroll(function() {
-            const scrollPos = $(document).scrollTop() + 100;
-            
-            $('section').each(function() {
-                const top = $(this).offset().top;
-                const bottom = top + $(this).outerHeight();
-                const id = $(this).attr('id');
-                
-                if (scrollPos >= top && scrollPos <= bottom) {
-                    $('.nav-item').removeClass('active');
-                    $(`.nav-item[data-section="${id}"]`).addClass('active');
-                }
-            });
-        });
-    }
 });
 </script>
