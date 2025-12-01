@@ -1,8 +1,8 @@
 <?php
 // Page specific variables
-$pageTitle = "Gov. Lilia 'Nanay' Pineda - Official Portfolio";
-$pageDescription = "Official portfolio showcasing transformative governance and development initiatives in Pampanga under Governor Lilia 'Nanay' Pineda.";
-$additionalCSS = []; // Add any page-specific CSS files here
+$pageTitle = "Pampanga Provincial Government - Official Website";
+$pageDescription = "Official website of Pampanga Provincial Government showcasing programs, services, and development initiatives for the province.";
+$additionalCSS = ['css/homepage.css']; 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,43 +69,189 @@ $additionalCSS = []; // Add any page-specific CSS files here
             </div>
         </section>
 
-        <!-- About Section -->
-        <section id="about" class="about-section">
+        <!-- UPDATED: About Pampanga Section -->
+        <section id="about" class="about-pampanga-section">
             <div class="about-container">
                 <div class="about-content">
-                    <h2>About Nanay Lilia</h2>
-                    <div id="aboutPreview">
+                    <div class="section-label">Discover</div>
+                    <h2>About Pampanga</h2>
+                    <p class="about-intro">
+                        The Culinary Capital of the Philippines and the heartland of Central Luzon
+                    </p>
+                    
+                    <div id="pampangaPreview">
                         <div class="loading-container">
                             <div class="loading-spinner"></div>
                         </div>
                     </div>
-                    <a href="about.php" class="learn-more-btn">
-                        Learn More About Nanay Lilia
+
+                    <!-- Quick Facts Grid -->
+                    <div class="quick-facts-grid" id="quickFactsGrid">
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+
+                    <a href="about-pampanga.php" class="learn-more-btn">
+                        Explore Pampanga's Rich History
                         <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
+                
                 <div class="about-visual">
-                    <div class="img-container">
-                        <img src="assets/about-photo-full.jpg" alt="">
+                    <div class="about-image-showcase">
+                        <!-- Main Image -->
+                        <div class="main-showcase-image" id="showcaseMainImage">
+                            <div class="image-placeholder"></div>
+                        </div>
+                        
+                        <!-- Small Images Grid -->
+                        <div class="showcase-grid">
+                            <div class="showcase-item" id="showcaseImage1">
+                                <div class="image-placeholder"></div>
+                            </div>
+                            <div class="showcase-item" id="showcaseImage2">
+                                <div class="image-placeholder"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Political Journey Section -->
-        <section id="journey" class="journey-section">
+        <!-- NEW: Leadership Section -->
+        <section id="leadership" class="leadership-section">
+            <div class="leadership-container">
+                <div class="leadership-image-col">
+                    <div class="governor-card">
+                        <div class="governor-image" id="governorImage">
+                            <img src="assets/profile.jpg" alt="Gov. Lilia Nanay Pineda">
+                        </div>
+                        <div class="governor-info">
+                            <h3>Gov. Lilia "Nanay" Pineda</h3>
+                            <p class="governor-title">Vice Governor of Pampanga</p>
+                            <div class="governor-social">
+                                <a href="https://www.facebook.com/p/Gov-Nanay-Pineda-100083159116285/" target="_blank" class="social-link">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="leadership-content-col">
+                    <div class="section-label">Provincial Leadership</div>
+                    <h2>Leading with Heart and Vision</h2>
+                    
+                    <div id="governorBioPreview">
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+
+                    <div class="leadership-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-hospital"></i>
+                            </div>
+                            <div class="highlight-text">
+                                <strong>Healthcare Champion</strong>
+                                <p>Modernized provincial hospitals</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="highlight-text">
+                                <strong>Education Advocate</strong>
+                                <p>25,000+ scholarship graduates</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="highlight-text">
+                                <strong>Economic Growth</strong>
+                                <p>180,000+ jobs created</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="government.php" class="learn-more-btn secondary">
+                        View Full Profile & Government
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- UPDATED: Pampanga History Timeline Section -->
+        <section id="history" class="history-section">
             <div class="section-header">
-                <h2 class="section-title">Political Journey</h2>
+                <div class="section-label">Our Heritage</div>
+                <h2 class="section-title">Pampanga Through the Ages</h2>
                 <p class="section-subtitle">
-                    A remarkable career spanning decades of dedicated public service 
-                    and transformative leadership in Pampanga.
+                    A rich history spanning centuries of culture, resilience, and progress
                 </p>
             </div>
 
-            <div class="timeline-container" id="timelineContainer">
+            <div class="history-timeline" id="historyTimeline">
                 <div class="timeline-line"></div>
                 <div class="loading-container">
                     <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Key Initiatives Section -->
+        <section class="key-initiatives-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-label">What We Do</div>
+                    <h2 class="section-title">Key Initiatives</h2>
+                    <p class="section-subtitle">
+                        Discover how we're transforming Pampanga through strategic programs and services
+                    </p>
+                </div>
+
+                <div class="initiatives-grid">
+                    <a href="tourism.php" class="initiative-card tourism">
+                        <div class="initiative-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h3>Tourism</h3>
+                        <p>Explore Pampanga's rich heritage sites and natural attractions</p>
+                        <span class="initiative-link">Discover More <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <a href="programs.php" class="initiative-card programs">
+                        <div class="initiative-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h3>Programs & Services</h3>
+                        <p>Social welfare, health, and education programs for all Kapampangans</p>
+                        <span class="initiative-link">View Programs <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <a href="development.php" class="initiative-card development">
+                        <div class="initiative-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Development</h3>
+                        <p>Infrastructure projects and economic growth initiatives</p>
+                        <span class="initiative-link">See Projects <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <a href="environment.php" class="initiative-card environment">
+                        <div class="initiative-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3>Environment</h3>
+                        <p>Sustainability and disaster preparedness programs</p>
+                        <span class="initiative-link">Learn More <i class="fas fa-arrow-right"></i></span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -134,8 +280,11 @@ $additionalCSS = []; // Add any page-specific CSS files here
             loadFeaturedProjects();
             loadCategories();
             loadProjects();
-            loadPoliticalJourney();
-            loadAboutPreview();
+            loadPampangaHistory(); // Changed from loadPoliticalJourney
+            // NEW: Load Pampanga and Governor data
+            loadPampangaPreview();
+            loadQuickFacts();
+            loadGovernorBioPreview();
 
             // Project Category Scroll Functionality
             function updateProjectScrollButtons() {
@@ -237,53 +386,88 @@ $additionalCSS = []; // Add any page-specific CSS files here
                 });
             }
 
-            function loadPoliticalJourney() {
+            function loadPampangaHistory() {
                 $.ajax({
-                    url: `${API_BASE}/Admin/api/journey`,
+                    url: `${API_BASE}/Admin/api/province/history`,
                     method: 'GET',
                     success: function(response) {
                         if (response.success && response.data) {
-                            renderTimeline(response.data);
+                            renderHistoryTimeline(response.data);
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error loading political journey:', error);
+                        console.error('Error loading Pampanga history:', error);
+                        $('#historyTimeline').html('<p class="text-center">Unable to load history timeline</p>');
                     }
                 });
             }
 
-            function loadAboutPreview() {
-    // Load profile image
-    $.ajax({
-        url: `${API_BASE}/Admin/api/about/image`,
-        method: 'GET',
-        success: function(response) {
-            if (response.success && response.data.image_url) {
-                $('#aboutProfileImage').attr('src', response.data.image_url);
+            // NEW: Load Pampanga preview
+            function loadPampangaPreview() {
+                $.ajax({
+                    url: `${API_BASE}/Admin/api/province/preview`,
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            renderPampangaPreview(response.data);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading Pampanga preview:', error);
+                        $('#pampangaPreview').html('<p class="about-text">Pampanga, the Culinary Capital of the Philippines, is a vibrant province in Central Luzon known for its rich history, delicious cuisine, and warm hospitality.</p>');
+                    }
+                });
             }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error loading profile image:', error);
-        }
-    });
-    
-    // Load truncated about preview (max 600 characters)
-    $.ajax({
-        url: `${API_BASE}/Admin/api/about/preview`,
-        method: 'GET',
-        success: function(response) {
-            if (response.success && response.data) {
-                renderAboutPreview(response.data);
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error loading about preview:', error);
-            $('#aboutPreview').html('<p class="about-text">Content coming soon...</p>');
-        }
-    });
-}
 
-            // Render Functions
+            // NEW: Load Quick Facts
+            function loadQuickFacts() {
+                $.ajax({
+                    url: `${API_BASE}/Admin/api/province/quick-facts`,
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            renderQuickFacts(response.data);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading quick facts:', error);
+                        const fallbackFacts = [
+                            { label: 'Municipalities', value: '19', icon: 'fas fa-map' },
+                            { label: 'Population', value: '2.6M+', icon: 'fas fa-users' },
+                            { label: 'Area', value: '2,181 km²', icon: 'fas fa-expand' }
+                        ];
+                        renderQuickFacts(fallbackFacts);
+                    }
+                });
+            }
+
+            // NEW: Load Governor Bio Preview
+            function loadGovernorBioPreview() {
+                $.ajax({
+                    url: `${API_BASE}/Admin/api/about/preview`,
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            renderGovernorBioPreview(response.data);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading governor bio:', error);
+                    }
+                });
+
+                $.ajax({
+                    url: `${API_BASE}/Admin/api/about/image`,
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success && response.data.image_url) {
+                            $('#governorImage img').attr('src', response.data.image_url);
+                        }
+                    }
+                });
+            }
+
+            // Render Functions (Keep existing ones, add new ones)
             function renderCarousel() {
                 if (featuredProjects.length === 0) {
                     $('#carouselContainer').html('<p class="text-center">No featured projects available</p>');
@@ -403,29 +587,81 @@ $additionalCSS = []; // Add any page-specific CSS files here
                 $('#timelineContainer').html(timelineHtml);
             }
 
-            function renderAboutPreview(data) {
-    let html = '';
-    
-    if (data.content && data.content.length > 0) {
-        data.content.forEach(item => {
-            html += `<p class="about-text">${item.content}</p>`;
-        });
-        
-        // Add "..." indicator if content is truncated
-        if (data.is_preview) {
-            // Remove any existing "..." at the end
-            html = html.replace(/\.\.\.(<\/p>)$/, '$1');
-            // Ensure the last paragraph ends with "..."
-            html = html.replace(/(<\/p>)$/, '...$1');
-        }
-    } else {
-        html = '<p class="about-text">Content coming soon...</p>';
-    }
-    
-    $('#aboutPreview').html(html);
-}
+            // NEW: Render Pampanga History Timeline
+            function renderHistoryTimeline(historyData) {
+                if (historyData.length === 0) {
+                    $('#historyTimeline').html('<p class="text-center">No history data available</p>');
+                    return;
+                }
+                
+                let timelineHtml = '<div class="timeline-line"></div>';
+                
+                historyData.forEach((item, index) => {
+                    const isLeft = index % 2 === 0;
+                    
+                    timelineHtml += `
+                        <div class="history-item ${isLeft ? 'left' : 'right'}">
+                            <div class="history-content">
+                                ${item.image_url ? `
+                                    <div class="history-image">
+                                        <img src="${item.image_url}" alt="${item.title}">
+                                    </div>
+                                ` : ''}
+                                <div class="history-year">${item.timeline_year || item.period}</div>
+                                <h3 class="history-title">${item.title}</h3>
+                                ${item.period ? `<div class="history-period">${item.period}</div>` : ''}
+                                <p class="history-description">${item.content}</p>
+                            </div>
+                            <div class="history-dot"></div>
+                            ${isLeft ? '<div class="timeline-spacer"></div>' : ''}
+                            ${!isLeft ? '<div class="timeline-spacer"></div>' : ''}
+                        </div>
+                    `;
+                });
+                
+                $('#historyTimeline').html(timelineHtml);
+            }
 
-            // Carousel functions
+            // NEW: Render Pampanga Preview
+            function renderPampangaPreview(data) {
+                let html = '';
+                if (data.content && data.content.length > 0) {
+                    data.content.forEach(item => {
+                        html += `<p class="about-text">${item.content}</p>`;
+                    });
+                }
+                $('#pampangaPreview').html(html);
+            }
+
+            // NEW: Render Quick Facts
+            function renderQuickFacts(facts) {
+                let html = '';
+                facts.forEach(fact => {
+                    html += `
+                        <div class="fact-item">
+                            <div class="fact-icon">
+                                <i class="${fact.icon}"></i>
+                            </div>
+                            <div class="fact-content">
+                                <div class="fact-value">${fact.value}</div>
+                                <div class="fact-label">${fact.label}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                $('#quickFactsGrid').html(html);
+            }
+
+            // NEW: Render Governor Bio Preview
+            function renderGovernorBioPreview(data) {
+                let html = '';
+                if (data.content && data.content.length > 0) {
+                    html = `<p class="bio-text">${data.content[0].content}</p>`;
+                }
+                $('#governorBioPreview').html(html);
+            }
+
+            // Carousel functions (Keep existing)
             function showSlide(index) {
                 $('.carousel-slide').removeClass('active');
                 $('.carousel-dot').removeClass('active');
@@ -454,7 +690,7 @@ $additionalCSS = []; // Add any page-specific CSS files here
                 if (slideInterval) clearInterval(slideInterval);
             }
 
-            // Event handlers
+            // Event handlers (Keep existing)
             $(document).on('click', '.carousel-next', function(e) {
                 e.preventDefault();
                 nextSlide();

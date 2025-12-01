@@ -160,10 +160,10 @@ h6 {
     border: unset !important;
 }
 
-#ew-list{
+/* #ew-list{
   overflow: hidden;
   overflow-x: auto;
-}
+} */
 
 #ew-list > div {
     width: 100%;

@@ -1,0 +1,666 @@
+/* Homepage Specific Styles */
+
+/* Section Label */
+.section-label {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #dbeafe;
+    color: #2563eb;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+/* ===========================================
+   ABOUT PAMPANGA SECTION
+   =========================================== */
+
+.about-pampanga-section {
+    padding: 5rem 5%;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.about-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.about-content h2 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: #1e293b;
+}
+
+.about-intro {
+    font-size: 1.25rem;
+    color: #64748b;
+    margin-bottom: 2rem;
+}
+
+.about-text {
+    color: #475569;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+/* Quick Facts Grid */
+.quick-facts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.fact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.fact-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.fact-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.fact-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.fact-label {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+/* Image Showcase */
+.about-image-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.main-showcase-image {
+    grid-column: 1 / -1;
+    height: 300px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.main-showcase-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.showcase-grid {
+    display: contents;
+}
+
+.showcase-item {
+    height: 200px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.showcase-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Learn More Button */
+.learn-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: #3b82f6;
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+}
+
+.learn-more-btn:hover {
+    background: #2563eb;
+    transform: translateX(5px);
+}
+
+.learn-more-btn.secondary {
+    background: transparent;
+    color: #3b82f6;
+    border: 2px solid #3b82f6;
+}
+
+.learn-more-btn.secondary:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+/* ===========================================
+   LEADERSHIP SECTION
+   =========================================== */
+
+.leadership-section {
+    padding: 5rem 5%;
+    background: white;
+}
+
+.leadership-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+/* Governor Card */
+.governor-card {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+    text-align: center;
+    color: white;
+}
+
+.governor-image {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.governor-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.governor-info h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.governor-title {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+}
+
+.governor-social {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.social-link {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+}
+
+/* Leadership Content */
+.leadership-content-col h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    color: #1e293b;
+}
+
+.bio-text {
+    color: #475569;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+}
+
+.leadership-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.highlight-item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.highlight-item:hover {
+    background: #f1f5f9;
+    transform: translateX(10px);
+}
+
+.highlight-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.highlight-text strong {
+    display: block;
+    font-size: 1.125rem;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.highlight-text p {
+    color: #64748b;
+    margin: 0;
+}
+
+/* ===========================================
+   PAMPANGA HISTORY SECTION
+   =========================================== */
+
+.history-section {
+    padding: 5rem 5%;
+    background: #f8fafc;
+}
+
+.history-timeline {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.history-item {
+    display: flex;
+    margin-bottom: 4rem;
+    position: relative;
+}
+
+.history-item.left {
+    justify-content: flex-start;
+}
+
+.history-item.right {
+    justify-content: flex-end;
+}
+
+.history-item.left .history-content {
+    margin-right: 50%;
+    padding-right: 4rem;
+}
+
+.history-item.right .history-content {
+    margin-left: 50%;
+    padding-left: 4rem;
+}
+
+.history-content {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.history-content:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.history-image {
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.history-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.history-year {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.history-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #1e293b;
+}
+
+.history-period {
+    font-size: 0.9375rem;
+    color: #3b82f6;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.history-description {
+    color: #64748b;
+    line-height: 1.7;
+}
+
+.history-dot {
+    position: absolute;
+    left: 50%;
+    top: 2rem;
+    width: 24px;
+    height: 24px;
+    background: #3b82f6;
+    border: 5px solid #f8fafc;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.history-item .timeline-spacer {
+    flex: 1;
+}
+
+/* ===========================================
+   KEY INITIATIVES SECTION
+   =========================================== */
+
+.key-initiatives-section {
+    padding: 5rem 5%;
+    background: white;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.initiatives-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.initiative-card {
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 2.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid transparent;
+}
+
+.initiative-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.initiative-card.tourism {
+    border-color: #f59e0b;
+}
+
+.initiative-card.tourism:hover {
+    background: linear-gradient(135deg, #fef3c7, #fed7aa);
+}
+
+.initiative-card.programs {
+    border-color: #10b981;
+}
+
+.initiative-card.programs:hover {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+}
+
+.initiative-card.development {
+    border-color: #3b82f6;
+}
+
+.initiative-card.development:hover {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.initiative-card.environment {
+    border-color: #059669;
+}
+
+.initiative-card.environment:hover {
+    background: linear-gradient(135deg, #d1fae5, #6ee7b7);
+}
+
+.initiative-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.initiative-card.tourism .initiative-icon {
+    background: #fed7aa;
+    color: #f59e0b;
+}
+
+.initiative-card.programs .initiative-icon {
+    background: #a7f3d0;
+    color: #10b981;
+}
+
+.initiative-card.development .initiative-icon {
+    background: #bfdbfe;
+    color: #3b82f6;
+}
+
+.initiative-card.environment .initiative-icon {
+    background: #6ee7b7;
+    color: #059669;
+}
+
+.initiative-card:hover .initiative-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.initiative-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+}
+
+.initiative-card p {
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.initiative-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #3b82f6;
+    transition: all 0.3s ease;
+}
+
+.initiative-card:hover .initiative-link {
+    gap: 1rem;
+}
+
+/* ===========================================
+   RESPONSIVE DESIGN
+   =========================================== */
+
+@media (max-width: 1024px) {
+    .about-container,
+    .leadership-container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .leadership-image-col {
+        display: flex;
+        justify-content: center;
+    }
+
+    .timeline-item,
+    .timeline-item:nth-child(even) {
+        flex-direction: column;
+    }
+
+    .timeline-line {
+        left: 20px;
+    }
+
+    .timeline-dot {
+        left: 20px;
+    }
+
+    .timeline-content {
+        margin-left: 4rem;
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-content h2,
+    .leadership-content-col h2 {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .quick-facts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .about-image-showcase {
+        grid-template-columns: 1fr;
+    }
+
+    .main-showcase-image,
+    .showcase-item {
+        height: 250px;
+    }
+
+    .initiatives-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .governor-card {
+        max-width: 350px;
+        margin: 0 auto;
+    }
+
+    .leadership-highlights {
+        gap: 1rem;
+    }
+
+    .highlight-item {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-pampanga-section,
+    .leadership-section,
+    .journey-section,
+    .key-initiatives-section {
+        padding: 3rem 5%;
+    }
+
+    .about-content h2,
+    .leadership-content-col h2 {
+        font-size: 1.75rem;
+    }
+
+    .fact-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .timeline-content {
+        margin-left: 3rem;
+        padding: 1.5rem;
+    }
+}

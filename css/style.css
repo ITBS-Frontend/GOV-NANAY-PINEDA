@@ -705,7 +705,6 @@ section{
 
 /* Political Journey Section */
 .journey-section {
-    margin-top: 100px;
     padding: 5rem 5%;
     background: var(--bg-secondary);
 }
