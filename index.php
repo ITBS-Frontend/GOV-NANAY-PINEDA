@@ -625,12 +625,24 @@ $additionalCSS = ['css/homepage.css'];
             // NEW: Render Pampanga Preview
             function renderPampangaPreview(data) {
                 let html = '';
-                if (data.content && data.content.length > 0) {
-                    data.content.forEach(item => {
-                        html += `<p class="about-text">${item.content}</p>`;
-                    });
+                if (data.content) {
+                    html = `<p class="about-text">${data.content}</p>`;
                 }
                 $('#pampangaPreview').html(html);
+                
+                // Load showcase images
+                if (data.image_url) {
+                    $('#showcaseMainImage').html(`<img src="${data.image_url}" alt="Pampanga" class="showcase-img">`);
+                }
+                
+                if (data.showcase_images && data.showcase_images.length > 0) {
+                    if (data.showcase_images[0]) {
+                        $('#showcaseImage1').html(`<img src="${data.showcase_images[0]}" alt="Pampanga" class="showcase-img">`);
+                    }
+                    if (data.showcase_images[1]) {
+                        $('#showcaseImage2').html(`<img src="${data.showcase_images[1]}" alt="Pampanga" class="showcase-img">`);
+                    }
+                }
             }
 
             // NEW: Render Quick Facts

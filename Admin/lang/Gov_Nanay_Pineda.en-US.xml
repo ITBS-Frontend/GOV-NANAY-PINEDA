@@ -26,6 +26,12 @@
     <menu id="104">
       <phrase id="menutext" value="Geographic Info Types" />
     </menu>
+    <menu id="155">
+      <phrase id="menutext" value="Quick Facts" />
+    </menu>
+    <menu id="154">
+      <phrase id="menutext" value="Pampanga About" />
+    </menu>
     <menu id="89">
       <phrase id="menutext" value="Government" />
     </menu>
@@ -1844,6 +1850,55 @@
     </table>
     <table id="dashboard2">
       <phrase id="tblcaption" value="dashboard" />
+    </table>
+    <table id="pampanga_about">
+      <phrase id="tblcaption" value="pampanga about" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="preview_text">
+        <phrase id="fldcaption" value="preview text" />
+      </field>
+      <field id="main_image">
+        <phrase id="fldcaption" value="main image" />
+      </field>
+      <field id="showcase_image_1">
+        <phrase id="fldcaption" value="showcase image 1" />
+      </field>
+      <field id="showcase_image_2">
+        <phrase id="fldcaption" value="showcase image 2" />
+      </field>
+      <field id="created_at">
+        <phrase id="fldcaption" value="created at" />
+      </field>
+      <field id="updated_at">
+        <phrase id="fldcaption" value="updated at" />
+      </field>
+    </table>
+    <table id="quick_facts">
+      <phrase id="tblcaption" value="quick facts" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="icon">
+        <phrase id="fldcaption" value="icon" />
+      </field>
+      <field id="_title">
+        <phrase id="fldcaption" value="title" />
+      </field>
+      <field id="description">
+        <phrase id="fldcaption" value="description" />
+      </field>
+      <field id="display_order">
+        <phrase id="fldcaption" value="display order" />
+      </field>
+      <field id="is_active">
+        <phrase id="fldcaption" value="is active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
     </table>
   </project>
 </ew-language>

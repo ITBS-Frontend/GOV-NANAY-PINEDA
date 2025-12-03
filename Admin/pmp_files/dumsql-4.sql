@@ -415,46 +415,46 @@ WHERE news_type_id IS NULL;
 
 UPDATE news_posts 
 SET news_type_id = (SELECT id FROM news_types WHERE type_name = 'Provincial Update')
-WHERE news_type = 'provincial_update';
+WHERE news_type_id IS NULL;
 
 UPDATE news_posts 
 SET news_type_id = (SELECT id FROM news_types WHERE type_name = 'Tourism')
-WHERE news_type = 'tourism';
+WHERE news_type_id IS NULL;
 
 UPDATE news_posts 
 SET news_type_id = (SELECT id FROM news_types WHERE type_name = 'Health')
-WHERE news_type = 'health';
+WHERE news_type_id IS NULL;
 
 UPDATE news_posts 
 SET news_type_id = (SELECT id FROM news_types WHERE type_name = 'Disaster')
-WHERE news_type = 'disaster';
+WHERE news_type_id IS NULL;
 
 -- 8. CATEGORIES - Update to use category_type_id
 UPDATE categories 
 SET category_type_id = (SELECT id FROM category_types WHERE type_name = 'Project')
-WHERE category_type = 'project' OR category_type IS NULL;
+WHERE category_type_id IS NULL;
 
 UPDATE categories 
 SET category_type_id = (SELECT id FROM category_types WHERE type_name = 'News')
-WHERE category_type = 'news';
+WHERE category_type_id IS NULL;
 
 UPDATE categories 
 SET category_type_id = (SELECT id FROM category_types WHERE type_name = 'Tourism')
-WHERE category_type = 'tourism';
+WHERE category_type_id IS NULL;
 
 UPDATE categories 
 SET category_type_id = (SELECT id FROM category_types WHERE type_name = 'Service')
-WHERE category_type = 'service';
+WHERE category_type_id IS NULL;
 
 -- 9. HEALTH PROGRAMS - Update to use status_id
 UPDATE health_programs 
 SET status_id = (SELECT id FROM status_types WHERE type_name = 'Active')
-WHERE status = 'Active';
+WHERE status_id IS NULL;
 
 UPDATE health_programs 
 SET status_id = (SELECT id FROM status_types WHERE type_name = 'Completed')
-WHERE status = 'Completed';
+WHERE status_id IS NULL;
 
 UPDATE health_programs 
 SET status_id = (SELECT id FROM status_types WHERE type_name = 'Planned')
-WHERE status = 'Planned';
+WHERE status_id IS NULL;

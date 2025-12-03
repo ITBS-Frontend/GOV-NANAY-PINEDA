@@ -586,4 +586,6 @@ public function getProjectDetails($projectId)
         return ['success' => false, 'message' => 'Failed to fetch project details'];
     }
 }
+
+
 }

@@ -135,6 +135,8 @@ return [
     "project_types" => \DI\create(ProjectTypes::class),
     "status_types" => \DI\create(StatusTypes::class),
     "dashboard2" => \DI\create(Dashboard2::class),
+    "pampanga_about" => \DI\create(PampangaAbout::class),
+    "quick_facts" => \DI\create(QuickFacts::class),
 
     // User table
     "usertable" => \DI\get("users"),

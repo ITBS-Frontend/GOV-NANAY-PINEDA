@@ -175,4 +175,126 @@ class ProvinceService
             return ['success' => false, 'message' => 'Failed to fetch municipalities'];
         }
     }
+
+    /**
+ * Get Pampanga preview for homepage
+ */
+public function getPreview() 
+{
+    try {
+        $conn = Conn();
+        
+        // Get province preview content
+        $sql = "
+            SELECT 
+                id,
+                title,
+                content,
+                featured_image
+            FROM province_history
+            WHERE is_active = true
+            AND title = 'Province Overview'
+            LIMIT 1
+        ";
+        
+        $preview = $conn->executeQuery($sql)->fetchAssociative();
+        
+        if ($preview) {
+            // Truncate content for homepage
+            $preview['content'] = substr(strip_tags($preview['content']), 0, 300) . '...';
+            
+            if (!empty($preview['featured_image'])) {
+                $preview['image_url'] = getPresignedUrl('gov-pineda-images/' . $preview['featured_image']);
+            }
+            
+            // Get 2 additional showcase images from province_history
+            $showcaseSql = "
+                SELECT featured_image
+                FROM province_history
+                WHERE is_active = true
+                AND featured_image IS NOT NULL
+                AND id != ?
+                ORDER BY display_order ASC
+                LIMIT 2
+            ";
+            
+            $showcaseImages = $conn->executeQuery($showcaseSql, [$preview['id']])->fetchAllAssociative();
+            
+            $preview['showcase_images'] = array_map(function($img) {
+                return getPresignedUrl('gov-pineda-images/' . $img['featured_image']);
+            }, $showcaseImages);
+        }
+        
+        return [
+            'success' => true,
+            'data' => $preview ?: [
+                'content' => 'Pampanga, the Culinary Capital of the Philippines...',
+                'image_url' => null,
+                'showcase_images' => []
+            ]
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get preview error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch preview'];
+    }
+}
+
+/**
+ * Get quick facts for homepage
+ */
+public function getQuickFacts() 
+{
+    try {
+        $conn = Conn();
+        
+        // Get key statistics
+        $facts = [];
+        
+        // Municipalities count
+        $munSql = "SELECT COUNT(*) as count FROM geographic_info WHERE info_type = 'municipality'";
+        $munCount = $conn->executeQuery($munSql)->fetchOne();
+        $facts[] = [
+            'label' => 'Municipalities',
+            'value' => $munCount,
+            'icon' => 'fas fa-map'
+        ];
+        
+        // Population
+        $popSql = "SELECT value FROM demographics_data WHERE label = 'Total Population' LIMIT 1";
+        $population = $conn->executeQuery($popSql)->fetchOne();
+        $facts[] = [
+            'label' => 'Population',
+            'value' => $population ?: '2.6M+',
+            'icon' => 'fas fa-users'
+        ];
+        
+        // Total area
+        $areaSql = "SELECT SUM(area_sqkm) as total FROM geographic_info WHERE info_type = 'municipality'";
+        $totalArea = $conn->executeQuery($areaSql)->fetchOne();
+        $facts[] = [
+            'label' => 'Area',
+            'value' => number_format($totalArea, 0) . ' km²',
+            'icon' => 'fas fa-expand'
+        ];
+        
+        return [
+            'success' => true,
+            'data' => $facts
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get quick facts error: ' . $e->getMessage());
+        return [
+            'success' => true,
+            'data' => [
+                ['label' => 'Municipalities', 'value' => '19', 'icon' => 'fas fa-map'],
+                ['label' => 'Population', 'value' => '2.6M+', 'icon' => 'fas fa-users'],
+                ['label' => 'Area', 'value' => '2,181 km²', 'icon' => 'fas fa-expand']
+            ]
+        ];
+    }
+}
+
+
 }

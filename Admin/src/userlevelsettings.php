@@ -133,7 +133,11 @@ $USER_LEVEL_PRIVS = [["{05BA416D-6E12-4581-9EFA-04B8838F18C5}categories","-2","0
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}status_types","-2","0"],
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}status_types","0","0"],
     ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}dashboard.php","-2","0"],
-    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}dashboard.php","0","0"]];
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}dashboard.php","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}pampanga_about","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}pampanga_about","0","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}quick_facts","-2","0"],
+    ["{05BA416D-6E12-4581-9EFA-04B8838F18C5}quick_facts","0","0"]];
 
 /**
  * Tables
@@ -201,4 +205,6 @@ $USER_LEVEL_TABLES = [["categories","categories","categories",true,"{05BA416D-6E
     ["news_types","news_types","news types",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","NewsTypesList"],
     ["project_types","project_types","project types",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","ProjectTypesList"],
     ["status_types","status_types","status types",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","StatusTypesList"],
-    ["dashboard.php","dashboard2","dashboard",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","Dashboard2"]];
+    ["dashboard.php","dashboard2","dashboard",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","Dashboard2"],
+    ["pampanga_about","pampanga_about","pampanga about",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","PampangaAboutList"],
+    ["quick_facts","quick_facts","quick facts",true,"{05BA416D-6E12-4581-9EFA-04B8838F18C5}","QuickFactsList"]];

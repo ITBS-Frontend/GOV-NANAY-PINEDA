@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "Dashboard2Controller";
+    public $CurrentPageName = "QuickFactsDelete";
 
     // Page headings
     public $Heading = "";
