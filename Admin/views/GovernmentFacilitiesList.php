@@ -150,9 +150,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_government_facilities_id" class="government_facilities_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->facility_type->Visible) { // facility_type ?>
-        <th data-name="facility_type" class="<?= $Page->facility_type->headerCellClass() ?>"><div id="elh_government_facilities_facility_type" class="government_facilities_facility_type"><?= $Page->renderFieldHeader($Page->facility_type) ?></div></th>
-<?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
         <th data-name="name" class="<?= $Page->name->headerCellClass() ?>"><div id="elh_government_facilities_name" class="government_facilities_name"><?= $Page->renderFieldHeader($Page->name) ?></div></th>
 <?php } ?>
@@ -179,6 +176,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_government_facilities_created_at" class="government_facilities_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->facility_type_id->Visible) { // facility_type_id ?>
+        <th data-name="facility_type_id" class="<?= $Page->facility_type_id->headerCellClass() ?>"><div id="elh_government_facilities_facility_type_id" class="government_facilities_facility_type_id"><?= $Page->renderFieldHeader($Page->facility_type_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -212,14 +212,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_government_facilities_id" class="el_government_facilities_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->facility_type->Visible) { // facility_type ?>
-        <td data-name="facility_type"<?= $Page->facility_type->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_government_facilities_facility_type" class="el_government_facilities_facility_type">
-<span<?= $Page->facility_type->viewAttributes() ?>>
-<?= $Page->facility_type->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -293,6 +285,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_government_facilities_created_at" class="el_government_facilities_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->facility_type_id->Visible) { // facility_type_id ?>
+        <td data-name="facility_type_id"<?= $Page->facility_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_government_facilities_facility_type_id" class="el_government_facilities_facility_type_id">
+<span<?= $Page->facility_type_id->viewAttributes() ?>>
+<?= $Page->facility_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

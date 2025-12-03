@@ -34,9 +34,6 @@ class GeographicInfo extends AbstractEntity
     #[SequenceGenerator(sequenceName: "geographic_info_id_seq")]
     private int $id;
 
-    #[Column(name: "info_type", type: "string")]
-    private string $infoType;
-
     #[Column(type: "string")]
     private string $name;
 
@@ -55,6 +52,9 @@ class GeographicInfo extends AbstractEntity
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
+    #[Column(name: "info_type_id", type: "integer", nullable: true)]
+    private ?int $infoTypeId;
+
     public function getId(): int
     {
         return $this->id;
@@ -63,17 +63,6 @@ class GeographicInfo extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
-        return $this;
-    }
-
-    public function getInfoType(): string
-    {
-        return HtmlDecode($this->infoType);
-    }
-
-    public function setInfoType(string $value): static
-    {
-        $this->infoType = RemoveXss($value);
         return $this;
     }
 
@@ -140,6 +129,17 @@ class GeographicInfo extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getInfoTypeId(): ?int
+    {
+        return $this->infoTypeId;
+    }
+
+    public function setInfoTypeId(?int $value): static
+    {
+        $this->infoTypeId = $value;
         return $this;
     }
 }

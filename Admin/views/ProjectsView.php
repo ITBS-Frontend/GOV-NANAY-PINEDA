@@ -229,17 +229,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->project_type->Visible) { // project_type ?>
-    <tr id="r_project_type"<?= $Page->project_type->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_project_type"><?= $Page->project_type->caption() ?></span></td>
-        <td data-name="project_type"<?= $Page->project_type->cellAttributes() ?>>
-<span id="el_projects_project_type">
-<span<?= $Page->project_type->viewAttributes() ?>>
-<?= $Page->project_type->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->municipality->Visible) { // municipality ?>
     <tr id="r_municipality"<?= $Page->municipality->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_municipality"><?= $Page->municipality->caption() ?></span></td>
@@ -269,6 +258,17 @@ loadjs.ready("head", function () {
 <span id="el_projects_economic_impact">
 <span<?= $Page->economic_impact->viewAttributes() ?>>
 <?= $Page->economic_impact->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->project_type_id->Visible) { // project_type_id ?>
+    <tr id="r_project_type_id"<?= $Page->project_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_project_type_id"><?= $Page->project_type_id->caption() ?></span></td>
+        <td data-name="project_type_id"<?= $Page->project_type_id->cellAttributes() ?>>
+<span id="el_projects_project_type_id">
+<span<?= $Page->project_type_id->viewAttributes() ?>>
+<?= $Page->project_type_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

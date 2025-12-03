@@ -48,14 +48,14 @@ class EnvironmentalPrograms extends DbTable
     // Fields
     public $id;
     public $program_name;
-    public $program_type;
     public $description;
     public $objectives;
     public $coverage_area;
     public $implementation_date;
-    public $status;
     public $featured_image;
     public $created_at;
+    public $program_type_id;
+    public $status_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -153,28 +153,6 @@ class EnvironmentalPrograms extends DbTable
         $this->program_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['program_name'] = &$this->program_name;
 
-        // program_type
-        $this->program_type = new DbField(
-            $this, // Table
-            'x_program_type', // Variable name
-            'program_type', // Name
-            '"program_type"', // Expression
-            '"program_type"', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"program_type"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->program_type->InputTextType = "text";
-        $this->program_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['program_type'] = &$this->program_type;
-
         // description
         $this->description = new DbField(
             $this, // Table
@@ -267,29 +245,6 @@ class EnvironmentalPrograms extends DbTable
         $this->implementation_date->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['implementation_date'] = &$this->implementation_date;
 
-        // status
-        $this->status = new DbField(
-            $this, // Table
-            'x_status', // Variable name
-            'status', // Name
-            '"status"', // Expression
-            '"status"', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"status"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->status->addMethod("getDefault", fn() => "active");
-        $this->status->InputTextType = "text";
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['status'] = &$this->status;
-
         // featured_image
         $this->featured_image = new DbField(
             $this, // Table
@@ -300,16 +255,17 @@ class EnvironmentalPrograms extends DbTable
             200, // Type
             500, // Size
             -1, // Date/Time format
-            false, // Is upload field
+            true, // Is upload field
             '"featured_image"', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'IMAGE', // View Tag
+            'FILE' // Edit Tag
         );
+        $this->featured_image->addMethod("getUploadPath", fn() => appConfig('s3.custom_path'));
         $this->featured_image->InputTextType = "text";
-        $this->featured_image->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->featured_image->SearchOperators = ["=", "<>", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['featured_image'] = &$this->featured_image;
 
         // created_at
@@ -330,11 +286,68 @@ class EnvironmentalPrograms extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->created_at->addMethod("getAutoUpdateValue", fn() => CurrentDateTime());
         $this->created_at->InputTextType = "text";
         $this->created_at->Raw = true;
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
+
+        // program_type_id
+        $this->program_type_id = new DbField(
+            $this, // Table
+            'x_program_type_id', // Variable name
+            'program_type_id', // Name
+            '"program_type_id"', // Expression
+            'CAST("program_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"program_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->program_type_id->InputTextType = "text";
+        $this->program_type_id->Raw = true;
+        $this->program_type_id->setSelectMultiple(false); // Select one
+        $this->program_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->program_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->program_type_id->Lookup = new Lookup($this->program_type_id, 'environmental_program_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->program_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->program_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['program_type_id'] = &$this->program_type_id;
+
+        // status_id
+        $this->status_id = new DbField(
+            $this, // Table
+            'x_status_id', // Variable name
+            'status_id', // Name
+            '"status_id"', // Expression
+            'CAST("status_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"status_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->status_id->InputTextType = "text";
+        $this->status_id->Raw = true;
+        $this->status_id->setSelectMultiple(false); // Select one
+        $this->status_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->status_id->Lookup = new Lookup($this->status_id, 'status_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->status_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['status_id'] = &$this->status_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -860,20 +873,27 @@ class EnvironmentalPrograms extends DbTable
         }
         $this->id->DbValue = $row['id'];
         $this->program_name->DbValue = $row['program_name'];
-        $this->program_type->DbValue = $row['program_type'];
         $this->description->DbValue = $row['description'];
         $this->objectives->DbValue = $row['objectives'];
         $this->coverage_area->DbValue = $row['coverage_area'];
         $this->implementation_date->DbValue = $row['implementation_date'];
-        $this->status->DbValue = $row['status'];
-        $this->featured_image->DbValue = $row['featured_image'];
+        $this->featured_image->Upload->DbValue = $row['featured_image'];
         $this->created_at->DbValue = $row['created_at'];
+        $this->program_type_id->DbValue = $row['program_type_id'];
+        $this->status_id->DbValue = $row['status_id'];
     }
 
     // Delete uploaded files
     public function deleteUploadedFiles($row)
     {
         $this->loadDbValues($row);
+        $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+        $oldFiles = EmptyValue($row['featured_image']) ? [] : [$row['featured_image']];
+        foreach ($oldFiles as $oldFile) {
+            if (file_exists($this->featured_image->oldPhysicalUploadPath() . $oldFile)) {
+                @unlink($this->featured_image->oldPhysicalUploadPath() . $oldFile);
+            }
+        }
     }
 
     // Record filter WHERE clause
@@ -1222,14 +1242,14 @@ class EnvironmentalPrograms extends DbTable
         }
         $this->id->setDbValue($row['id']);
         $this->program_name->setDbValue($row['program_name']);
-        $this->program_type->setDbValue($row['program_type']);
         $this->description->setDbValue($row['description']);
         $this->objectives->setDbValue($row['objectives']);
         $this->coverage_area->setDbValue($row['coverage_area']);
         $this->implementation_date->setDbValue($row['implementation_date']);
-        $this->status->setDbValue($row['status']);
-        $this->featured_image->setDbValue($row['featured_image']);
+        $this->featured_image->Upload->DbValue = $row['featured_image'];
         $this->created_at->setDbValue($row['created_at']);
+        $this->program_type_id->setDbValue($row['program_type_id']);
+        $this->status_id->setDbValue($row['status_id']);
     }
 
     // Render list content
@@ -1264,8 +1284,6 @@ class EnvironmentalPrograms extends DbTable
 
         // program_name
 
-        // program_type
-
         // description
 
         // objectives
@@ -1274,20 +1292,19 @@ class EnvironmentalPrograms extends DbTable
 
         // implementation_date
 
-        // status
-
         // featured_image
 
         // created_at
+
+        // program_type_id
+
+        // status_id
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // program_name
         $this->program_name->ViewValue = $this->program_name->CurrentValue;
-
-        // program_type
-        $this->program_type->ViewValue = $this->program_type->CurrentValue;
 
         // description
         $this->description->ViewValue = $this->description->CurrentValue;
@@ -1302,15 +1319,65 @@ class EnvironmentalPrograms extends DbTable
         $this->implementation_date->ViewValue = $this->implementation_date->CurrentValue;
         $this->implementation_date->ViewValue = FormatDateTime($this->implementation_date->ViewValue, $this->implementation_date->formatPattern());
 
-        // status
-        $this->status->ViewValue = $this->status->CurrentValue;
-
         // featured_image
-        $this->featured_image->ViewValue = $this->featured_image->CurrentValue;
+        $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+        if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+            $this->featured_image->ImageAlt = $this->featured_image->alt();
+            $this->featured_image->ImageCssClass = "ew-image";
+            $this->featured_image->ViewValue = $this->featured_image->Upload->DbValue;
+        } else {
+            $this->featured_image->ViewValue = "";
+        }
 
         // created_at
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
+
+        // program_type_id
+        $curVal = strval($this->program_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->program_type_id->ViewValue = $this->program_type_id->lookupCacheOption($curVal);
+            if ($this->program_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->program_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->program_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->program_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->program_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->program_type_id->ViewValue = $this->program_type_id->displayValue($arwrk);
+                } else {
+                    $this->program_type_id->ViewValue = FormatNumber($this->program_type_id->CurrentValue, $this->program_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->program_type_id->ViewValue = null;
+        }
+
+        // status_id
+        $curVal = strval($this->status_id->CurrentValue);
+        if ($curVal != "") {
+            $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
+            if ($this->status_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->status_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->status_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->status_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->status_id->ViewValue = $this->status_id->displayValue($arwrk);
+                } else {
+                    $this->status_id->ViewValue = FormatNumber($this->status_id->CurrentValue, $this->status_id->formatPattern());
+                }
+            }
+        } else {
+            $this->status_id->ViewValue = null;
+        }
 
         // id
         $this->id->HrefValue = "";
@@ -1319,10 +1386,6 @@ class EnvironmentalPrograms extends DbTable
         // program_name
         $this->program_name->HrefValue = "";
         $this->program_name->TooltipValue = "";
-
-        // program_type
-        $this->program_type->HrefValue = "";
-        $this->program_type->TooltipValue = "";
 
         // description
         $this->description->HrefValue = "";
@@ -1340,17 +1403,38 @@ class EnvironmentalPrograms extends DbTable
         $this->implementation_date->HrefValue = "";
         $this->implementation_date->TooltipValue = "";
 
-        // status
-        $this->status->HrefValue = "";
-        $this->status->TooltipValue = "";
-
         // featured_image
-        $this->featured_image->HrefValue = "";
+        $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+        if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+            $this->featured_image->HrefValue = GetFileUploadUrl($this->featured_image, $this->featured_image->htmlDecode($this->featured_image->Upload->DbValue)); // Add prefix/suffix
+            $this->featured_image->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->featured_image->HrefValue = FullUrl($this->featured_image->HrefValue, "href");
+            }
+        } else {
+            $this->featured_image->HrefValue = "";
+        }
+        $this->featured_image->ExportHrefValue = $this->featured_image->UploadPath . $this->featured_image->Upload->DbValue;
         $this->featured_image->TooltipValue = "";
+        if ($this->featured_image->UseColorbox) {
+            if (EmptyValue($this->featured_image->TooltipValue)) {
+                $this->featured_image->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
+            }
+            $this->featured_image->LinkAttrs["data-rel"] = "environmental_programs_x_featured_image";
+            $this->featured_image->LinkAttrs->appendClass("ew-lightbox");
+        }
 
         // created_at
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
+
+        // program_type_id
+        $this->program_type_id->HrefValue = "";
+        $this->program_type_id->TooltipValue = "";
+
+        // status_id
+        $this->status_id->HrefValue = "";
+        $this->status_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1379,14 +1463,6 @@ class EnvironmentalPrograms extends DbTable
         $this->program_name->EditValue = $this->program_name->CurrentValue;
         $this->program_name->PlaceHolder = RemoveHtml($this->program_name->caption());
 
-        // program_type
-        $this->program_type->setupEditAttributes();
-        if (!$this->program_type->Raw) {
-            $this->program_type->CurrentValue = HtmlDecode($this->program_type->CurrentValue);
-        }
-        $this->program_type->EditValue = $this->program_type->CurrentValue;
-        $this->program_type->PlaceHolder = RemoveHtml($this->program_type->caption());
-
         // description
         $this->description->setupEditAttributes();
         $this->description->EditValue = $this->description->CurrentValue;
@@ -1410,26 +1486,29 @@ class EnvironmentalPrograms extends DbTable
         $this->implementation_date->EditValue = FormatDateTime($this->implementation_date->CurrentValue, $this->implementation_date->formatPattern());
         $this->implementation_date->PlaceHolder = RemoveHtml($this->implementation_date->caption());
 
-        // status
-        $this->status->setupEditAttributes();
-        if (!$this->status->Raw) {
-            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-        }
-        $this->status->EditValue = $this->status->CurrentValue;
-        $this->status->PlaceHolder = RemoveHtml($this->status->caption());
-
         // featured_image
         $this->featured_image->setupEditAttributes();
-        if (!$this->featured_image->Raw) {
-            $this->featured_image->CurrentValue = HtmlDecode($this->featured_image->CurrentValue);
+        $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+        if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+            $this->featured_image->ImageAlt = $this->featured_image->alt();
+            $this->featured_image->ImageCssClass = "ew-image";
+            $this->featured_image->EditValue = $this->featured_image->Upload->DbValue;
+        } else {
+            $this->featured_image->EditValue = "";
         }
-        $this->featured_image->EditValue = $this->featured_image->CurrentValue;
-        $this->featured_image->PlaceHolder = RemoveHtml($this->featured_image->caption());
+        if (!EmptyValue($this->featured_image->CurrentValue)) {
+            $this->featured_image->Upload->FileName = $this->featured_image->CurrentValue;
+        }
 
         // created_at
-        $this->created_at->setupEditAttributes();
-        $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+        // program_type_id
+        $this->program_type_id->setupEditAttributes();
+        $this->program_type_id->PlaceHolder = RemoveHtml($this->program_type_id->caption());
+
+        // status_id
+        $this->status_id->setupEditAttributes();
+        $this->status_id->PlaceHolder = RemoveHtml($this->status_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1461,23 +1540,23 @@ class EnvironmentalPrograms extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->program_name);
-                    $doc->exportCaption($this->program_type);
                     $doc->exportCaption($this->description);
                     $doc->exportCaption($this->objectives);
                     $doc->exportCaption($this->coverage_area);
                     $doc->exportCaption($this->implementation_date);
-                    $doc->exportCaption($this->status);
                     $doc->exportCaption($this->featured_image);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->program_type_id);
+                    $doc->exportCaption($this->status_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->program_name);
-                    $doc->exportCaption($this->program_type);
                     $doc->exportCaption($this->coverage_area);
                     $doc->exportCaption($this->implementation_date);
-                    $doc->exportCaption($this->status);
                     $doc->exportCaption($this->featured_image);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->program_type_id);
+                    $doc->exportCaption($this->status_id);
                 }
                 $doc->endExportRow();
             }
@@ -1506,23 +1585,23 @@ class EnvironmentalPrograms extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->program_name);
-                        $doc->exportField($this->program_type);
                         $doc->exportField($this->description);
                         $doc->exportField($this->objectives);
                         $doc->exportField($this->coverage_area);
                         $doc->exportField($this->implementation_date);
-                        $doc->exportField($this->status);
                         $doc->exportField($this->featured_image);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->program_type_id);
+                        $doc->exportField($this->status_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->program_name);
-                        $doc->exportField($this->program_type);
                         $doc->exportField($this->coverage_area);
                         $doc->exportField($this->implementation_date);
-                        $doc->exportField($this->status);
                         $doc->exportField($this->featured_image);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->program_type_id);
+                        $doc->exportField($this->status_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1542,8 +1621,123 @@ class EnvironmentalPrograms extends DbTable
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
         global $DownloadFileName;
+        $width = ($width > 0) ? $width : Config("THUMBNAIL_DEFAULT_WIDTH");
+        $height = ($height > 0) ? $height : Config("THUMBNAIL_DEFAULT_HEIGHT");
 
-        // No binary fields
+        // Set up field name / file name field / file type field
+        $fldName = "";
+        $fileNameFld = "";
+        $fileTypeFld = "";
+        if ($fldparm == 'featured_image') {
+            $fldName = "featured_image";
+            $fileNameFld = "featured_image";
+        } else {
+            return false; // Incorrect field
+        }
+
+        // Set up key values
+        $ar = explode(Config("COMPOSITE_KEY_SEPARATOR"), $key);
+        if (count($ar) == 1) {
+            $this->id->CurrentValue = $ar[0];
+        } else {
+            return false; // Incorrect key
+        }
+
+        // Set up filter (WHERE Clause)
+        $filter = $this->getRecordFilter();
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $dbtype = GetConnectionType($this->Dbid);
+        if ($row = $conn->fetchAssociative($sql)) {
+            $val = $row[$fldName];
+            if (!EmptyValue($val)) {
+                $fld = $this->Fields[$fldName];
+
+                // Binary data
+                if ($fld->DataType == DataType::BLOB) {
+                    if ($dbtype != "MYSQL") {
+                        if (is_resource($val) && get_resource_type($val) == "stream") { // Byte array
+                            $val = stream_get_contents($val);
+                        }
+                    }
+                    if ($resize) {
+                        ResizeBinary($val, $width, $height, $plugins);
+                    }
+
+                    // Write file type
+                    if ($fileTypeFld != "" && !EmptyValue($row[$fileTypeFld])) {
+                        AddHeader("Content-type", $row[$fileTypeFld]);
+                    } else {
+                        AddHeader("Content-type", ContentType($val));
+                    }
+
+                    // Write file name
+                    $downloadPdf = !Config("EMBED_PDF") && Config("DOWNLOAD_PDF_FILE");
+                    if ($fileNameFld != "" && !EmptyValue($row[$fileNameFld])) {
+                        $fileName = $row[$fileNameFld];
+                        $pathinfo = pathinfo($fileName);
+                        $ext = strtolower($pathinfo["extension"] ?? "");
+                        $isPdf = SameText($ext, "pdf");
+                        if ($downloadPdf || !$isPdf) { // Skip header if not download PDF
+                            AddHeader("Content-Disposition", "attachment; filename=\"" . $fileName . "\"");
+                        }
+                    } else {
+                        $ext = ContentExtension($val);
+                        $isPdf = SameText($ext, ".pdf");
+                        if ($isPdf && $downloadPdf) { // Add header if download PDF
+                            AddHeader("Content-Disposition", "attachment" . ($DownloadFileName ? "; filename=\"" . $DownloadFileName . "\"" : ""));
+                        }
+                    }
+
+                    // Write file data
+                    if (
+                        StartsString("PK", $val) &&
+                        ContainsString($val, "[Content_Types].xml") &&
+                        ContainsString($val, "_rels") &&
+                        ContainsString($val, "docProps")
+                    ) { // Fix Office 2007 documents
+                        if (!EndsString("\0\0\0", $val)) { // Not ends with 3 or 4 \0
+                            $val .= "\0\0\0\0";
+                        }
+                    }
+
+                    // Clear any debug message
+                    if (ob_get_length()) {
+                        ob_end_clean();
+                    }
+
+                    // Write binary data
+                    Write($val);
+
+                // Upload to folder
+                } else {
+                    if ($fld->UploadMultiple) {
+                        $files = explode(Config("MULTIPLE_UPLOAD_SEPARATOR"), $val);
+                    } else {
+                        $files = [$val];
+                    }
+                    $data = [];
+                    $ar = [];
+                    if ($fld->hasMethod("getUploadPath")) { // Check field level upload path
+                        $fld->UploadPath = $fld->getUploadPath();
+                    }
+                    foreach ($files as $file) {
+                        if (!EmptyValue($file)) {
+                            if (Config("ENCRYPT_FILE_PATH")) {
+                                $ar[$file] = FullUrl(GetApiUrl(Config("API_FILE_ACTION") .
+                                    "/" . $this->TableVar . "/" . Encrypt($fld->physicalUploadPath() . $file)));
+                            } else {
+                                $ar[$file] = FullUrl($fld->hrefPath() . $file);
+                            }
+                        }
+                    }
+                    $data[$fld->Param] = $ar;
+                    WriteJson($data);
+                }
+            }
+            return true;
+        }
         return false;
     }
 

@@ -604,20 +604,20 @@ class Login extends Users
         // Redirect based on user level
         switch ($userLevel) {
             case -1: // Administrator
-                header("Location: " . GetUrl("ProjectsList"));
+                header("Location: " . GetUrl("Dashboard2"));
                 exit();
                 break;
             case 0: // Default users
-                header("Location: " . GetUrl("ProjectsList"));
+                header("Location: " . GetUrl("Dashboard2"));
                 exit();
                 break;
             case 2: // Your custom user level
-                header("Location: " . GetUrl("ProjectsList"));
+                header("Location: " . GetUrl("Dashboard2"));
                 exit();
                 break;
             default:
                 // Default redirect
-                header("Location: " . GetUrl("ProjectsList"));
+                header("Location: " . GetUrl("Dashboard2"));
                 exit();
                 break;
         }

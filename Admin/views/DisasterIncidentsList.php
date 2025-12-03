@@ -150,9 +150,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_disaster_incidents_id" class="disaster_incidents_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->incident_type->Visible) { // incident_type ?>
-        <th data-name="incident_type" class="<?= $Page->incident_type->headerCellClass() ?>"><div id="elh_disaster_incidents_incident_type" class="disaster_incidents_incident_type"><?= $Page->renderFieldHeader($Page->incident_type) ?></div></th>
-<?php } ?>
 <?php if ($Page->incident_name->Visible) { // incident_name ?>
         <th data-name="incident_name" class="<?= $Page->incident_name->headerCellClass() ?>"><div id="elh_disaster_incidents_incident_name" class="disaster_incidents_incident_name"><?= $Page->renderFieldHeader($Page->incident_name) ?></div></th>
 <?php } ?>
@@ -167,6 +164,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_disaster_incidents_created_at" class="disaster_incidents_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->incident_type_id->Visible) { // incident_type_id ?>
+        <th data-name="incident_type_id" class="<?= $Page->incident_type_id->headerCellClass() ?>"><div id="elh_disaster_incidents_incident_type_id" class="disaster_incidents_incident_type_id"><?= $Page->renderFieldHeader($Page->incident_type_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -200,14 +200,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_disaster_incidents_id" class="el_disaster_incidents_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->incident_type->Visible) { // incident_type ?>
-        <td data-name="incident_type"<?= $Page->incident_type->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_disaster_incidents_incident_type" class="el_disaster_incidents_incident_type">
-<span<?= $Page->incident_type->viewAttributes() ?>>
-<?= $Page->incident_type->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -248,6 +240,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_disaster_incidents_created_at" class="el_disaster_incidents_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->incident_type_id->Visible) { // incident_type_id ?>
+        <td data-name="incident_type_id"<?= $Page->incident_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_disaster_incidents_incident_type_id" class="el_disaster_incidents_incident_type_id">
+<span<?= $Page->incident_type_id->viewAttributes() ?>>
+<?= $Page->incident_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

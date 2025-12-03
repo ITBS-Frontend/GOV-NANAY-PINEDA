@@ -138,10 +138,10 @@ class ProjectsDelete extends Projects
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
         $this->status->setVisibility();
-        $this->project_type->setVisibility();
         $this->municipality->setVisibility();
         $this->coordinates->setVisibility();
         $this->economic_impact->Visible = false;
+        $this->project_type_id->setVisibility();
     }
 
     // Constructor
@@ -423,6 +423,8 @@ class ProjectsDelete extends Projects
         // Set up lookup cache
         $this->setupLookupOptions($this->category_id);
         $this->setupLookupOptions($this->is_featured);
+        $this->setupLookupOptions($this->status);
+        $this->setupLookupOptions($this->project_type_id);
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -624,10 +626,10 @@ class ProjectsDelete extends Projects
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->status->setDbValue($row['status']);
-        $this->project_type->setDbValue($row['project_type']);
         $this->municipality->setDbValue($row['municipality']);
         $this->coordinates->setDbValue($row['coordinates']);
         $this->economic_impact->setDbValue($row['economic_impact']);
+        $this->project_type_id->setDbValue($row['project_type_id']);
     }
 
     // Return a row with default values
@@ -651,10 +653,10 @@ class ProjectsDelete extends Projects
         $row['start_date'] = $this->start_date->DefaultValue;
         $row['end_date'] = $this->end_date->DefaultValue;
         $row['status'] = $this->status->DefaultValue;
-        $row['project_type'] = $this->project_type->DefaultValue;
         $row['municipality'] = $this->municipality->DefaultValue;
         $row['coordinates'] = $this->coordinates->DefaultValue;
         $row['economic_impact'] = $this->economic_impact->DefaultValue;
+        $row['project_type_id'] = $this->project_type_id->DefaultValue;
         return $row;
     }
 
@@ -704,13 +706,13 @@ class ProjectsDelete extends Projects
 
         // status
 
-        // project_type
-
         // municipality
 
         // coordinates
 
         // economic_impact
+
+        // project_type_id
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -790,16 +792,40 @@ class ProjectsDelete extends Projects
             $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
 
             // status
-            $this->status->ViewValue = $this->status->CurrentValue;
-
-            // project_type
-            $this->project_type->ViewValue = $this->project_type->CurrentValue;
+            if (strval($this->status->CurrentValue) != "") {
+                $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+            } else {
+                $this->status->ViewValue = null;
+            }
 
             // municipality
             $this->municipality->ViewValue = $this->municipality->CurrentValue;
 
             // coordinates
             $this->coordinates->ViewValue = $this->coordinates->CurrentValue;
+
+            // project_type_id
+            $curVal = strval($this->project_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->project_type_id->ViewValue = $this->project_type_id->lookupCacheOption($curVal);
+                if ($this->project_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->project_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->project_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->project_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->project_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->project_type_id->ViewValue = $this->project_type_id->displayValue($arwrk);
+                    } else {
+                        $this->project_type_id->ViewValue = FormatNumber($this->project_type_id->CurrentValue, $this->project_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->project_type_id->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
@@ -866,10 +892,6 @@ class ProjectsDelete extends Projects
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
 
-            // project_type
-            $this->project_type->HrefValue = "";
-            $this->project_type->TooltipValue = "";
-
             // municipality
             $this->municipality->HrefValue = "";
             $this->municipality->TooltipValue = "";
@@ -877,6 +899,10 @@ class ProjectsDelete extends Projects
             // coordinates
             $this->coordinates->HrefValue = "";
             $this->coordinates->TooltipValue = "";
+
+            // project_type_id
+            $this->project_type_id->HrefValue = "";
+            $this->project_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1011,6 +1037,10 @@ class ProjectsDelete extends Projects
                 case "x_category_id":
                     break;
                 case "x_is_featured":
+                    break;
+                case "x_status":
+                    break;
+                case "x_project_type_id":
                     break;
                 default:
                     $lookupFilter = "";

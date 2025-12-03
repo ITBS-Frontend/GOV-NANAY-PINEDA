@@ -717,7 +717,7 @@ class ProgramCategoriesAdd extends ProgramCategories
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         }
@@ -916,9 +916,6 @@ class ProgramCategoriesAdd extends ProgramCategories
             }
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
 
             // Add refer script
 
@@ -984,9 +981,6 @@ class ProgramCategoriesAdd extends ProgramCategories
                 if (!$this->created_at->IsDetailKey && EmptyValue($this->created_at->FormValue)) {
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
-            }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1072,6 +1066,7 @@ class ProgramCategoriesAdd extends ProgramCategories
         $this->display_order->setDbValueDef($rsnew, $this->display_order->CurrentValue, strval($this->display_order->CurrentValue) == "");
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), false);
         return $rsnew;
     }

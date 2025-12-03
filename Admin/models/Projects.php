@@ -63,10 +63,10 @@ class Projects extends DbTable
     public $start_date;
     public $end_date;
     public $status;
-    public $project_type;
     public $municipality;
     public $coordinates;
     public $economic_impact;
+    public $project_type_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -511,35 +511,17 @@ class Projects extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->status->addMethod("getDefault", fn() => "completed");
         $this->status->InputTextType = "text";
-        $this->status->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->status->setSelectMultiple(false); // Select one
+        $this->status->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->status->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->status->Lookup = new Lookup($this->status, 'projects', false, '', ["","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
+        $this->status->OptionCount = 2;
+        $this->status->SearchOperators = ["=", "<>", "IS NULL", "IS NOT NULL"];
         $this->Fields['status'] = &$this->status;
-
-        // project_type
-        $this->project_type = new DbField(
-            $this, // Table
-            'x_project_type', // Variable name
-            'project_type', // Name
-            '"project_type"', // Expression
-            '"project_type"', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"project_type"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->project_type->addMethod("getDefault", fn() => "governance");
-        $this->project_type->InputTextType = "text";
-        $this->project_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['project_type'] = &$this->project_type;
 
         // municipality
         $this->municipality = new DbField(
@@ -606,6 +588,34 @@ class Projects extends DbTable
         $this->economic_impact->InputTextType = "text";
         $this->economic_impact->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['economic_impact'] = &$this->economic_impact;
+
+        // project_type_id
+        $this->project_type_id = new DbField(
+            $this, // Table
+            'x_project_type_id', // Variable name
+            'project_type_id', // Name
+            '"project_type_id"', // Expression
+            'CAST("project_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"project_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->project_type_id->InputTextType = "text";
+        $this->project_type_id->Raw = true;
+        $this->project_type_id->setSelectMultiple(false); // Select one
+        $this->project_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->project_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->project_type_id->Lookup = new Lookup($this->project_type_id, 'project_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->project_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->project_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['project_type_id'] = &$this->project_type_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -1146,10 +1156,10 @@ class Projects extends DbTable
         $this->start_date->DbValue = $row['start_date'];
         $this->end_date->DbValue = $row['end_date'];
         $this->status->DbValue = $row['status'];
-        $this->project_type->DbValue = $row['project_type'];
         $this->municipality->DbValue = $row['municipality'];
         $this->coordinates->DbValue = $row['coordinates'];
         $this->economic_impact->DbValue = $row['economic_impact'];
+        $this->project_type_id->DbValue = $row['project_type_id'];
     }
 
     // Delete uploaded files
@@ -1526,10 +1536,10 @@ class Projects extends DbTable
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->status->setDbValue($row['status']);
-        $this->project_type->setDbValue($row['project_type']);
         $this->municipality->setDbValue($row['municipality']);
         $this->coordinates->setDbValue($row['coordinates']);
         $this->economic_impact->setDbValue($row['economic_impact']);
+        $this->project_type_id->setDbValue($row['project_type_id']);
     }
 
     // Render list content
@@ -1594,13 +1604,13 @@ class Projects extends DbTable
 
         // status
 
-        // project_type
-
         // municipality
 
         // coordinates
 
         // economic_impact
+
+        // project_type_id
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1690,10 +1700,11 @@ class Projects extends DbTable
         $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, $this->end_date->formatPattern());
 
         // status
-        $this->status->ViewValue = $this->status->CurrentValue;
-
-        // project_type
-        $this->project_type->ViewValue = $this->project_type->CurrentValue;
+        if (strval($this->status->CurrentValue) != "") {
+            $this->status->ViewValue = $this->status->optionCaption($this->status->CurrentValue);
+        } else {
+            $this->status->ViewValue = null;
+        }
 
         // municipality
         $this->municipality->ViewValue = $this->municipality->CurrentValue;
@@ -1703,6 +1714,29 @@ class Projects extends DbTable
 
         // economic_impact
         $this->economic_impact->ViewValue = $this->economic_impact->CurrentValue;
+
+        // project_type_id
+        $curVal = strval($this->project_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->project_type_id->ViewValue = $this->project_type_id->lookupCacheOption($curVal);
+            if ($this->project_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->project_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->project_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->project_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->project_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->project_type_id->ViewValue = $this->project_type_id->displayValue($arwrk);
+                } else {
+                    $this->project_type_id->ViewValue = FormatNumber($this->project_type_id->CurrentValue, $this->project_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->project_type_id->ViewValue = null;
+        }
 
         // id
         $this->id->HrefValue = "";
@@ -1789,10 +1823,6 @@ class Projects extends DbTable
         $this->status->HrefValue = "";
         $this->status->TooltipValue = "";
 
-        // project_type
-        $this->project_type->HrefValue = "";
-        $this->project_type->TooltipValue = "";
-
         // municipality
         $this->municipality->HrefValue = "";
         $this->municipality->TooltipValue = "";
@@ -1804,6 +1834,10 @@ class Projects extends DbTable
         // economic_impact
         $this->economic_impact->HrefValue = "";
         $this->economic_impact->TooltipValue = "";
+
+        // project_type_id
+        $this->project_type_id->HrefValue = "";
+        $this->project_type_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1922,19 +1956,8 @@ class Projects extends DbTable
 
         // status
         $this->status->setupEditAttributes();
-        if (!$this->status->Raw) {
-            $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-        }
-        $this->status->EditValue = $this->status->CurrentValue;
+        $this->status->EditValue = $this->status->options(true);
         $this->status->PlaceHolder = RemoveHtml($this->status->caption());
-
-        // project_type
-        $this->project_type->setupEditAttributes();
-        if (!$this->project_type->Raw) {
-            $this->project_type->CurrentValue = HtmlDecode($this->project_type->CurrentValue);
-        }
-        $this->project_type->EditValue = $this->project_type->CurrentValue;
-        $this->project_type->PlaceHolder = RemoveHtml($this->project_type->caption());
 
         // municipality
         $this->municipality->setupEditAttributes();
@@ -1956,6 +1979,10 @@ class Projects extends DbTable
         $this->economic_impact->setupEditAttributes();
         $this->economic_impact->EditValue = $this->economic_impact->CurrentValue;
         $this->economic_impact->PlaceHolder = RemoveHtml($this->economic_impact->caption());
+
+        // project_type_id
+        $this->project_type_id->setupEditAttributes();
+        $this->project_type_id->PlaceHolder = RemoveHtml($this->project_type_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -2001,10 +2028,10 @@ class Projects extends DbTable
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->status);
-                    $doc->exportCaption($this->project_type);
                     $doc->exportCaption($this->municipality);
                     $doc->exportCaption($this->coordinates);
                     $doc->exportCaption($this->economic_impact);
+                    $doc->exportCaption($this->project_type_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->_title);
@@ -2019,9 +2046,9 @@ class Projects extends DbTable
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->status);
-                    $doc->exportCaption($this->project_type);
                     $doc->exportCaption($this->municipality);
                     $doc->exportCaption($this->coordinates);
+                    $doc->exportCaption($this->project_type_id);
                 }
                 $doc->endExportRow();
             }
@@ -2064,10 +2091,10 @@ class Projects extends DbTable
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->status);
-                        $doc->exportField($this->project_type);
                         $doc->exportField($this->municipality);
                         $doc->exportField($this->coordinates);
                         $doc->exportField($this->economic_impact);
+                        $doc->exportField($this->project_type_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->_title);
@@ -2082,9 +2109,9 @@ class Projects extends DbTable
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->status);
-                        $doc->exportField($this->project_type);
                         $doc->exportField($this->municipality);
                         $doc->exportField($this->coordinates);
+                        $doc->exportField($this->project_type_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

@@ -457,6 +457,9 @@ class UserPermissionsList extends UserPermissions
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->permission_id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
     }
 
     // Lookup data

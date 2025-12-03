@@ -146,13 +146,13 @@ class DemographicsDataList extends DemographicsData
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->data_type->setVisibility();
         $this->label->setVisibility();
         $this->value->setVisibility();
         $this->year->setVisibility();
         $this->source->setVisibility();
         $this->display_order->setVisibility();
         $this->created_at->setVisibility();
+        $this->data_type_id->setVisibility();
     }
 
     // Constructor
@@ -460,6 +460,9 @@ class DemographicsDataList extends DemographicsData
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
     }
 
     // Lookup data
@@ -692,6 +695,9 @@ class DemographicsDataList extends DemographicsData
 
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->data_type_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1030,13 +1036,13 @@ class DemographicsDataList extends DemographicsData
         $filterList = "";
         $savedFilterList = "";
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->data_type->AdvancedSearch->toJson(), ","); // Field data_type
         $filterList = Concat($filterList, $this->label->AdvancedSearch->toJson(), ","); // Field label
         $filterList = Concat($filterList, $this->value->AdvancedSearch->toJson(), ","); // Field value
         $filterList = Concat($filterList, $this->year->AdvancedSearch->toJson(), ","); // Field year
         $filterList = Concat($filterList, $this->source->AdvancedSearch->toJson(), ","); // Field source
         $filterList = Concat($filterList, $this->display_order->AdvancedSearch->toJson(), ","); // Field display_order
         $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
+        $filterList = Concat($filterList, $this->data_type_id->AdvancedSearch->toJson(), ","); // Field data_type_id
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1083,14 +1089,6 @@ class DemographicsDataList extends DemographicsData
         $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
-
-        // Field data_type
-        $this->data_type->AdvancedSearch->SearchValue = @$filter["x_data_type"];
-        $this->data_type->AdvancedSearch->SearchOperator = @$filter["z_data_type"];
-        $this->data_type->AdvancedSearch->SearchCondition = @$filter["v_data_type"];
-        $this->data_type->AdvancedSearch->SearchValue2 = @$filter["y_data_type"];
-        $this->data_type->AdvancedSearch->SearchOperator2 = @$filter["w_data_type"];
-        $this->data_type->AdvancedSearch->save();
 
         // Field label
         $this->label->AdvancedSearch->SearchValue = @$filter["x_label"];
@@ -1139,6 +1137,14 @@ class DemographicsDataList extends DemographicsData
         $this->created_at->AdvancedSearch->SearchValue2 = @$filter["y_created_at"];
         $this->created_at->AdvancedSearch->SearchOperator2 = @$filter["w_created_at"];
         $this->created_at->AdvancedSearch->save();
+
+        // Field data_type_id
+        $this->data_type_id->AdvancedSearch->SearchValue = @$filter["x_data_type_id"];
+        $this->data_type_id->AdvancedSearch->SearchOperator = @$filter["z_data_type_id"];
+        $this->data_type_id->AdvancedSearch->SearchCondition = @$filter["v_data_type_id"];
+        $this->data_type_id->AdvancedSearch->SearchValue2 = @$filter["y_data_type_id"];
+        $this->data_type_id->AdvancedSearch->SearchOperator2 = @$filter["w_data_type_id"];
+        $this->data_type_id->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1178,7 +1184,6 @@ class DemographicsDataList extends DemographicsData
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->data_type;
         $searchFlds[] = &$this->label;
         $searchFlds[] = &$this->value;
         $searchFlds[] = &$this->source;
@@ -1261,13 +1266,13 @@ class DemographicsDataList extends DemographicsData
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->data_type); // data_type
             $this->updateSort($this->label); // label
             $this->updateSort($this->value); // value
             $this->updateSort($this->year); // year
             $this->updateSort($this->source); // source
             $this->updateSort($this->display_order); // display_order
             $this->updateSort($this->created_at); // created_at
+            $this->updateSort($this->data_type_id); // data_type_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1293,13 +1298,13 @@ class DemographicsDataList extends DemographicsData
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->data_type->setSort("");
                 $this->label->setSort("");
                 $this->value->setSort("");
                 $this->year->setSort("");
                 $this->source->setSort("");
                 $this->display_order->setSort("");
                 $this->created_at->setSort("");
+                $this->data_type_id->setSort("");
             }
 
             // Reset start position
@@ -1535,13 +1540,13 @@ class DemographicsDataList extends DemographicsData
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "data_type");
             $this->createColumnOption($option, "label");
             $this->createColumnOption($option, "value");
             $this->createColumnOption($option, "year");
             $this->createColumnOption($option, "source");
             $this->createColumnOption($option, "display_order");
             $this->createColumnOption($option, "created_at");
+            $this->createColumnOption($option, "data_type_id");
         }
 
         // Set up custom actions
@@ -1981,13 +1986,13 @@ class DemographicsDataList extends DemographicsData
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->data_type->setDbValue($row['data_type']);
         $this->label->setDbValue($row['label']);
         $this->value->setDbValue($row['value']);
         $this->year->setDbValue($row['year']);
         $this->source->setDbValue($row['source']);
         $this->display_order->setDbValue($row['display_order']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->data_type_id->setDbValue($row['data_type_id']);
     }
 
     // Return a row with default values
@@ -1995,13 +2000,13 @@ class DemographicsDataList extends DemographicsData
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['data_type'] = $this->data_type->DefaultValue;
         $row['label'] = $this->label->DefaultValue;
         $row['value'] = $this->value->DefaultValue;
         $row['year'] = $this->year->DefaultValue;
         $row['source'] = $this->source->DefaultValue;
         $row['display_order'] = $this->display_order->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['data_type_id'] = $this->data_type_id->DefaultValue;
         return $row;
     }
 
@@ -2044,8 +2049,6 @@ class DemographicsDataList extends DemographicsData
 
         // id
 
-        // data_type
-
         // label
 
         // value
@@ -2058,13 +2061,12 @@ class DemographicsDataList extends DemographicsData
 
         // created_at
 
+        // data_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // data_type
-            $this->data_type->ViewValue = $this->data_type->CurrentValue;
 
             // label
             $this->label->ViewValue = $this->label->CurrentValue;
@@ -2087,13 +2089,32 @@ class DemographicsDataList extends DemographicsData
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // data_type_id
+            $curVal = strval($this->data_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->data_type_id->ViewValue = $this->data_type_id->lookupCacheOption($curVal);
+                if ($this->data_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->data_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->data_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->data_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->data_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->data_type_id->ViewValue = $this->data_type_id->displayValue($arwrk);
+                    } else {
+                        $this->data_type_id->ViewValue = FormatNumber($this->data_type_id->CurrentValue, $this->data_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->data_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // data_type
-            $this->data_type->HrefValue = "";
-            $this->data_type->TooltipValue = "";
 
             // label
             $this->label->HrefValue = "";
@@ -2118,6 +2139,10 @@ class DemographicsDataList extends DemographicsData
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // data_type_id
+            $this->data_type_id->HrefValue = "";
+            $this->data_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2205,6 +2230,8 @@ class DemographicsDataList extends DemographicsData
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_data_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

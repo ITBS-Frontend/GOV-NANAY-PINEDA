@@ -122,7 +122,6 @@ class DisasterIncidentsEdit extends DisasterIncidents
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->incident_type->setVisibility();
         $this->incident_name->setVisibility();
         $this->occurrence_date->setVisibility();
         $this->affected_areas->setVisibility();
@@ -131,6 +130,7 @@ class DisasterIncidentsEdit extends DisasterIncidents
         $this->response_actions->setVisibility();
         $this->lessons_learned->setVisibility();
         $this->created_at->setVisibility();
+        $this->incident_type_id->setVisibility();
     }
 
     // Constructor
@@ -518,6 +518,9 @@ class DisasterIncidentsEdit extends DisasterIncidents
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->incident_type_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -705,16 +708,6 @@ class DisasterIncidentsEdit extends DisasterIncidents
             $this->id->setFormValue($val);
         }
 
-        // Check field name 'incident_type' first before field var 'x_incident_type'
-        $val = $CurrentForm->hasValue("incident_type") ? $CurrentForm->getValue("incident_type") : $CurrentForm->getValue("x_incident_type");
-        if (!$this->incident_type->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->incident_type->Visible = false; // Disable update for API request
-            } else {
-                $this->incident_type->setFormValue($val);
-            }
-        }
-
         // Check field name 'incident_name' first before field var 'x_incident_name'
         $val = $CurrentForm->hasValue("incident_name") ? $CurrentForm->getValue("incident_name") : $CurrentForm->getValue("x_incident_name");
         if (!$this->incident_name->IsDetailKey) {
@@ -792,9 +785,19 @@ class DisasterIncidentsEdit extends DisasterIncidents
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        }
+
+        // Check field name 'incident_type_id' first before field var 'x_incident_type_id'
+        $val = $CurrentForm->hasValue("incident_type_id") ? $CurrentForm->getValue("incident_type_id") : $CurrentForm->getValue("x_incident_type_id");
+        if (!$this->incident_type_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->incident_type_id->Visible = false; // Disable update for API request
+            } else {
+                $this->incident_type_id->setFormValue($val);
+            }
         }
     }
 
@@ -803,7 +806,6 @@ class DisasterIncidentsEdit extends DisasterIncidents
     {
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
-        $this->incident_type->CurrentValue = $this->incident_type->FormValue;
         $this->incident_name->CurrentValue = $this->incident_name->FormValue;
         $this->occurrence_date->CurrentValue = $this->occurrence_date->FormValue;
         $this->occurrence_date->CurrentValue = UnFormatDateTime($this->occurrence_date->CurrentValue, $this->occurrence_date->formatPattern());
@@ -814,6 +816,7 @@ class DisasterIncidentsEdit extends DisasterIncidents
         $this->lessons_learned->CurrentValue = $this->lessons_learned->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->incident_type_id->CurrentValue = $this->incident_type_id->FormValue;
     }
 
     /**
@@ -855,7 +858,6 @@ class DisasterIncidentsEdit extends DisasterIncidents
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->incident_type->setDbValue($row['incident_type']);
         $this->incident_name->setDbValue($row['incident_name']);
         $this->occurrence_date->setDbValue($row['occurrence_date']);
         $this->affected_areas->setDbValue($row['affected_areas']);
@@ -864,6 +866,7 @@ class DisasterIncidentsEdit extends DisasterIncidents
         $this->response_actions->setDbValue($row['response_actions']);
         $this->lessons_learned->setDbValue($row['lessons_learned']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->incident_type_id->setDbValue($row['incident_type_id']);
     }
 
     // Return a row with default values
@@ -871,7 +874,6 @@ class DisasterIncidentsEdit extends DisasterIncidents
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['incident_type'] = $this->incident_type->DefaultValue;
         $row['incident_name'] = $this->incident_name->DefaultValue;
         $row['occurrence_date'] = $this->occurrence_date->DefaultValue;
         $row['affected_areas'] = $this->affected_areas->DefaultValue;
@@ -880,6 +882,7 @@ class DisasterIncidentsEdit extends DisasterIncidents
         $row['response_actions'] = $this->response_actions->DefaultValue;
         $row['lessons_learned'] = $this->lessons_learned->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['incident_type_id'] = $this->incident_type_id->DefaultValue;
         return $row;
     }
 
@@ -917,9 +920,6 @@ class DisasterIncidentsEdit extends DisasterIncidents
         // id
         $this->id->RowCssClass = "row";
 
-        // incident_type
-        $this->incident_type->RowCssClass = "row";
-
         // incident_name
         $this->incident_name->RowCssClass = "row";
 
@@ -944,13 +944,13 @@ class DisasterIncidentsEdit extends DisasterIncidents
         // created_at
         $this->created_at->RowCssClass = "row";
 
+        // incident_type_id
+        $this->incident_type_id->RowCssClass = "row";
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // incident_type
-            $this->incident_type->ViewValue = $this->incident_type->CurrentValue;
 
             // incident_name
             $this->incident_name->ViewValue = $this->incident_name->CurrentValue;
@@ -980,11 +980,31 @@ class DisasterIncidentsEdit extends DisasterIncidents
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // incident_type_id
+            $curVal = strval($this->incident_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->incident_type_id->ViewValue = $this->incident_type_id->lookupCacheOption($curVal);
+                if ($this->incident_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->incident_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->incident_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->incident_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->incident_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->incident_type_id->ViewValue = $this->incident_type_id->displayValue($arwrk);
+                    } else {
+                        $this->incident_type_id->ViewValue = FormatNumber($this->incident_type_id->CurrentValue, $this->incident_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->incident_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
-
-            // incident_type
-            $this->incident_type->HrefValue = "";
 
             // incident_name
             $this->incident_name->HrefValue = "";
@@ -1009,18 +1029,13 @@ class DisasterIncidentsEdit extends DisasterIncidents
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // incident_type_id
+            $this->incident_type_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
-
-            // incident_type
-            $this->incident_type->setupEditAttributes();
-            if (!$this->incident_type->Raw) {
-                $this->incident_type->CurrentValue = HtmlDecode($this->incident_type->CurrentValue);
-            }
-            $this->incident_type->EditValue = HtmlEncode($this->incident_type->CurrentValue);
-            $this->incident_type->PlaceHolder = RemoveHtml($this->incident_type->caption());
 
             // incident_name
             $this->incident_name->setupEditAttributes();
@@ -1067,17 +1082,38 @@ class DisasterIncidentsEdit extends DisasterIncidents
             $this->lessons_learned->PlaceHolder = RemoveHtml($this->lessons_learned->caption());
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+            // incident_type_id
+            $this->incident_type_id->setupEditAttributes();
+            $curVal = trim(strval($this->incident_type_id->CurrentValue));
+            if ($curVal != "") {
+                $this->incident_type_id->ViewValue = $this->incident_type_id->lookupCacheOption($curVal);
+            } else {
+                $this->incident_type_id->ViewValue = $this->incident_type_id->Lookup !== null && is_array($this->incident_type_id->lookupOptions()) && count($this->incident_type_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->incident_type_id->ViewValue !== null) { // Load from cache
+                $this->incident_type_id->EditValue = array_values($this->incident_type_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->incident_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->incident_type_id->CurrentValue, $this->incident_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->incident_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->incident_type_id->EditValue = $arwrk;
+            }
+            $this->incident_type_id->PlaceHolder = RemoveHtml($this->incident_type_id->caption());
 
             // Edit refer script
 
             // id
             $this->id->HrefValue = "";
-
-            // incident_type
-            $this->incident_type->HrefValue = "";
 
             // incident_name
             $this->incident_name->HrefValue = "";
@@ -1102,6 +1138,9 @@ class DisasterIncidentsEdit extends DisasterIncidents
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // incident_type_id
+            $this->incident_type_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1126,11 +1165,6 @@ class DisasterIncidentsEdit extends DisasterIncidents
             if ($this->id->Visible && $this->id->Required) {
                 if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
-            if ($this->incident_type->Visible && $this->incident_type->Required) {
-                if (!$this->incident_type->IsDetailKey && EmptyValue($this->incident_type->FormValue)) {
-                    $this->incident_type->addErrorMessage(str_replace("%s", $this->incident_type->caption(), $this->incident_type->RequiredErrorMessage));
                 }
             }
             if ($this->incident_name->Visible && $this->incident_name->Required) {
@@ -1182,8 +1216,10 @@ class DisasterIncidentsEdit extends DisasterIncidents
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
             }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
+            if ($this->incident_type_id->Visible && $this->incident_type_id->Required) {
+                if (!$this->incident_type_id->IsDetailKey && EmptyValue($this->incident_type_id->FormValue)) {
+                    $this->incident_type_id->addErrorMessage(str_replace("%s", $this->incident_type_id->caption(), $this->incident_type_id->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1274,9 +1310,6 @@ class DisasterIncidentsEdit extends DisasterIncidents
         global $Security;
         $rsnew = [];
 
-        // incident_type
-        $this->incident_type->setDbValueDef($rsnew, $this->incident_type->CurrentValue, $this->incident_type->ReadOnly);
-
         // incident_name
         $this->incident_name->setDbValueDef($rsnew, $this->incident_name->CurrentValue, $this->incident_name->ReadOnly);
 
@@ -1299,7 +1332,11 @@ class DisasterIncidentsEdit extends DisasterIncidents
         $this->lessons_learned->setDbValueDef($rsnew, $this->lessons_learned->CurrentValue, $this->lessons_learned->ReadOnly);
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), $this->created_at->ReadOnly);
+
+        // incident_type_id
+        $this->incident_type_id->setDbValueDef($rsnew, $this->incident_type_id->CurrentValue, $this->incident_type_id->ReadOnly);
         return $rsnew;
     }
 
@@ -1309,9 +1346,6 @@ class DisasterIncidentsEdit extends DisasterIncidents
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['incident_type'])) { // incident_type
-            $this->incident_type->CurrentValue = $row['incident_type'];
-        }
         if (isset($row['incident_name'])) { // incident_name
             $this->incident_name->CurrentValue = $row['incident_name'];
         }
@@ -1335,6 +1369,9 @@ class DisasterIncidentsEdit extends DisasterIncidents
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->CurrentValue = $row['created_at'];
+        }
+        if (isset($row['incident_type_id'])) { // incident_type_id
+            $this->incident_type_id->CurrentValue = $row['incident_type_id'];
         }
     }
 
@@ -1362,6 +1399,8 @@ class DisasterIncidentsEdit extends DisasterIncidents
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_incident_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

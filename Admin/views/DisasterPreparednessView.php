@@ -62,17 +62,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->disaster_type->Visible) { // disaster_type ?>
-    <tr id="r_disaster_type"<?= $Page->disaster_type->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_disaster_preparedness_disaster_type"><?= $Page->disaster_type->caption() ?></span></td>
-        <td data-name="disaster_type"<?= $Page->disaster_type->cellAttributes() ?>>
-<span id="el_disaster_preparedness_disaster_type">
-<span<?= $Page->disaster_type->viewAttributes() ?>>
-<?= $Page->disaster_type->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->preparedness_guide->Visible) { // preparedness_guide ?>
     <tr id="r_preparedness_guide"<?= $Page->preparedness_guide->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_disaster_preparedness_preparedness_guide"><?= $Page->preparedness_guide->caption() ?></span></td>
@@ -122,8 +111,9 @@ loadjs.ready("head", function () {
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_disaster_preparedness_featured_image"><?= $Page->featured_image->caption() ?></span></td>
         <td data-name="featured_image"<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el_disaster_preparedness_featured_image">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     </tr>
@@ -146,6 +136,17 @@ loadjs.ready("head", function () {
 <span id="el_disaster_preparedness_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->disaster_type_id->Visible) { // disaster_type_id ?>
+    <tr id="r_disaster_type_id"<?= $Page->disaster_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_disaster_preparedness_disaster_type_id"><?= $Page->disaster_type_id->caption() ?></span></td>
+        <td data-name="disaster_type_id"<?= $Page->disaster_type_id->cellAttributes() ?>>
+<span id="el_disaster_preparedness_disaster_type_id">
+<span<?= $Page->disaster_type_id->viewAttributes() ?>>
+<?= $Page->disaster_type_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

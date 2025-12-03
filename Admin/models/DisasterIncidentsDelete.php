@@ -122,7 +122,6 @@ class DisasterIncidentsDelete extends DisasterIncidents
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->incident_type->setVisibility();
         $this->incident_name->setVisibility();
         $this->occurrence_date->setVisibility();
         $this->affected_areas->Visible = false;
@@ -131,6 +130,7 @@ class DisasterIncidentsDelete extends DisasterIncidents
         $this->response_actions->Visible = false;
         $this->lessons_learned->Visible = false;
         $this->created_at->setVisibility();
+        $this->incident_type_id->setVisibility();
     }
 
     // Constructor
@@ -407,6 +407,9 @@ class DisasterIncidentsDelete extends DisasterIncidents
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->incident_type_id);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -590,7 +593,6 @@ class DisasterIncidentsDelete extends DisasterIncidents
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->incident_type->setDbValue($row['incident_type']);
         $this->incident_name->setDbValue($row['incident_name']);
         $this->occurrence_date->setDbValue($row['occurrence_date']);
         $this->affected_areas->setDbValue($row['affected_areas']);
@@ -599,6 +601,7 @@ class DisasterIncidentsDelete extends DisasterIncidents
         $this->response_actions->setDbValue($row['response_actions']);
         $this->lessons_learned->setDbValue($row['lessons_learned']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->incident_type_id->setDbValue($row['incident_type_id']);
     }
 
     // Return a row with default values
@@ -606,7 +609,6 @@ class DisasterIncidentsDelete extends DisasterIncidents
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['incident_type'] = $this->incident_type->DefaultValue;
         $row['incident_name'] = $this->incident_name->DefaultValue;
         $row['occurrence_date'] = $this->occurrence_date->DefaultValue;
         $row['affected_areas'] = $this->affected_areas->DefaultValue;
@@ -615,6 +617,7 @@ class DisasterIncidentsDelete extends DisasterIncidents
         $row['response_actions'] = $this->response_actions->DefaultValue;
         $row['lessons_learned'] = $this->lessons_learned->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['incident_type_id'] = $this->incident_type_id->DefaultValue;
         return $row;
     }
 
@@ -632,8 +635,6 @@ class DisasterIncidentsDelete extends DisasterIncidents
 
         // id
 
-        // incident_type
-
         // incident_name
 
         // occurrence_date
@@ -650,13 +651,12 @@ class DisasterIncidentsDelete extends DisasterIncidents
 
         // created_at
 
+        // incident_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // incident_type
-            $this->incident_type->ViewValue = $this->incident_type->CurrentValue;
 
             // incident_name
             $this->incident_name->ViewValue = $this->incident_name->CurrentValue;
@@ -677,13 +677,32 @@ class DisasterIncidentsDelete extends DisasterIncidents
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // incident_type_id
+            $curVal = strval($this->incident_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->incident_type_id->ViewValue = $this->incident_type_id->lookupCacheOption($curVal);
+                if ($this->incident_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->incident_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->incident_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->incident_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->incident_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->incident_type_id->ViewValue = $this->incident_type_id->displayValue($arwrk);
+                    } else {
+                        $this->incident_type_id->ViewValue = FormatNumber($this->incident_type_id->CurrentValue, $this->incident_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->incident_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // incident_type
-            $this->incident_type->HrefValue = "";
-            $this->incident_type->TooltipValue = "";
 
             // incident_name
             $this->incident_name->HrefValue = "";
@@ -704,6 +723,10 @@ class DisasterIncidentsDelete extends DisasterIncidents
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // incident_type_id
+            $this->incident_type_id->HrefValue = "";
+            $this->incident_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -835,6 +858,8 @@ class DisasterIncidentsDelete extends DisasterIncidents
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_incident_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

@@ -52,9 +52,6 @@ class HealthProgram extends AbstractEntity
     #[Column(name: "implementation_date", type: "date", nullable: true)]
     private ?DateTime $implementationDate;
 
-    #[Column(type: "string", nullable: true)]
-    private ?string $status;
-
     #[Column(name: "contact_info", type: "text", nullable: true)]
     private ?string $contactInfo;
 
@@ -67,10 +64,8 @@ class HealthProgram extends AbstractEntity
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
-    public function __construct()
-    {
-        $this->status = "active";
-    }
+    #[Column(name: "status_id", type: "integer", nullable: true)]
+    private ?int $statusId;
 
     public function getId(): int
     {
@@ -149,17 +144,6 @@ class HealthProgram extends AbstractEntity
         return $this;
     }
 
-    public function getStatus(): ?string
-    {
-        return HtmlDecode($this->status);
-    }
-
-    public function setStatus(?string $value): static
-    {
-        $this->status = RemoveXss($value);
-        return $this;
-    }
-
     public function getContactInfo(): ?string
     {
         return HtmlDecode($this->contactInfo);
@@ -201,6 +185,17 @@ class HealthProgram extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getStatusId(): ?int
+    {
+        return $this->statusId;
+    }
+
+    public function setStatusId(?int $value): static
+    {
+        $this->statusId = $value;
         return $this;
     }
 }

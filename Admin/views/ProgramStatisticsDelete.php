@@ -56,9 +56,6 @@ $Page->showMessage();
 <?php if ($Page->program_id->Visible) { // program_id ?>
         <th class="<?= $Page->program_id->headerCellClass() ?>"><span id="elh_program_statistics_program_id" class="program_statistics_program_id"><?= $Page->program_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->program_type->Visible) { // program_type ?>
-        <th class="<?= $Page->program_type->headerCellClass() ?>"><span id="elh_program_statistics_program_type" class="program_statistics_program_type"><?= $Page->program_type->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->stat_label->Visible) { // stat_label ?>
         <th class="<?= $Page->stat_label->headerCellClass() ?>"><span id="elh_program_statistics_stat_label" class="program_statistics_stat_label"><?= $Page->stat_label->caption() ?></span></th>
 <?php } ?>
@@ -70,6 +67,9 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_program_statistics_created_at" class="program_statistics_created_at"><?= $Page->created_at->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+        <th class="<?= $Page->program_type_id->headerCellClass() ?>"><span id="elh_program_statistics_program_type_id" class="program_statistics_program_type_id"><?= $Page->program_type_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -108,14 +108,6 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->program_type->Visible) { // program_type ?>
-        <td<?= $Page->program_type->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->program_type->viewAttributes() ?>>
-<?= $Page->program_type->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->stat_label->Visible) { // stat_label ?>
         <td<?= $Page->stat_label->cellAttributes() ?>>
 <span id="">
@@ -145,6 +137,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+        <td<?= $Page->program_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->program_type_id->viewAttributes() ?>>
+<?= $Page->program_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

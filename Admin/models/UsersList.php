@@ -462,6 +462,12 @@ class UsersList extends Users
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->user_id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
+        if ($this->isAddOrEdit()) {
+            $this->updated_at->Visible = false;
+        }
     }
 
     // Lookup data

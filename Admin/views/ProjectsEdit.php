@@ -44,10 +44,10 @@ loadjs.ready(["wrapper", "head"], function () {
             ["start_date", [fields.start_date.visible && fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(fields.start_date.clientFormatPattern)], fields.start_date.isInvalid],
             ["end_date", [fields.end_date.visible && fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(fields.end_date.clientFormatPattern)], fields.end_date.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
-            ["project_type", [fields.project_type.visible && fields.project_type.required ? ew.Validators.required(fields.project_type.caption) : null], fields.project_type.isInvalid],
             ["municipality", [fields.municipality.visible && fields.municipality.required ? ew.Validators.required(fields.municipality.caption) : null], fields.municipality.isInvalid],
             ["coordinates", [fields.coordinates.visible && fields.coordinates.required ? ew.Validators.required(fields.coordinates.caption) : null], fields.coordinates.isInvalid],
-            ["economic_impact", [fields.economic_impact.visible && fields.economic_impact.required ? ew.Validators.required(fields.economic_impact.caption) : null], fields.economic_impact.isInvalid]
+            ["economic_impact", [fields.economic_impact.visible && fields.economic_impact.required ? ew.Validators.required(fields.economic_impact.caption) : null], fields.economic_impact.isInvalid],
+            ["project_type_id", [fields.project_type_id.visible && fields.project_type_id.required ? ew.Validators.required(fields.project_type_id.caption) : null], fields.project_type_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -65,6 +65,8 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "category_id": <?= $Page->category_id->toClientList($Page) ?>,
             "is_featured": <?= $Page->is_featured->toClientList($Page) ?>,
+            "status": <?= $Page->status->toClientList($Page) ?>,
+            "project_type_id": <?= $Page->project_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -449,21 +451,42 @@ loadjs.ready(["fprojectsedit", "datetimepicker"], function () {
         <label id="elh_projects_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
 <span id="el_projects_status">
-<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="projects" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
-<?= $Page->status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
+    <select
+        id="x_status"
+        name="x_status"
+        class="form-select ew-select<?= $Page->status->isInvalidClass() ?>"
+        <?php if (!$Page->status->IsNativeSelect) { ?>
+        data-select2-id="fprojectsedit_x_status"
+        <?php } ?>
+        data-table="projects"
+        data-field="x_status"
+        data-value-separator="<?= $Page->status->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>"
+        <?= $Page->status->editAttributes() ?>>
+        <?= $Page->status->selectOptionListHtml("x_status") ?>
+    </select>
+    <?= $Page->status->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
+<?php if (!$Page->status->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fprojectsedit", function() {
+    var options = { name: "x_status", selectId: "fprojectsedit_x_status" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprojectsedit.lists.status?.lookupOptions.length) {
+        options.data = { id: "x_status", form: "fprojectsedit" };
+    } else {
+        options.ajax = { id: "x_status", form: "fprojectsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.projects.fields.status.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 <?php } ?>
-<?php if ($Page->project_type->Visible) { // project_type ?>
-    <div id="r_project_type"<?= $Page->project_type->rowAttributes() ?>>
-        <label id="elh_projects_project_type" for="x_project_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->project_type->caption() ?><?= $Page->project_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->project_type->cellAttributes() ?>>
-<span id="el_projects_project_type">
-<input type="<?= $Page->project_type->getInputTextType() ?>" name="x_project_type" id="x_project_type" data-table="projects" data-field="x_project_type" value="<?= $Page->project_type->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->project_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->project_type->formatPattern()) ?>"<?= $Page->project_type->editAttributes() ?> aria-describedby="x_project_type_help">
-<?= $Page->project_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->project_type->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>
@@ -500,6 +523,52 @@ loadjs.ready(["fprojectsedit", "datetimepicker"], function () {
 <textarea data-table="projects" data-field="x_economic_impact" name="x_economic_impact" id="x_economic_impact" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->economic_impact->getPlaceHolder()) ?>"<?= $Page->economic_impact->editAttributes() ?> aria-describedby="x_economic_impact_help"><?= $Page->economic_impact->EditValue ?></textarea>
 <?= $Page->economic_impact->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->economic_impact->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->project_type_id->Visible) { // project_type_id ?>
+    <div id="r_project_type_id"<?= $Page->project_type_id->rowAttributes() ?>>
+        <label id="elh_projects_project_type_id" for="x_project_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->project_type_id->caption() ?><?= $Page->project_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->project_type_id->cellAttributes() ?>>
+<span id="el_projects_project_type_id">
+    <select
+        id="x_project_type_id"
+        name="x_project_type_id"
+        class="form-select ew-select<?= $Page->project_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->project_type_id->IsNativeSelect) { ?>
+        data-select2-id="fprojectsedit_x_project_type_id"
+        <?php } ?>
+        data-table="projects"
+        data-field="x_project_type_id"
+        data-value-separator="<?= $Page->project_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->project_type_id->getPlaceHolder()) ?>"
+        <?= $Page->project_type_id->editAttributes() ?>>
+        <?= $Page->project_type_id->selectOptionListHtml("x_project_type_id") ?>
+    </select>
+    <?= $Page->project_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->project_type_id->getErrorMessage() ?></div>
+<?= $Page->project_type_id->Lookup->getParamTag($Page, "p_x_project_type_id") ?>
+<?php if (!$Page->project_type_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fprojectsedit", function() {
+    var options = { name: "x_project_type_id", selectId: "fprojectsedit_x_project_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprojectsedit.lists.project_type_id?.lookupOptions.length) {
+        options.data = { id: "x_project_type_id", form: "fprojectsedit" };
+    } else {
+        options.ajax = { id: "x_project_type_id", form: "fprojectsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.projects.fields.project_type_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

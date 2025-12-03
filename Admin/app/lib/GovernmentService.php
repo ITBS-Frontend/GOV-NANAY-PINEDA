@@ -75,21 +75,21 @@ class GovernmentService
     /**
      * Get government facilities
      */
-    public function getFacilities($facilityType = null, $municipality = null) 
+    public function getFacilities($facilityTypeId = null, $municipality = null) 
     {
         try {
             $conn = Conn();
             
-            $whereClauses = ["is_active = true"];
+            $whereClauses = ["gf.is_active = true"];
             $params = [];
             
-            if ($facilityType) {
-                $whereClauses[] = "facility_type = ?";
-                $params[] = $facilityType;
+            if ($facilityTypeId) {
+                $whereClauses[] = "gf.facility_type_id = ?";
+                $params[] = $facilityTypeId;
             }
             
             if ($municipality) {
-                $whereClauses[] = "municipality = ?";
+                $whereClauses[] = "gf.municipality = ?";
                 $params[] = $municipality;
             }
             
@@ -97,20 +97,22 @@ class GovernmentService
             
             $sql = "
                 SELECT 
-                    id,
-                    facility_type,
-                    name,
-                    address,
-                    municipality,
-                    contact_number,
-                    email,
-                    operating_hours,
-                    services_offered,
-                    coordinates,
-                    featured_image
-                FROM government_facilities
+                    gf.id,
+                    ft.type_name as facility_type,
+                    ft.icon_class,
+                    gf.name,
+                    gf.address,
+                    gf.municipality,
+                    gf.contact_number,
+                    gf.email,
+                    gf.operating_hours,
+                    gf.services_offered,
+                    gf.coordinates,
+                    gf.featured_image
+                FROM government_facilities gf
+                LEFT JOIN facility_types ft ON gf.facility_type_id = ft.id
                 WHERE $whereClause
-                ORDER BY municipality ASC, name ASC
+                ORDER BY gf.municipality ASC, ft.display_order ASC, gf.name ASC
             ";
             
             $facilities = $conn->executeQuery($sql, $params)->fetchAllAssociative();

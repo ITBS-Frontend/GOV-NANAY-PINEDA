@@ -146,7 +146,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->facility_type->setVisibility();
         $this->name->setVisibility();
         $this->municipality->setVisibility();
         $this->address->Visible = false;
@@ -155,6 +154,7 @@ class EmergencyFacilitiesList extends EmergencyFacilities
         $this->coordinates->setVisibility();
         $this->is_active->setVisibility();
         $this->created_at->setVisibility();
+        $this->facility_type_id->setVisibility();
     }
 
     // Constructor
@@ -462,6 +462,9 @@ class EmergencyFacilitiesList extends EmergencyFacilities
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
     }
 
     // Lookup data
@@ -697,6 +700,7 @@ class EmergencyFacilitiesList extends EmergencyFacilities
 
         // Set up lookup cache
         $this->setupLookupOptions($this->is_active);
+        $this->setupLookupOptions($this->facility_type_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1035,7 +1039,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
         $filterList = "";
         $savedFilterList = "";
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->facility_type->AdvancedSearch->toJson(), ","); // Field facility_type
         $filterList = Concat($filterList, $this->name->AdvancedSearch->toJson(), ","); // Field name
         $filterList = Concat($filterList, $this->municipality->AdvancedSearch->toJson(), ","); // Field municipality
         $filterList = Concat($filterList, $this->address->AdvancedSearch->toJson(), ","); // Field address
@@ -1044,6 +1047,7 @@ class EmergencyFacilitiesList extends EmergencyFacilities
         $filterList = Concat($filterList, $this->coordinates->AdvancedSearch->toJson(), ","); // Field coordinates
         $filterList = Concat($filterList, $this->is_active->AdvancedSearch->toJson(), ","); // Field is_active
         $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
+        $filterList = Concat($filterList, $this->facility_type_id->AdvancedSearch->toJson(), ","); // Field facility_type_id
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1090,14 +1094,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
         $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
-
-        // Field facility_type
-        $this->facility_type->AdvancedSearch->SearchValue = @$filter["x_facility_type"];
-        $this->facility_type->AdvancedSearch->SearchOperator = @$filter["z_facility_type"];
-        $this->facility_type->AdvancedSearch->SearchCondition = @$filter["v_facility_type"];
-        $this->facility_type->AdvancedSearch->SearchValue2 = @$filter["y_facility_type"];
-        $this->facility_type->AdvancedSearch->SearchOperator2 = @$filter["w_facility_type"];
-        $this->facility_type->AdvancedSearch->save();
 
         // Field name
         $this->name->AdvancedSearch->SearchValue = @$filter["x_name"];
@@ -1162,6 +1158,14 @@ class EmergencyFacilitiesList extends EmergencyFacilities
         $this->created_at->AdvancedSearch->SearchValue2 = @$filter["y_created_at"];
         $this->created_at->AdvancedSearch->SearchOperator2 = @$filter["w_created_at"];
         $this->created_at->AdvancedSearch->save();
+
+        // Field facility_type_id
+        $this->facility_type_id->AdvancedSearch->SearchValue = @$filter["x_facility_type_id"];
+        $this->facility_type_id->AdvancedSearch->SearchOperator = @$filter["z_facility_type_id"];
+        $this->facility_type_id->AdvancedSearch->SearchCondition = @$filter["v_facility_type_id"];
+        $this->facility_type_id->AdvancedSearch->SearchValue2 = @$filter["y_facility_type_id"];
+        $this->facility_type_id->AdvancedSearch->SearchOperator2 = @$filter["w_facility_type_id"];
+        $this->facility_type_id->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1201,7 +1205,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->facility_type;
         $searchFlds[] = &$this->name;
         $searchFlds[] = &$this->municipality;
         $searchFlds[] = &$this->address;
@@ -1286,7 +1289,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->facility_type); // facility_type
             $this->updateSort($this->name); // name
             $this->updateSort($this->municipality); // municipality
             $this->updateSort($this->capacity); // capacity
@@ -1294,6 +1296,7 @@ class EmergencyFacilitiesList extends EmergencyFacilities
             $this->updateSort($this->coordinates); // coordinates
             $this->updateSort($this->is_active); // is_active
             $this->updateSort($this->created_at); // created_at
+            $this->updateSort($this->facility_type_id); // facility_type_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1319,7 +1322,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->facility_type->setSort("");
                 $this->name->setSort("");
                 $this->municipality->setSort("");
                 $this->address->setSort("");
@@ -1328,6 +1330,7 @@ class EmergencyFacilitiesList extends EmergencyFacilities
                 $this->coordinates->setSort("");
                 $this->is_active->setSort("");
                 $this->created_at->setSort("");
+                $this->facility_type_id->setSort("");
             }
 
             // Reset start position
@@ -1563,7 +1566,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "facility_type");
             $this->createColumnOption($option, "name");
             $this->createColumnOption($option, "municipality");
             $this->createColumnOption($option, "capacity");
@@ -1571,6 +1573,7 @@ class EmergencyFacilitiesList extends EmergencyFacilities
             $this->createColumnOption($option, "coordinates");
             $this->createColumnOption($option, "is_active");
             $this->createColumnOption($option, "created_at");
+            $this->createColumnOption($option, "facility_type_id");
         }
 
         // Set up custom actions
@@ -2010,7 +2013,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->facility_type->setDbValue($row['facility_type']);
         $this->name->setDbValue($row['name']);
         $this->municipality->setDbValue($row['municipality']);
         $this->address->setDbValue($row['address']);
@@ -2019,6 +2021,7 @@ class EmergencyFacilitiesList extends EmergencyFacilities
         $this->coordinates->setDbValue($row['coordinates']);
         $this->is_active->setDbValue((ConvertToBool($row['is_active']) ? "1" : "0"));
         $this->created_at->setDbValue($row['created_at']);
+        $this->facility_type_id->setDbValue($row['facility_type_id']);
     }
 
     // Return a row with default values
@@ -2026,7 +2029,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['facility_type'] = $this->facility_type->DefaultValue;
         $row['name'] = $this->name->DefaultValue;
         $row['municipality'] = $this->municipality->DefaultValue;
         $row['address'] = $this->address->DefaultValue;
@@ -2035,6 +2037,7 @@ class EmergencyFacilitiesList extends EmergencyFacilities
         $row['coordinates'] = $this->coordinates->DefaultValue;
         $row['is_active'] = $this->is_active->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['facility_type_id'] = $this->facility_type_id->DefaultValue;
         return $row;
     }
 
@@ -2077,8 +2080,6 @@ class EmergencyFacilitiesList extends EmergencyFacilities
 
         // id
 
-        // facility_type
-
         // name
 
         // municipality
@@ -2095,13 +2096,12 @@ class EmergencyFacilitiesList extends EmergencyFacilities
 
         // created_at
 
+        // facility_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // facility_type
-            $this->facility_type->ViewValue = $this->facility_type->CurrentValue;
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
@@ -2130,13 +2130,32 @@ class EmergencyFacilitiesList extends EmergencyFacilities
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // facility_type_id
+            $curVal = strval($this->facility_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->facility_type_id->ViewValue = $this->facility_type_id->lookupCacheOption($curVal);
+                if ($this->facility_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->facility_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->facility_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->facility_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->facility_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->facility_type_id->ViewValue = $this->facility_type_id->displayValue($arwrk);
+                    } else {
+                        $this->facility_type_id->ViewValue = FormatNumber($this->facility_type_id->CurrentValue, $this->facility_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->facility_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // facility_type
-            $this->facility_type->HrefValue = "";
-            $this->facility_type->TooltipValue = "";
 
             // name
             $this->name->HrefValue = "";
@@ -2165,6 +2184,10 @@ class EmergencyFacilitiesList extends EmergencyFacilities
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // facility_type_id
+            $this->facility_type_id->HrefValue = "";
+            $this->facility_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2253,6 +2276,8 @@ class EmergencyFacilitiesList extends EmergencyFacilities
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_is_active":
+                    break;
+                case "x_facility_type_id":
                     break;
                 default:
                     $lookupFilter = "";

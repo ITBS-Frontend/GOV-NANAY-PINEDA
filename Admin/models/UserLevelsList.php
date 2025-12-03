@@ -454,6 +454,12 @@ class UserLevelsList extends UserLevels
      */
     protected function hideFieldsForAddEdit()
     {
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
+        if ($this->isAddOrEdit()) {
+            $this->updated_at->Visible = false;
+        }
     }
 
     // Lookup data

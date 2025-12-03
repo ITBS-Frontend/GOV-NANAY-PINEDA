@@ -153,9 +153,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->program_id->Visible) { // program_id ?>
         <th data-name="program_id" class="<?= $Page->program_id->headerCellClass() ?>"><div id="elh_program_statistics_program_id" class="program_statistics_program_id"><?= $Page->renderFieldHeader($Page->program_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->program_type->Visible) { // program_type ?>
-        <th data-name="program_type" class="<?= $Page->program_type->headerCellClass() ?>"><div id="elh_program_statistics_program_type" class="program_statistics_program_type"><?= $Page->renderFieldHeader($Page->program_type) ?></div></th>
-<?php } ?>
 <?php if ($Page->stat_label->Visible) { // stat_label ?>
         <th data-name="stat_label" class="<?= $Page->stat_label->headerCellClass() ?>"><div id="elh_program_statistics_stat_label" class="program_statistics_stat_label"><?= $Page->renderFieldHeader($Page->stat_label) ?></div></th>
 <?php } ?>
@@ -167,6 +164,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_program_statistics_created_at" class="program_statistics_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+        <th data-name="program_type_id" class="<?= $Page->program_type_id->headerCellClass() ?>"><div id="elh_program_statistics_program_type_id" class="program_statistics_program_type_id"><?= $Page->renderFieldHeader($Page->program_type_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -211,14 +211,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->program_type->Visible) { // program_type ?>
-        <td data-name="program_type"<?= $Page->program_type->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_program_statistics_program_type" class="el_program_statistics_program_type">
-<span<?= $Page->program_type->viewAttributes() ?>>
-<?= $Page->program_type->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->stat_label->Visible) { // stat_label ?>
         <td data-name="stat_label"<?= $Page->stat_label->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_program_statistics_stat_label" class="el_program_statistics_stat_label">
@@ -248,6 +240,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_program_statistics_created_at" class="el_program_statistics_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+        <td data-name="program_type_id"<?= $Page->program_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_program_statistics_program_type_id" class="el_program_statistics_program_type_id">
+<span<?= $Page->program_type_id->viewAttributes() ?>>
+<?= $Page->program_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

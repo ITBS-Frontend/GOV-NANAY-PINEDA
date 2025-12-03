@@ -53,9 +53,6 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_disaster_incidents_id" class="disaster_incidents_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->incident_type->Visible) { // incident_type ?>
-        <th class="<?= $Page->incident_type->headerCellClass() ?>"><span id="elh_disaster_incidents_incident_type" class="disaster_incidents_incident_type"><?= $Page->incident_type->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->incident_name->Visible) { // incident_name ?>
         <th class="<?= $Page->incident_name->headerCellClass() ?>"><span id="elh_disaster_incidents_incident_name" class="disaster_incidents_incident_name"><?= $Page->incident_name->caption() ?></span></th>
 <?php } ?>
@@ -70,6 +67,9 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_disaster_incidents_created_at" class="disaster_incidents_created_at"><?= $Page->created_at->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->incident_type_id->Visible) { // incident_type_id ?>
+        <th class="<?= $Page->incident_type_id->headerCellClass() ?>"><span id="elh_disaster_incidents_incident_type_id" class="disaster_incidents_incident_type_id"><?= $Page->incident_type_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -97,14 +97,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->incident_type->Visible) { // incident_type ?>
-        <td<?= $Page->incident_type->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->incident_type->viewAttributes() ?>>
-<?= $Page->incident_type->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -145,6 +137,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->incident_type_id->Visible) { // incident_type_id ?>
+        <td<?= $Page->incident_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->incident_type_id->viewAttributes() ?>>
+<?= $Page->incident_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

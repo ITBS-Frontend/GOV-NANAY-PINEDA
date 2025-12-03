@@ -47,13 +47,13 @@ class DemographicsData extends DbTable
 
     // Fields
     public $id;
-    public $data_type;
     public $label;
     public $value;
     public $year;
     public $source;
     public $display_order;
     public $created_at;
+    public $data_type_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -126,30 +126,6 @@ class DemographicsData extends DbTable
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
-
-        // data_type
-        $this->data_type = new DbField(
-            $this, // Table
-            'x_data_type', // Variable name
-            'data_type', // Name
-            '"data_type"', // Expression
-            '"data_type"', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"data_type"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->data_type->InputTextType = "text";
-        $this->data_type->Nullable = false; // NOT NULL field
-        $this->data_type->Required = true; // Required field
-        $this->data_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['data_type'] = &$this->data_type;
 
         // label
         $this->label = new DbField(
@@ -290,11 +266,40 @@ class DemographicsData extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->created_at->addMethod("getAutoUpdateValue", fn() => CurrentDateTime());
         $this->created_at->InputTextType = "text";
         $this->created_at->Raw = true;
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
+
+        // data_type_id
+        $this->data_type_id = new DbField(
+            $this, // Table
+            'x_data_type_id', // Variable name
+            'data_type_id', // Name
+            '"data_type_id"', // Expression
+            'CAST("data_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"data_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->data_type_id->InputTextType = "text";
+        $this->data_type_id->Raw = true;
+        $this->data_type_id->setSelectMultiple(false); // Select one
+        $this->data_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->data_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->data_type_id->Lookup = new Lookup($this->data_type_id, 'demographics_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->data_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->data_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['data_type_id'] = &$this->data_type_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -819,13 +824,13 @@ class DemographicsData extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->data_type->DbValue = $row['data_type'];
         $this->label->DbValue = $row['label'];
         $this->value->DbValue = $row['value'];
         $this->year->DbValue = $row['year'];
         $this->source->DbValue = $row['source'];
         $this->display_order->DbValue = $row['display_order'];
         $this->created_at->DbValue = $row['created_at'];
+        $this->data_type_id->DbValue = $row['data_type_id'];
     }
 
     // Delete uploaded files
@@ -1179,13 +1184,13 @@ class DemographicsData extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->data_type->setDbValue($row['data_type']);
         $this->label->setDbValue($row['label']);
         $this->value->setDbValue($row['value']);
         $this->year->setDbValue($row['year']);
         $this->source->setDbValue($row['source']);
         $this->display_order->setDbValue($row['display_order']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->data_type_id->setDbValue($row['data_type_id']);
     }
 
     // Render list content
@@ -1218,8 +1223,6 @@ class DemographicsData extends DbTable
 
         // id
 
-        // data_type
-
         // label
 
         // value
@@ -1232,11 +1235,10 @@ class DemographicsData extends DbTable
 
         // created_at
 
+        // data_type_id
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
-
-        // data_type
-        $this->data_type->ViewValue = $this->data_type->CurrentValue;
 
         // label
         $this->label->ViewValue = $this->label->CurrentValue;
@@ -1259,13 +1261,32 @@ class DemographicsData extends DbTable
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+        // data_type_id
+        $curVal = strval($this->data_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->data_type_id->ViewValue = $this->data_type_id->lookupCacheOption($curVal);
+            if ($this->data_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->data_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->data_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->data_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->data_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->data_type_id->ViewValue = $this->data_type_id->displayValue($arwrk);
+                } else {
+                    $this->data_type_id->ViewValue = FormatNumber($this->data_type_id->CurrentValue, $this->data_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->data_type_id->ViewValue = null;
+        }
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
-
-        // data_type
-        $this->data_type->HrefValue = "";
-        $this->data_type->TooltipValue = "";
 
         // label
         $this->label->HrefValue = "";
@@ -1291,6 +1312,10 @@ class DemographicsData extends DbTable
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
 
+        // data_type_id
+        $this->data_type_id->HrefValue = "";
+        $this->data_type_id->TooltipValue = "";
+
         // Call Row Rendered event
         $this->rowRendered();
 
@@ -1309,14 +1334,6 @@ class DemographicsData extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
-
-        // data_type
-        $this->data_type->setupEditAttributes();
-        if (!$this->data_type->Raw) {
-            $this->data_type->CurrentValue = HtmlDecode($this->data_type->CurrentValue);
-        }
-        $this->data_type->EditValue = $this->data_type->CurrentValue;
-        $this->data_type->PlaceHolder = RemoveHtml($this->data_type->caption());
 
         // label
         $this->label->setupEditAttributes();
@@ -1359,9 +1376,10 @@ class DemographicsData extends DbTable
         }
 
         // created_at
-        $this->created_at->setupEditAttributes();
-        $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+        // data_type_id
+        $this->data_type_id->setupEditAttributes();
+        $this->data_type_id->PlaceHolder = RemoveHtml($this->data_type_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1392,22 +1410,22 @@ class DemographicsData extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->data_type);
                     $doc->exportCaption($this->label);
                     $doc->exportCaption($this->value);
                     $doc->exportCaption($this->year);
                     $doc->exportCaption($this->source);
                     $doc->exportCaption($this->display_order);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->data_type_id);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->data_type);
                     $doc->exportCaption($this->label);
                     $doc->exportCaption($this->value);
                     $doc->exportCaption($this->year);
                     $doc->exportCaption($this->source);
                     $doc->exportCaption($this->display_order);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->data_type_id);
                 }
                 $doc->endExportRow();
             }
@@ -1435,22 +1453,22 @@ class DemographicsData extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->data_type);
                         $doc->exportField($this->label);
                         $doc->exportField($this->value);
                         $doc->exportField($this->year);
                         $doc->exportField($this->source);
                         $doc->exportField($this->display_order);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->data_type_id);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->data_type);
                         $doc->exportField($this->label);
                         $doc->exportField($this->value);
                         $doc->exportField($this->year);
                         $doc->exportField($this->source);
                         $doc->exportField($this->display_order);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->data_type_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

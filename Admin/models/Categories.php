@@ -50,8 +50,8 @@ class Categories extends DbTable
     public $name;
     public $color_code;
     public $created_at;
-    public $category_type;
     public $parent_id;
+    public $category_type_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -196,29 +196,6 @@ class Categories extends DbTable
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
 
-        // category_type
-        $this->category_type = new DbField(
-            $this, // Table
-            'x_category_type', // Variable name
-            'category_type', // Name
-            '"category_type"', // Expression
-            '"category_type"', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"category_type"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->category_type->addMethod("getDefault", fn() => "project");
-        $this->category_type->InputTextType = "text";
-        $this->category_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['category_type'] = &$this->category_type;
-
         // parent_id
         $this->parent_id = new DbField(
             $this, // Table
@@ -242,6 +219,34 @@ class Categories extends DbTable
         $this->parent_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->parent_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['parent_id'] = &$this->parent_id;
+
+        // category_type_id
+        $this->category_type_id = new DbField(
+            $this, // Table
+            'x_category_type_id', // Variable name
+            'category_type_id', // Name
+            '"category_type_id"', // Expression
+            'CAST("category_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"category_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->category_type_id->InputTextType = "text";
+        $this->category_type_id->Raw = true;
+        $this->category_type_id->setSelectMultiple(false); // Select one
+        $this->category_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->category_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->category_type_id->Lookup = new Lookup($this->category_type_id, 'category_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->category_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->category_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['category_type_id'] = &$this->category_type_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -769,8 +774,8 @@ class Categories extends DbTable
         $this->name->DbValue = $row['name'];
         $this->color_code->DbValue = $row['color_code'];
         $this->created_at->DbValue = $row['created_at'];
-        $this->category_type->DbValue = $row['category_type'];
         $this->parent_id->DbValue = $row['parent_id'];
+        $this->category_type_id->DbValue = $row['category_type_id'];
     }
 
     // Delete uploaded files
@@ -1127,8 +1132,8 @@ class Categories extends DbTable
         $this->name->setDbValue($row['name']);
         $this->color_code->setDbValue($row['color_code']);
         $this->created_at->setDbValue($row['created_at']);
-        $this->category_type->setDbValue($row['category_type']);
         $this->parent_id->setDbValue($row['parent_id']);
+        $this->category_type_id->setDbValue($row['category_type_id']);
     }
 
     // Render list content
@@ -1167,9 +1172,9 @@ class Categories extends DbTable
 
         // created_at
 
-        // category_type
-
         // parent_id
+
+        // category_type_id
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1184,12 +1189,32 @@ class Categories extends DbTable
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
-        // category_type
-        $this->category_type->ViewValue = $this->category_type->CurrentValue;
-
         // parent_id
         $this->parent_id->ViewValue = $this->parent_id->CurrentValue;
         $this->parent_id->ViewValue = FormatNumber($this->parent_id->ViewValue, $this->parent_id->formatPattern());
+
+        // category_type_id
+        $curVal = strval($this->category_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->category_type_id->ViewValue = $this->category_type_id->lookupCacheOption($curVal);
+            if ($this->category_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->category_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->category_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->category_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->category_type_id->ViewValue = $this->category_type_id->displayValue($arwrk);
+                } else {
+                    $this->category_type_id->ViewValue = FormatNumber($this->category_type_id->CurrentValue, $this->category_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->category_type_id->ViewValue = null;
+        }
 
         // id
         $this->id->HrefValue = "";
@@ -1207,13 +1232,13 @@ class Categories extends DbTable
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
 
-        // category_type
-        $this->category_type->HrefValue = "";
-        $this->category_type->TooltipValue = "";
-
         // parent_id
         $this->parent_id->HrefValue = "";
         $this->parent_id->TooltipValue = "";
+
+        // category_type_id
+        $this->category_type_id->HrefValue = "";
+        $this->category_type_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1255,14 +1280,6 @@ class Categories extends DbTable
         $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
 
-        // category_type
-        $this->category_type->setupEditAttributes();
-        if (!$this->category_type->Raw) {
-            $this->category_type->CurrentValue = HtmlDecode($this->category_type->CurrentValue);
-        }
-        $this->category_type->EditValue = $this->category_type->CurrentValue;
-        $this->category_type->PlaceHolder = RemoveHtml($this->category_type->caption());
-
         // parent_id
         $this->parent_id->setupEditAttributes();
         $this->parent_id->EditValue = $this->parent_id->CurrentValue;
@@ -1270,6 +1287,10 @@ class Categories extends DbTable
         if (strval($this->parent_id->EditValue) != "" && is_numeric($this->parent_id->EditValue)) {
             $this->parent_id->EditValue = FormatNumber($this->parent_id->EditValue, null);
         }
+
+        // category_type_id
+        $this->category_type_id->setupEditAttributes();
+        $this->category_type_id->PlaceHolder = RemoveHtml($this->category_type_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1303,15 +1324,15 @@ class Categories extends DbTable
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->color_code);
                     $doc->exportCaption($this->created_at);
-                    $doc->exportCaption($this->category_type);
                     $doc->exportCaption($this->parent_id);
+                    $doc->exportCaption($this->category_type_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->color_code);
                     $doc->exportCaption($this->created_at);
-                    $doc->exportCaption($this->category_type);
                     $doc->exportCaption($this->parent_id);
+                    $doc->exportCaption($this->category_type_id);
                 }
                 $doc->endExportRow();
             }
@@ -1342,15 +1363,15 @@ class Categories extends DbTable
                         $doc->exportField($this->name);
                         $doc->exportField($this->color_code);
                         $doc->exportField($this->created_at);
-                        $doc->exportField($this->category_type);
                         $doc->exportField($this->parent_id);
+                        $doc->exportField($this->category_type_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->name);
                         $doc->exportField($this->color_code);
                         $doc->exportField($this->created_at);
-                        $doc->exportField($this->category_type);
                         $doc->exportField($this->parent_id);
+                        $doc->exportField($this->category_type_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

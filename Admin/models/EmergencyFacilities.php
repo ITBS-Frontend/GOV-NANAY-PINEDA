@@ -47,7 +47,6 @@ class EmergencyFacilities extends DbTable
 
     // Fields
     public $id;
-    public $facility_type;
     public $name;
     public $municipality;
     public $address;
@@ -56,6 +55,7 @@ class EmergencyFacilities extends DbTable
     public $coordinates;
     public $is_active;
     public $created_at;
+    public $facility_type_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -128,30 +128,6 @@ class EmergencyFacilities extends DbTable
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
-
-        // facility_type
-        $this->facility_type = new DbField(
-            $this, // Table
-            'x_facility_type', // Variable name
-            'facility_type', // Name
-            '"facility_type"', // Expression
-            '"facility_type"', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"facility_type"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->facility_type->InputTextType = "text";
-        $this->facility_type->Nullable = false; // NOT NULL field
-        $this->facility_type->Required = true; // Required field
-        $this->facility_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['facility_type'] = &$this->facility_type;
 
         // name
         $this->name = new DbField(
@@ -333,11 +309,40 @@ class EmergencyFacilities extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->created_at->addMethod("getAutoUpdateValue", fn() => CurrentDateTime());
         $this->created_at->InputTextType = "text";
         $this->created_at->Raw = true;
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
+
+        // facility_type_id
+        $this->facility_type_id = new DbField(
+            $this, // Table
+            'x_facility_type_id', // Variable name
+            'facility_type_id', // Name
+            '"facility_type_id"', // Expression
+            'CAST("facility_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"facility_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->facility_type_id->InputTextType = "text";
+        $this->facility_type_id->Raw = true;
+        $this->facility_type_id->setSelectMultiple(false); // Select one
+        $this->facility_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->facility_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->facility_type_id->Lookup = new Lookup($this->facility_type_id, 'emergency_facility_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->facility_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->facility_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['facility_type_id'] = &$this->facility_type_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -862,7 +867,6 @@ class EmergencyFacilities extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->facility_type->DbValue = $row['facility_type'];
         $this->name->DbValue = $row['name'];
         $this->municipality->DbValue = $row['municipality'];
         $this->address->DbValue = $row['address'];
@@ -871,6 +875,7 @@ class EmergencyFacilities extends DbTable
         $this->coordinates->DbValue = $row['coordinates'];
         $this->is_active->DbValue = (ConvertToBool($row['is_active']) ? "1" : "0");
         $this->created_at->DbValue = $row['created_at'];
+        $this->facility_type_id->DbValue = $row['facility_type_id'];
     }
 
     // Delete uploaded files
@@ -1224,7 +1229,6 @@ class EmergencyFacilities extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->facility_type->setDbValue($row['facility_type']);
         $this->name->setDbValue($row['name']);
         $this->municipality->setDbValue($row['municipality']);
         $this->address->setDbValue($row['address']);
@@ -1233,6 +1237,7 @@ class EmergencyFacilities extends DbTable
         $this->coordinates->setDbValue($row['coordinates']);
         $this->is_active->setDbValue(ConvertToBool($row['is_active']) ? "1" : "0");
         $this->created_at->setDbValue($row['created_at']);
+        $this->facility_type_id->setDbValue($row['facility_type_id']);
     }
 
     // Render list content
@@ -1265,8 +1270,6 @@ class EmergencyFacilities extends DbTable
 
         // id
 
-        // facility_type
-
         // name
 
         // municipality
@@ -1283,11 +1286,10 @@ class EmergencyFacilities extends DbTable
 
         // created_at
 
+        // facility_type_id
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
-
-        // facility_type
-        $this->facility_type->ViewValue = $this->facility_type->CurrentValue;
 
         // name
         $this->name->ViewValue = $this->name->CurrentValue;
@@ -1319,13 +1321,32 @@ class EmergencyFacilities extends DbTable
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+        // facility_type_id
+        $curVal = strval($this->facility_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->facility_type_id->ViewValue = $this->facility_type_id->lookupCacheOption($curVal);
+            if ($this->facility_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->facility_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->facility_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->facility_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->facility_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->facility_type_id->ViewValue = $this->facility_type_id->displayValue($arwrk);
+                } else {
+                    $this->facility_type_id->ViewValue = FormatNumber($this->facility_type_id->CurrentValue, $this->facility_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->facility_type_id->ViewValue = null;
+        }
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
-
-        // facility_type
-        $this->facility_type->HrefValue = "";
-        $this->facility_type->TooltipValue = "";
 
         // name
         $this->name->HrefValue = "";
@@ -1359,6 +1380,10 @@ class EmergencyFacilities extends DbTable
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
 
+        // facility_type_id
+        $this->facility_type_id->HrefValue = "";
+        $this->facility_type_id->TooltipValue = "";
+
         // Call Row Rendered event
         $this->rowRendered();
 
@@ -1377,14 +1402,6 @@ class EmergencyFacilities extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
-
-        // facility_type
-        $this->facility_type->setupEditAttributes();
-        if (!$this->facility_type->Raw) {
-            $this->facility_type->CurrentValue = HtmlDecode($this->facility_type->CurrentValue);
-        }
-        $this->facility_type->EditValue = $this->facility_type->CurrentValue;
-        $this->facility_type->PlaceHolder = RemoveHtml($this->facility_type->caption());
 
         // name
         $this->name->setupEditAttributes();
@@ -1436,9 +1453,10 @@ class EmergencyFacilities extends DbTable
         $this->is_active->PlaceHolder = RemoveHtml($this->is_active->caption());
 
         // created_at
-        $this->created_at->setupEditAttributes();
-        $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+        // facility_type_id
+        $this->facility_type_id->setupEditAttributes();
+        $this->facility_type_id->PlaceHolder = RemoveHtml($this->facility_type_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1469,7 +1487,6 @@ class EmergencyFacilities extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->facility_type);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->municipality);
                     $doc->exportCaption($this->address);
@@ -1478,9 +1495,9 @@ class EmergencyFacilities extends DbTable
                     $doc->exportCaption($this->coordinates);
                     $doc->exportCaption($this->is_active);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->facility_type_id);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->facility_type);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->municipality);
                     $doc->exportCaption($this->capacity);
@@ -1488,6 +1505,7 @@ class EmergencyFacilities extends DbTable
                     $doc->exportCaption($this->coordinates);
                     $doc->exportCaption($this->is_active);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->facility_type_id);
                 }
                 $doc->endExportRow();
             }
@@ -1515,7 +1533,6 @@ class EmergencyFacilities extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->facility_type);
                         $doc->exportField($this->name);
                         $doc->exportField($this->municipality);
                         $doc->exportField($this->address);
@@ -1524,9 +1541,9 @@ class EmergencyFacilities extends DbTable
                         $doc->exportField($this->coordinates);
                         $doc->exportField($this->is_active);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->facility_type_id);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->facility_type);
                         $doc->exportField($this->name);
                         $doc->exportField($this->municipality);
                         $doc->exportField($this->capacity);
@@ -1534,6 +1551,7 @@ class EmergencyFacilities extends DbTable
                         $doc->exportField($this->coordinates);
                         $doc->exportField($this->is_active);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->facility_type_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

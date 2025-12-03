@@ -29,8 +29,6 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["facility_type", [fields.facility_type.visible && fields.facility_type.required ? ew.Validators.required(fields.facility_type.caption) : null], fields.facility_type.isInvalid],
-            ["ownership", [fields.ownership.visible && fields.ownership.required ? ew.Validators.required(fields.ownership.caption) : null], fields.ownership.isInvalid],
             ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
             ["description", [fields.description.visible && fields.description.required ? ew.Validators.required(fields.description.caption) : null], fields.description.isInvalid],
             ["municipality", [fields.municipality.visible && fields.municipality.required ? ew.Validators.required(fields.municipality.caption) : null], fields.municipality.isInvalid],
@@ -45,7 +43,9 @@ loadjs.ready(["wrapper", "head"], function () {
             ["rating", [fields.rating.visible && fields.rating.required ? ew.Validators.required(fields.rating.caption) : null, ew.Validators.float], fields.rating.isInvalid],
             ["is_verified", [fields.is_verified.visible && fields.is_verified.required ? ew.Validators.required(fields.is_verified.caption) : null], fields.is_verified.isInvalid],
             ["is_active", [fields.is_active.visible && fields.is_active.required ? ew.Validators.required(fields.is_active.caption) : null], fields.is_active.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
+            ["facility_type_id", [fields.facility_type_id.visible && fields.facility_type_id.required ? ew.Validators.required(fields.facility_type_id.caption) : null], fields.facility_type_id.isInvalid],
+            ["ownership_type_id", [fields.ownership_type_id.visible && fields.ownership_type_id.required ? ew.Validators.required(fields.ownership_type_id.caption) : null], fields.ownership_type_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -63,6 +63,8 @@ loadjs.ready(["wrapper", "head"], function () {
         .setLists({
             "is_verified": <?= $Page->is_verified->toClientList($Page) ?>,
             "is_active": <?= $Page->is_active->toClientList($Page) ?>,
+            "facility_type_id": <?= $Page->facility_type_id->toClientList($Page) ?>,
+            "ownership_type_id": <?= $Page->ownership_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -95,30 +97,6 @@ loadjs.ready("head", function () {
 <span<?= $Page->id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
 <input type="hidden" data-table="tourism_facilities" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->facility_type->Visible) { // facility_type ?>
-    <div id="r_facility_type"<?= $Page->facility_type->rowAttributes() ?>>
-        <label id="elh_tourism_facilities_facility_type" for="x_facility_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->facility_type->caption() ?><?= $Page->facility_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->facility_type->cellAttributes() ?>>
-<span id="el_tourism_facilities_facility_type">
-<input type="<?= $Page->facility_type->getInputTextType() ?>" name="x_facility_type" id="x_facility_type" data-table="tourism_facilities" data-field="x_facility_type" value="<?= $Page->facility_type->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->facility_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->facility_type->formatPattern()) ?>"<?= $Page->facility_type->editAttributes() ?> aria-describedby="x_facility_type_help">
-<?= $Page->facility_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->facility_type->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->ownership->Visible) { // ownership ?>
-    <div id="r_ownership"<?= $Page->ownership->rowAttributes() ?>>
-        <label id="elh_tourism_facilities_ownership" for="x_ownership" class="<?= $Page->LeftColumnClass ?>"><?= $Page->ownership->caption() ?><?= $Page->ownership->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->ownership->cellAttributes() ?>>
-<span id="el_tourism_facilities_ownership">
-<input type="<?= $Page->ownership->getInputTextType() ?>" name="x_ownership" id="x_ownership" data-table="tourism_facilities" data-field="x_ownership" value="<?= $Page->ownership->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->ownership->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->ownership->formatPattern()) ?>"<?= $Page->ownership->editAttributes() ?> aria-describedby="x_ownership_help">
-<?= $Page->ownership->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->ownership->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>
@@ -318,40 +296,91 @@ loadjs.ready("head", function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_tourism_facilities_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_tourism_facilities_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="tourism_facilities" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
+<?php if ($Page->facility_type_id->Visible) { // facility_type_id ?>
+    <div id="r_facility_type_id"<?= $Page->facility_type_id->rowAttributes() ?>>
+        <label id="elh_tourism_facilities_facility_type_id" for="x_facility_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->facility_type_id->caption() ?><?= $Page->facility_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->facility_type_id->cellAttributes() ?>>
+<span id="el_tourism_facilities_facility_type_id">
+    <select
+        id="x_facility_type_id"
+        name="x_facility_type_id"
+        class="form-select ew-select<?= $Page->facility_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->facility_type_id->IsNativeSelect) { ?>
+        data-select2-id="ftourism_facilitiesedit_x_facility_type_id"
+        <?php } ?>
+        data-table="tourism_facilities"
+        data-field="x_facility_type_id"
+        data-value-separator="<?= $Page->facility_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->facility_type_id->getPlaceHolder()) ?>"
+        <?= $Page->facility_type_id->editAttributes() ?>>
+        <?= $Page->facility_type_id->selectOptionListHtml("x_facility_type_id") ?>
+    </select>
+    <?= $Page->facility_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->facility_type_id->getErrorMessage() ?></div>
+<?= $Page->facility_type_id->Lookup->getParamTag($Page, "p_x_facility_type_id") ?>
+<?php if (!$Page->facility_type_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["ftourism_facilitiesedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("ftourism_facilitiesedit", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("ftourism_facilitiesedit", function() {
+    var options = { name: "x_facility_type_id", selectId: "ftourism_facilitiesedit_x_facility_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (ftourism_facilitiesedit.lists.facility_type_id?.lookupOptions.length) {
+        options.data = { id: "x_facility_type_id", form: "ftourism_facilitiesedit" };
+    } else {
+        options.ajax = { id: "x_facility_type_id", form: "ftourism_facilitiesedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.tourism_facilities.fields.facility_type_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->ownership_type_id->Visible) { // ownership_type_id ?>
+    <div id="r_ownership_type_id"<?= $Page->ownership_type_id->rowAttributes() ?>>
+        <label id="elh_tourism_facilities_ownership_type_id" for="x_ownership_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->ownership_type_id->caption() ?><?= $Page->ownership_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->ownership_type_id->cellAttributes() ?>>
+<span id="el_tourism_facilities_ownership_type_id">
+    <select
+        id="x_ownership_type_id"
+        name="x_ownership_type_id"
+        class="form-select ew-select<?= $Page->ownership_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->ownership_type_id->IsNativeSelect) { ?>
+        data-select2-id="ftourism_facilitiesedit_x_ownership_type_id"
+        <?php } ?>
+        data-table="tourism_facilities"
+        data-field="x_ownership_type_id"
+        data-value-separator="<?= $Page->ownership_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->ownership_type_id->getPlaceHolder()) ?>"
+        <?= $Page->ownership_type_id->editAttributes() ?>>
+        <?= $Page->ownership_type_id->selectOptionListHtml("x_ownership_type_id") ?>
+    </select>
+    <?= $Page->ownership_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->ownership_type_id->getErrorMessage() ?></div>
+<?= $Page->ownership_type_id->Lookup->getParamTag($Page, "p_x_ownership_type_id") ?>
+<?php if (!$Page->ownership_type_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("ftourism_facilitiesedit", function() {
+    var options = { name: "x_ownership_type_id", selectId: "ftourism_facilitiesedit_x_ownership_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (ftourism_facilitiesedit.lists.ownership_type_id?.lookupOptions.length) {
+        options.data = { id: "x_ownership_type_id", form: "ftourism_facilitiesedit" };
+    } else {
+        options.ajax = { id: "x_ownership_type_id", form: "ftourism_facilitiesedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.tourism_facilities.fields.ownership_type_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

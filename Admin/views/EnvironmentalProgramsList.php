@@ -153,23 +153,23 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->program_name->Visible) { // program_name ?>
         <th data-name="program_name" class="<?= $Page->program_name->headerCellClass() ?>"><div id="elh_environmental_programs_program_name" class="environmental_programs_program_name"><?= $Page->renderFieldHeader($Page->program_name) ?></div></th>
 <?php } ?>
-<?php if ($Page->program_type->Visible) { // program_type ?>
-        <th data-name="program_type" class="<?= $Page->program_type->headerCellClass() ?>"><div id="elh_environmental_programs_program_type" class="environmental_programs_program_type"><?= $Page->renderFieldHeader($Page->program_type) ?></div></th>
-<?php } ?>
 <?php if ($Page->coverage_area->Visible) { // coverage_area ?>
         <th data-name="coverage_area" class="<?= $Page->coverage_area->headerCellClass() ?>"><div id="elh_environmental_programs_coverage_area" class="environmental_programs_coverage_area"><?= $Page->renderFieldHeader($Page->coverage_area) ?></div></th>
 <?php } ?>
 <?php if ($Page->implementation_date->Visible) { // implementation_date ?>
         <th data-name="implementation_date" class="<?= $Page->implementation_date->headerCellClass() ?>"><div id="elh_environmental_programs_implementation_date" class="environmental_programs_implementation_date"><?= $Page->renderFieldHeader($Page->implementation_date) ?></div></th>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-        <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_environmental_programs_status" class="environmental_programs_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <th data-name="featured_image" class="<?= $Page->featured_image->headerCellClass() ?>"><div id="elh_environmental_programs_featured_image" class="environmental_programs_featured_image"><?= $Page->renderFieldHeader($Page->featured_image) ?></div></th>
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_environmental_programs_created_at" class="environmental_programs_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+        <th data-name="program_type_id" class="<?= $Page->program_type_id->headerCellClass() ?>"><div id="elh_environmental_programs_program_type_id" class="environmental_programs_program_type_id"><?= $Page->renderFieldHeader($Page->program_type_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+        <th data-name="status_id" class="<?= $Page->status_id->headerCellClass() ?>"><div id="elh_environmental_programs_status_id" class="environmental_programs_status_id"><?= $Page->renderFieldHeader($Page->status_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -214,14 +214,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->program_type->Visible) { // program_type ?>
-        <td data-name="program_type"<?= $Page->program_type->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_environmental_programs_program_type" class="el_environmental_programs_program_type">
-<span<?= $Page->program_type->viewAttributes() ?>>
-<?= $Page->program_type->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->coverage_area->Visible) { // coverage_area ?>
         <td data-name="coverage_area"<?= $Page->coverage_area->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_environmental_programs_coverage_area" class="el_environmental_programs_coverage_area">
@@ -238,19 +230,12 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->status->Visible) { // status ?>
-        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_environmental_programs_status" class="el_environmental_programs_status">
-<span<?= $Page->status->viewAttributes() ?>>
-<?= $Page->status->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <td data-name="featured_image"<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_environmental_programs_featured_image" class="el_environmental_programs_featured_image">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     <?php } ?>
@@ -259,6 +244,22 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_environmental_programs_created_at" class="el_environmental_programs_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+        <td data-name="program_type_id"<?= $Page->program_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_environmental_programs_program_type_id" class="el_environmental_programs_program_type_id">
+<span<?= $Page->program_type_id->viewAttributes() ?>>
+<?= $Page->program_type_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->status_id->Visible) { // status_id ?>
+        <td data-name="status_id"<?= $Page->status_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_environmental_programs_status_id" class="el_environmental_programs_status_id">
+<span<?= $Page->status_id->viewAttributes() ?>>
+<?= $Page->status_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -140,8 +140,6 @@ class TourismFacilitiesView extends TourismFacilities
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->facility_type->setVisibility();
-        $this->ownership->setVisibility();
         $this->name->setVisibility();
         $this->description->setVisibility();
         $this->municipality->setVisibility();
@@ -157,6 +155,8 @@ class TourismFacilitiesView extends TourismFacilities
         $this->is_verified->setVisibility();
         $this->is_active->setVisibility();
         $this->created_at->setVisibility();
+        $this->facility_type_id->setVisibility();
+        $this->ownership_type_id->setVisibility();
     }
 
     // Constructor
@@ -550,6 +550,8 @@ class TourismFacilitiesView extends TourismFacilities
         // Set up lookup cache
         $this->setupLookupOptions($this->is_verified);
         $this->setupLookupOptions($this->is_active);
+        $this->setupLookupOptions($this->facility_type_id);
+        $this->setupLookupOptions($this->ownership_type_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -750,8 +752,6 @@ class TourismFacilitiesView extends TourismFacilities
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->facility_type->setDbValue($row['facility_type']);
-        $this->ownership->setDbValue($row['ownership']);
         $this->name->setDbValue($row['name']);
         $this->description->setDbValue($row['description']);
         $this->municipality->setDbValue($row['municipality']);
@@ -768,6 +768,8 @@ class TourismFacilitiesView extends TourismFacilities
         $this->is_verified->setDbValue((ConvertToBool($row['is_verified']) ? "1" : "0"));
         $this->is_active->setDbValue((ConvertToBool($row['is_active']) ? "1" : "0"));
         $this->created_at->setDbValue($row['created_at']);
+        $this->facility_type_id->setDbValue($row['facility_type_id']);
+        $this->ownership_type_id->setDbValue($row['ownership_type_id']);
     }
 
     // Return a row with default values
@@ -775,8 +777,6 @@ class TourismFacilitiesView extends TourismFacilities
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['facility_type'] = $this->facility_type->DefaultValue;
-        $row['ownership'] = $this->ownership->DefaultValue;
         $row['name'] = $this->name->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['municipality'] = $this->municipality->DefaultValue;
@@ -792,6 +792,8 @@ class TourismFacilitiesView extends TourismFacilities
         $row['is_verified'] = $this->is_verified->DefaultValue;
         $row['is_active'] = $this->is_active->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['facility_type_id'] = $this->facility_type_id->DefaultValue;
+        $row['ownership_type_id'] = $this->ownership_type_id->DefaultValue;
         return $row;
     }
 
@@ -814,10 +816,6 @@ class TourismFacilitiesView extends TourismFacilities
         // Common render codes for all row types
 
         // id
-
-        // facility_type
-
-        // ownership
 
         // name
 
@@ -849,16 +847,14 @@ class TourismFacilitiesView extends TourismFacilities
 
         // created_at
 
+        // facility_type_id
+
+        // ownership_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // facility_type
-            $this->facility_type->ViewValue = $this->facility_type->CurrentValue;
-
-            // ownership
-            $this->ownership->ViewValue = $this->ownership->CurrentValue;
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
@@ -922,17 +918,55 @@ class TourismFacilitiesView extends TourismFacilities
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // facility_type_id
+            $curVal = strval($this->facility_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->facility_type_id->ViewValue = $this->facility_type_id->lookupCacheOption($curVal);
+                if ($this->facility_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->facility_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->facility_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->facility_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->facility_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->facility_type_id->ViewValue = $this->facility_type_id->displayValue($arwrk);
+                    } else {
+                        $this->facility_type_id->ViewValue = FormatNumber($this->facility_type_id->CurrentValue, $this->facility_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->facility_type_id->ViewValue = null;
+            }
+
+            // ownership_type_id
+            $curVal = strval($this->ownership_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->ownership_type_id->ViewValue = $this->ownership_type_id->lookupCacheOption($curVal);
+                if ($this->ownership_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->ownership_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ownership_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->ownership_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->ownership_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->ownership_type_id->ViewValue = $this->ownership_type_id->displayValue($arwrk);
+                    } else {
+                        $this->ownership_type_id->ViewValue = FormatNumber($this->ownership_type_id->CurrentValue, $this->ownership_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->ownership_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // facility_type
-            $this->facility_type->HrefValue = "";
-            $this->facility_type->TooltipValue = "";
-
-            // ownership
-            $this->ownership->HrefValue = "";
-            $this->ownership->TooltipValue = "";
 
             // name
             $this->name->HrefValue = "";
@@ -1010,6 +1044,14 @@ class TourismFacilitiesView extends TourismFacilities
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // facility_type_id
+            $this->facility_type_id->HrefValue = "";
+            $this->facility_type_id->TooltipValue = "";
+
+            // ownership_type_id
+            $this->ownership_type_id->HrefValue = "";
+            $this->ownership_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1045,6 +1087,10 @@ class TourismFacilitiesView extends TourismFacilities
                 case "x_is_verified":
                     break;
                 case "x_is_active":
+                    break;
+                case "x_facility_type_id":
+                    break;
+                case "x_ownership_type_id":
                     break;
                 default:
                     $lookupFilter = "";

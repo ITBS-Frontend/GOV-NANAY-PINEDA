@@ -128,11 +128,11 @@ class HealthProgramsEdit extends HealthPrograms
         $this->target_beneficiaries->setVisibility();
         $this->coverage_area->setVisibility();
         $this->implementation_date->setVisibility();
-        $this->status->setVisibility();
         $this->contact_info->setVisibility();
         $this->featured_image->setVisibility();
         $this->is_active->setVisibility();
         $this->created_at->setVisibility();
+        $this->status_id->setVisibility();
     }
 
     // Constructor
@@ -298,6 +298,8 @@ class HealthProgramsEdit extends HealthPrograms
         if (is_object($rs)) { // Result set
             while ($row = $rs->fetch()) {
                 $this->loadRowValues($row); // Set up DbValue/CurrentValue
+                $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+                $this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
                 $row = $this->getRecordFromArray($row);
                 if ($current) {
                     return $row;
@@ -522,6 +524,7 @@ class HealthProgramsEdit extends HealthPrograms
 
         // Set up lookup cache
         $this->setupLookupOptions($this->is_active);
+        $this->setupLookupOptions($this->status_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -695,6 +698,9 @@ class HealthProgramsEdit extends HealthPrograms
     protected function getUploadFiles()
     {
         global $CurrentForm, $Language;
+        $this->featured_image->Upload->Index = $CurrentForm->Index;
+        $this->featured_image->Upload->uploadFile();
+        $this->featured_image->CurrentValue = $this->featured_image->Upload->FileName;
     }
 
     // Load form values
@@ -771,16 +777,6 @@ class HealthProgramsEdit extends HealthPrograms
             $this->implementation_date->CurrentValue = UnFormatDateTime($this->implementation_date->CurrentValue, $this->implementation_date->formatPattern());
         }
 
-        // Check field name 'status' first before field var 'x_status'
-        $val = $CurrentForm->hasValue("status") ? $CurrentForm->getValue("status") : $CurrentForm->getValue("x_status");
-        if (!$this->status->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->status->Visible = false; // Disable update for API request
-            } else {
-                $this->status->setFormValue($val);
-            }
-        }
-
         // Check field name 'contact_info' first before field var 'x_contact_info'
         $val = $CurrentForm->hasValue("contact_info") ? $CurrentForm->getValue("contact_info") : $CurrentForm->getValue("x_contact_info");
         if (!$this->contact_info->IsDetailKey) {
@@ -788,16 +784,6 @@ class HealthProgramsEdit extends HealthPrograms
                 $this->contact_info->Visible = false; // Disable update for API request
             } else {
                 $this->contact_info->setFormValue($val);
-            }
-        }
-
-        // Check field name 'featured_image' first before field var 'x_featured_image'
-        $val = $CurrentForm->hasValue("featured_image") ? $CurrentForm->getValue("featured_image") : $CurrentForm->getValue("x_featured_image");
-        if (!$this->featured_image->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->featured_image->Visible = false; // Disable update for API request
-            } else {
-                $this->featured_image->setFormValue($val);
             }
         }
 
@@ -817,10 +803,23 @@ class HealthProgramsEdit extends HealthPrograms
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         }
+
+        // Check field name 'status_id' first before field var 'x_status_id'
+        $val = $CurrentForm->hasValue("status_id") ? $CurrentForm->getValue("status_id") : $CurrentForm->getValue("x_status_id");
+        if (!$this->status_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->status_id->Visible = false; // Disable update for API request
+            } else {
+                $this->status_id->setFormValue($val);
+            }
+        }
+		$this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+		$this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
+        $this->getUploadFiles(); // Get upload files
     }
 
     // Restore form values
@@ -835,12 +834,11 @@ class HealthProgramsEdit extends HealthPrograms
         $this->coverage_area->CurrentValue = $this->coverage_area->FormValue;
         $this->implementation_date->CurrentValue = $this->implementation_date->FormValue;
         $this->implementation_date->CurrentValue = UnFormatDateTime($this->implementation_date->CurrentValue, $this->implementation_date->formatPattern());
-        $this->status->CurrentValue = $this->status->FormValue;
         $this->contact_info->CurrentValue = $this->contact_info->FormValue;
-        $this->featured_image->CurrentValue = $this->featured_image->FormValue;
         $this->is_active->CurrentValue = $this->is_active->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->status_id->CurrentValue = $this->status_id->FormValue;
     }
 
     /**
@@ -888,11 +886,12 @@ class HealthProgramsEdit extends HealthPrograms
         $this->target_beneficiaries->setDbValue($row['target_beneficiaries']);
         $this->coverage_area->setDbValue($row['coverage_area']);
         $this->implementation_date->setDbValue($row['implementation_date']);
-        $this->status->setDbValue($row['status']);
         $this->contact_info->setDbValue($row['contact_info']);
-        $this->featured_image->setDbValue($row['featured_image']);
+        $this->featured_image->Upload->DbValue = $row['featured_image'];
+        $this->featured_image->setDbValue($this->featured_image->Upload->DbValue);
         $this->is_active->setDbValue((ConvertToBool($row['is_active']) ? "1" : "0"));
         $this->created_at->setDbValue($row['created_at']);
+        $this->status_id->setDbValue($row['status_id']);
     }
 
     // Return a row with default values
@@ -906,11 +905,11 @@ class HealthProgramsEdit extends HealthPrograms
         $row['target_beneficiaries'] = $this->target_beneficiaries->DefaultValue;
         $row['coverage_area'] = $this->coverage_area->DefaultValue;
         $row['implementation_date'] = $this->implementation_date->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
         $row['contact_info'] = $this->contact_info->DefaultValue;
         $row['featured_image'] = $this->featured_image->DefaultValue;
         $row['is_active'] = $this->is_active->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['status_id'] = $this->status_id->DefaultValue;
         return $row;
     }
 
@@ -966,9 +965,6 @@ class HealthProgramsEdit extends HealthPrograms
         // implementation_date
         $this->implementation_date->RowCssClass = "row";
 
-        // status
-        $this->status->RowCssClass = "row";
-
         // contact_info
         $this->contact_info->RowCssClass = "row";
 
@@ -980,6 +976,9 @@ class HealthProgramsEdit extends HealthPrograms
 
         // created_at
         $this->created_at->RowCssClass = "row";
+
+        // status_id
+        $this->status_id->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1005,14 +1004,18 @@ class HealthProgramsEdit extends HealthPrograms
             $this->implementation_date->ViewValue = $this->implementation_date->CurrentValue;
             $this->implementation_date->ViewValue = FormatDateTime($this->implementation_date->ViewValue, $this->implementation_date->formatPattern());
 
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
-
             // contact_info
             $this->contact_info->ViewValue = $this->contact_info->CurrentValue;
 
             // featured_image
-            $this->featured_image->ViewValue = $this->featured_image->CurrentValue;
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->ImageAlt = $this->featured_image->alt();
+                $this->featured_image->ImageCssClass = "ew-image";
+                $this->featured_image->ViewValue = $this->featured_image->Upload->DbValue;
+            } else {
+                $this->featured_image->ViewValue = "";
+            }
 
             // is_active
             if (ConvertToBool($this->is_active->CurrentValue)) {
@@ -1024,6 +1027,29 @@ class HealthProgramsEdit extends HealthPrograms
             // created_at
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
+
+            // status_id
+            $curVal = strval($this->status_id->CurrentValue);
+            if ($curVal != "") {
+                $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
+                if ($this->status_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->status_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->status_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->status_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->status_id->ViewValue = $this->status_id->displayValue($arwrk);
+                    } else {
+                        $this->status_id->ViewValue = FormatNumber($this->status_id->CurrentValue, $this->status_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->status_id->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
@@ -1046,20 +1072,30 @@ class HealthProgramsEdit extends HealthPrograms
             // implementation_date
             $this->implementation_date->HrefValue = "";
 
-            // status
-            $this->status->HrefValue = "";
-
             // contact_info
             $this->contact_info->HrefValue = "";
 
             // featured_image
-            $this->featured_image->HrefValue = "";
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->HrefValue = GetFileUploadUrl($this->featured_image, $this->featured_image->htmlDecode($this->featured_image->Upload->DbValue)); // Add prefix/suffix
+                $this->featured_image->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->featured_image->HrefValue = FullUrl($this->featured_image->HrefValue, "href");
+                }
+            } else {
+                $this->featured_image->HrefValue = "";
+            }
+            $this->featured_image->ExportHrefValue = $this->featured_image->UploadPath . $this->featured_image->Upload->DbValue;
 
             // is_active
             $this->is_active->HrefValue = "";
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // status_id
+            $this->status_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1104,14 +1140,6 @@ class HealthProgramsEdit extends HealthPrograms
             $this->implementation_date->EditValue = HtmlEncode(FormatDateTime($this->implementation_date->CurrentValue, $this->implementation_date->formatPattern()));
             $this->implementation_date->PlaceHolder = RemoveHtml($this->implementation_date->caption());
 
-            // status
-            $this->status->setupEditAttributes();
-            if (!$this->status->Raw) {
-                $this->status->CurrentValue = HtmlDecode($this->status->CurrentValue);
-            }
-            $this->status->EditValue = HtmlEncode($this->status->CurrentValue);
-            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
-
             // contact_info
             $this->contact_info->setupEditAttributes();
             $this->contact_info->EditValue = HtmlEncode($this->contact_info->CurrentValue);
@@ -1119,20 +1147,53 @@ class HealthProgramsEdit extends HealthPrograms
 
             // featured_image
             $this->featured_image->setupEditAttributes();
-            if (!$this->featured_image->Raw) {
-                $this->featured_image->CurrentValue = HtmlDecode($this->featured_image->CurrentValue);
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->ImageAlt = $this->featured_image->alt();
+                $this->featured_image->ImageCssClass = "ew-image";
+                $this->featured_image->EditValue = $this->featured_image->Upload->DbValue;
+            } else {
+                $this->featured_image->EditValue = "";
             }
-            $this->featured_image->EditValue = HtmlEncode($this->featured_image->CurrentValue);
-            $this->featured_image->PlaceHolder = RemoveHtml($this->featured_image->caption());
+            if (!EmptyValue($this->featured_image->CurrentValue)) {
+                $this->featured_image->Upload->FileName = $this->featured_image->CurrentValue;
+            }
+            if ($this->isShow()) {
+                RenderUploadField($this->featured_image);
+            }
 
             // is_active
             $this->is_active->EditValue = $this->is_active->options(false);
             $this->is_active->PlaceHolder = RemoveHtml($this->is_active->caption());
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+            // status_id
+            $this->status_id->setupEditAttributes();
+            $curVal = trim(strval($this->status_id->CurrentValue));
+            if ($curVal != "") {
+                $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
+            } else {
+                $this->status_id->ViewValue = $this->status_id->Lookup !== null && is_array($this->status_id->lookupOptions()) && count($this->status_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->status_id->ViewValue !== null) { // Load from cache
+                $this->status_id->EditValue = array_values($this->status_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->status_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->status_id->CurrentValue, $this->status_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->status_id->EditValue = $arwrk;
+            }
+            $this->status_id->PlaceHolder = RemoveHtml($this->status_id->caption());
 
             // Edit refer script
 
@@ -1157,20 +1218,30 @@ class HealthProgramsEdit extends HealthPrograms
             // implementation_date
             $this->implementation_date->HrefValue = "";
 
-            // status
-            $this->status->HrefValue = "";
-
             // contact_info
             $this->contact_info->HrefValue = "";
 
             // featured_image
-            $this->featured_image->HrefValue = "";
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->HrefValue = GetFileUploadUrl($this->featured_image, $this->featured_image->htmlDecode($this->featured_image->Upload->DbValue)); // Add prefix/suffix
+                $this->featured_image->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->featured_image->HrefValue = FullUrl($this->featured_image->HrefValue, "href");
+                }
+            } else {
+                $this->featured_image->HrefValue = "";
+            }
+            $this->featured_image->ExportHrefValue = $this->featured_image->UploadPath . $this->featured_image->Upload->DbValue;
 
             // is_active
             $this->is_active->HrefValue = "";
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // status_id
+            $this->status_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1230,18 +1301,13 @@ class HealthProgramsEdit extends HealthPrograms
             if (!CheckDate($this->implementation_date->FormValue, $this->implementation_date->formatPattern())) {
                 $this->implementation_date->addErrorMessage($this->implementation_date->getErrorMessage(false));
             }
-            if ($this->status->Visible && $this->status->Required) {
-                if (!$this->status->IsDetailKey && EmptyValue($this->status->FormValue)) {
-                    $this->status->addErrorMessage(str_replace("%s", $this->status->caption(), $this->status->RequiredErrorMessage));
-                }
-            }
             if ($this->contact_info->Visible && $this->contact_info->Required) {
                 if (!$this->contact_info->IsDetailKey && EmptyValue($this->contact_info->FormValue)) {
                     $this->contact_info->addErrorMessage(str_replace("%s", $this->contact_info->caption(), $this->contact_info->RequiredErrorMessage));
                 }
             }
             if ($this->featured_image->Visible && $this->featured_image->Required) {
-                if (!$this->featured_image->IsDetailKey && EmptyValue($this->featured_image->FormValue)) {
+                if ($this->featured_image->Upload->FileName == "" && !$this->featured_image->Upload->KeepFile) {
                     $this->featured_image->addErrorMessage(str_replace("%s", $this->featured_image->caption(), $this->featured_image->RequiredErrorMessage));
                 }
             }
@@ -1255,8 +1321,10 @@ class HealthProgramsEdit extends HealthPrograms
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
             }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
+            if ($this->status_id->Visible && $this->status_id->Required) {
+                if (!$this->status_id->IsDetailKey && EmptyValue($this->status_id->FormValue)) {
+                    $this->status_id->addErrorMessage(str_replace("%s", $this->status_id->caption(), $this->status_id->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1296,6 +1364,13 @@ class HealthProgramsEdit extends HealthPrograms
 
         // Update current values
         $this->setCurrentValues($rsnew);
+        if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath();
+            if (!EmptyValue($this->featured_image->Upload->FileName)) {
+                FixUploadFileNames($this->featured_image);
+                $this->featured_image->setDbValueDef($rsnew, $this->featured_image->Upload->FileName, $this->featured_image->ReadOnly);
+            }
+        }
 
         // Call Row Updating event
         $updateRow = $this->rowUpdating($rsold, $rsnew);
@@ -1310,6 +1385,12 @@ class HealthProgramsEdit extends HealthPrograms
                 $editRow = true; // No field to update
             }
             if ($editRow) {
+                if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
+                    if (!SaveUploadFiles($this->featured_image, $rsnew['featured_image'], false)) {
+                        $this->setFailureMessage($Language->phrase("UploadError7"));
+                        return false;
+                    }
+                }
             }
         } else {
             if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
@@ -1345,6 +1426,8 @@ class HealthProgramsEdit extends HealthPrograms
     protected function getEditRow($rsold)
     {
         global $Security;
+        $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+        $this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
         $rsnew = [];
 
         // program_name
@@ -1365,14 +1448,18 @@ class HealthProgramsEdit extends HealthPrograms
         // implementation_date
         $this->implementation_date->setDbValueDef($rsnew, UnFormatDateTime($this->implementation_date->CurrentValue, $this->implementation_date->formatPattern()), $this->implementation_date->ReadOnly);
 
-        // status
-        $this->status->setDbValueDef($rsnew, $this->status->CurrentValue, $this->status->ReadOnly);
-
         // contact_info
         $this->contact_info->setDbValueDef($rsnew, $this->contact_info->CurrentValue, $this->contact_info->ReadOnly);
 
         // featured_image
-        $this->featured_image->setDbValueDef($rsnew, $this->featured_image->CurrentValue, $this->featured_image->ReadOnly);
+        if ($this->featured_image->Visible && !$this->featured_image->ReadOnly && !$this->featured_image->Upload->KeepFile) {
+            if ($this->featured_image->Upload->FileName == "") {
+                $rsnew['featured_image'] = null;
+            } else {
+                FixUploadTempFileNames($this->featured_image);
+                $rsnew['featured_image'] = $this->featured_image->Upload->FileName;
+            }
+        }
 
         // is_active
         $tmpBool = $this->is_active->CurrentValue;
@@ -1382,7 +1469,11 @@ class HealthProgramsEdit extends HealthPrograms
         $this->is_active->setDbValueDef($rsnew, $tmpBool, $this->is_active->ReadOnly);
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), $this->created_at->ReadOnly);
+
+        // status_id
+        $this->status_id->setDbValueDef($rsnew, $this->status_id->CurrentValue, $this->status_id->ReadOnly);
         return $rsnew;
     }
 
@@ -1410,9 +1501,6 @@ class HealthProgramsEdit extends HealthPrograms
         if (isset($row['implementation_date'])) { // implementation_date
             $this->implementation_date->CurrentValue = $row['implementation_date'];
         }
-        if (isset($row['status'])) { // status
-            $this->status->CurrentValue = $row['status'];
-        }
         if (isset($row['contact_info'])) { // contact_info
             $this->contact_info->CurrentValue = $row['contact_info'];
         }
@@ -1424,6 +1512,9 @@ class HealthProgramsEdit extends HealthPrograms
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->CurrentValue = $row['created_at'];
+        }
+        if (isset($row['status_id'])) { // status_id
+            $this->status_id->CurrentValue = $row['status_id'];
         }
     }
 
@@ -1452,6 +1543,8 @@ class HealthProgramsEdit extends HealthPrograms
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_is_active":
+                    break;
+                case "x_status_id":
                     break;
                 default:
                     $lookupFilter = "";

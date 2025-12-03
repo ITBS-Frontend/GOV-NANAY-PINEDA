@@ -123,11 +123,11 @@ class ProgramStatisticsEdit extends ProgramStatistics
     {
         $this->id->setVisibility();
         $this->program_id->setVisibility();
-        $this->program_type->setVisibility();
         $this->stat_label->setVisibility();
         $this->stat_value->setVisibility();
         $this->year->setVisibility();
         $this->created_at->setVisibility();
+        $this->program_type_id->setVisibility();
     }
 
     // Constructor
@@ -515,6 +515,9 @@ class ProgramStatisticsEdit extends ProgramStatistics
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->program_type_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -712,16 +715,6 @@ class ProgramStatisticsEdit extends ProgramStatistics
             }
         }
 
-        // Check field name 'program_type' first before field var 'x_program_type'
-        $val = $CurrentForm->hasValue("program_type") ? $CurrentForm->getValue("program_type") : $CurrentForm->getValue("x_program_type");
-        if (!$this->program_type->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->program_type->Visible = false; // Disable update for API request
-            } else {
-                $this->program_type->setFormValue($val);
-            }
-        }
-
         // Check field name 'stat_label' first before field var 'x_stat_label'
         $val = $CurrentForm->hasValue("stat_label") ? $CurrentForm->getValue("stat_label") : $CurrentForm->getValue("x_stat_label");
         if (!$this->stat_label->IsDetailKey) {
@@ -758,9 +751,19 @@ class ProgramStatisticsEdit extends ProgramStatistics
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        }
+
+        // Check field name 'program_type_id' first before field var 'x_program_type_id'
+        $val = $CurrentForm->hasValue("program_type_id") ? $CurrentForm->getValue("program_type_id") : $CurrentForm->getValue("x_program_type_id");
+        if (!$this->program_type_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->program_type_id->Visible = false; // Disable update for API request
+            } else {
+                $this->program_type_id->setFormValue($val);
+            }
         }
     }
 
@@ -770,12 +773,12 @@ class ProgramStatisticsEdit extends ProgramStatistics
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
         $this->program_id->CurrentValue = $this->program_id->FormValue;
-        $this->program_type->CurrentValue = $this->program_type->FormValue;
         $this->stat_label->CurrentValue = $this->stat_label->FormValue;
         $this->stat_value->CurrentValue = $this->stat_value->FormValue;
         $this->year->CurrentValue = $this->year->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->program_type_id->CurrentValue = $this->program_type_id->FormValue;
     }
 
     /**
@@ -818,11 +821,11 @@ class ProgramStatisticsEdit extends ProgramStatistics
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->program_id->setDbValue($row['program_id']);
-        $this->program_type->setDbValue($row['program_type']);
         $this->stat_label->setDbValue($row['stat_label']);
         $this->stat_value->setDbValue($row['stat_value']);
         $this->year->setDbValue($row['year']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->program_type_id->setDbValue($row['program_type_id']);
     }
 
     // Return a row with default values
@@ -831,11 +834,11 @@ class ProgramStatisticsEdit extends ProgramStatistics
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['program_id'] = $this->program_id->DefaultValue;
-        $row['program_type'] = $this->program_type->DefaultValue;
         $row['stat_label'] = $this->stat_label->DefaultValue;
         $row['stat_value'] = $this->stat_value->DefaultValue;
         $row['year'] = $this->year->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['program_type_id'] = $this->program_type_id->DefaultValue;
         return $row;
     }
 
@@ -876,9 +879,6 @@ class ProgramStatisticsEdit extends ProgramStatistics
         // program_id
         $this->program_id->RowCssClass = "row";
 
-        // program_type
-        $this->program_type->RowCssClass = "row";
-
         // stat_label
         $this->stat_label->RowCssClass = "row";
 
@@ -891,6 +891,9 @@ class ProgramStatisticsEdit extends ProgramStatistics
         // created_at
         $this->created_at->RowCssClass = "row";
 
+        // program_type_id
+        $this->program_type_id->RowCssClass = "row";
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
@@ -899,9 +902,6 @@ class ProgramStatisticsEdit extends ProgramStatistics
             // program_id
             $this->program_id->ViewValue = $this->program_id->CurrentValue;
             $this->program_id->ViewValue = FormatNumber($this->program_id->ViewValue, $this->program_id->formatPattern());
-
-            // program_type
-            $this->program_type->ViewValue = $this->program_type->CurrentValue;
 
             // stat_label
             $this->stat_label->ViewValue = $this->stat_label->CurrentValue;
@@ -917,14 +917,34 @@ class ProgramStatisticsEdit extends ProgramStatistics
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // program_type_id
+            $curVal = strval($this->program_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->program_type_id->ViewValue = $this->program_type_id->lookupCacheOption($curVal);
+                if ($this->program_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->program_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->program_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->program_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->program_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->program_type_id->ViewValue = $this->program_type_id->displayValue($arwrk);
+                    } else {
+                        $this->program_type_id->ViewValue = FormatNumber($this->program_type_id->CurrentValue, $this->program_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->program_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
 
             // program_id
             $this->program_id->HrefValue = "";
-
-            // program_type
-            $this->program_type->HrefValue = "";
 
             // stat_label
             $this->stat_label->HrefValue = "";
@@ -937,6 +957,9 @@ class ProgramStatisticsEdit extends ProgramStatistics
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // program_type_id
+            $this->program_type_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -949,14 +972,6 @@ class ProgramStatisticsEdit extends ProgramStatistics
             if (strval($this->program_id->EditValue) != "" && is_numeric($this->program_id->EditValue)) {
                 $this->program_id->EditValue = FormatNumber($this->program_id->EditValue, null);
             }
-
-            // program_type
-            $this->program_type->setupEditAttributes();
-            if (!$this->program_type->Raw) {
-                $this->program_type->CurrentValue = HtmlDecode($this->program_type->CurrentValue);
-            }
-            $this->program_type->EditValue = HtmlEncode($this->program_type->CurrentValue);
-            $this->program_type->PlaceHolder = RemoveHtml($this->program_type->caption());
 
             // stat_label
             $this->stat_label->setupEditAttributes();
@@ -983,9 +998,33 @@ class ProgramStatisticsEdit extends ProgramStatistics
             }
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+            // program_type_id
+            $this->program_type_id->setupEditAttributes();
+            $curVal = trim(strval($this->program_type_id->CurrentValue));
+            if ($curVal != "") {
+                $this->program_type_id->ViewValue = $this->program_type_id->lookupCacheOption($curVal);
+            } else {
+                $this->program_type_id->ViewValue = $this->program_type_id->Lookup !== null && is_array($this->program_type_id->lookupOptions()) && count($this->program_type_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->program_type_id->ViewValue !== null) { // Load from cache
+                $this->program_type_id->EditValue = array_values($this->program_type_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->program_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->program_type_id->CurrentValue, $this->program_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->program_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->program_type_id->EditValue = $arwrk;
+            }
+            $this->program_type_id->PlaceHolder = RemoveHtml($this->program_type_id->caption());
 
             // Edit refer script
 
@@ -994,9 +1033,6 @@ class ProgramStatisticsEdit extends ProgramStatistics
 
             // program_id
             $this->program_id->HrefValue = "";
-
-            // program_type
-            $this->program_type->HrefValue = "";
 
             // stat_label
             $this->stat_label->HrefValue = "";
@@ -1009,6 +1045,9 @@ class ProgramStatisticsEdit extends ProgramStatistics
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // program_type_id
+            $this->program_type_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1043,11 +1082,6 @@ class ProgramStatisticsEdit extends ProgramStatistics
             if (!CheckInteger($this->program_id->FormValue)) {
                 $this->program_id->addErrorMessage($this->program_id->getErrorMessage(false));
             }
-            if ($this->program_type->Visible && $this->program_type->Required) {
-                if (!$this->program_type->IsDetailKey && EmptyValue($this->program_type->FormValue)) {
-                    $this->program_type->addErrorMessage(str_replace("%s", $this->program_type->caption(), $this->program_type->RequiredErrorMessage));
-                }
-            }
             if ($this->stat_label->Visible && $this->stat_label->Required) {
                 if (!$this->stat_label->IsDetailKey && EmptyValue($this->stat_label->FormValue)) {
                     $this->stat_label->addErrorMessage(str_replace("%s", $this->stat_label->caption(), $this->stat_label->RequiredErrorMessage));
@@ -1071,8 +1105,10 @@ class ProgramStatisticsEdit extends ProgramStatistics
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
             }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
+            if ($this->program_type_id->Visible && $this->program_type_id->Required) {
+                if (!$this->program_type_id->IsDetailKey && EmptyValue($this->program_type_id->FormValue)) {
+                    $this->program_type_id->addErrorMessage(str_replace("%s", $this->program_type_id->caption(), $this->program_type_id->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1166,9 +1202,6 @@ class ProgramStatisticsEdit extends ProgramStatistics
         // program_id
         $this->program_id->setDbValueDef($rsnew, $this->program_id->CurrentValue, $this->program_id->ReadOnly);
 
-        // program_type
-        $this->program_type->setDbValueDef($rsnew, $this->program_type->CurrentValue, $this->program_type->ReadOnly);
-
         // stat_label
         $this->stat_label->setDbValueDef($rsnew, $this->stat_label->CurrentValue, $this->stat_label->ReadOnly);
 
@@ -1179,7 +1212,11 @@ class ProgramStatisticsEdit extends ProgramStatistics
         $this->year->setDbValueDef($rsnew, $this->year->CurrentValue, $this->year->ReadOnly);
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), $this->created_at->ReadOnly);
+
+        // program_type_id
+        $this->program_type_id->setDbValueDef($rsnew, $this->program_type_id->CurrentValue, $this->program_type_id->ReadOnly);
         return $rsnew;
     }
 
@@ -1192,9 +1229,6 @@ class ProgramStatisticsEdit extends ProgramStatistics
         if (isset($row['program_id'])) { // program_id
             $this->program_id->CurrentValue = $row['program_id'];
         }
-        if (isset($row['program_type'])) { // program_type
-            $this->program_type->CurrentValue = $row['program_type'];
-        }
         if (isset($row['stat_label'])) { // stat_label
             $this->stat_label->CurrentValue = $row['stat_label'];
         }
@@ -1206,6 +1240,9 @@ class ProgramStatisticsEdit extends ProgramStatistics
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->CurrentValue = $row['created_at'];
+        }
+        if (isset($row['program_type_id'])) { // program_type_id
+            $this->program_type_id->CurrentValue = $row['program_type_id'];
         }
     }
 
@@ -1233,6 +1270,8 @@ class ProgramStatisticsEdit extends ProgramStatistics
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_program_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

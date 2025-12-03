@@ -150,9 +150,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_geographic_info_id" class="geographic_info_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->info_type->Visible) { // info_type ?>
-        <th data-name="info_type" class="<?= $Page->info_type->headerCellClass() ?>"><div id="elh_geographic_info_info_type" class="geographic_info_info_type"><?= $Page->renderFieldHeader($Page->info_type) ?></div></th>
-<?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
         <th data-name="name" class="<?= $Page->name->headerCellClass() ?>"><div id="elh_geographic_info_name" class="geographic_info_name"><?= $Page->renderFieldHeader($Page->name) ?></div></th>
 <?php } ?>
@@ -167,6 +164,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_geographic_info_created_at" class="geographic_info_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->info_type_id->Visible) { // info_type_id ?>
+        <th data-name="info_type_id" class="<?= $Page->info_type_id->headerCellClass() ?>"><div id="elh_geographic_info_info_type_id" class="geographic_info_info_type_id"><?= $Page->renderFieldHeader($Page->info_type_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -200,14 +200,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_geographic_info_id" class="el_geographic_info_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->info_type->Visible) { // info_type ?>
-        <td data-name="info_type"<?= $Page->info_type->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_geographic_info_info_type" class="el_geographic_info_info_type">
-<span<?= $Page->info_type->viewAttributes() ?>>
-<?= $Page->info_type->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -248,6 +240,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_geographic_info_created_at" class="el_geographic_info_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->info_type_id->Visible) { // info_type_id ?>
+        <td data-name="info_type_id"<?= $Page->info_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_geographic_info_info_type_id" class="el_geographic_info_info_type_id">
+<span<?= $Page->info_type_id->viewAttributes() ?>>
+<?= $Page->info_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

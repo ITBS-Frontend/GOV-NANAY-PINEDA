@@ -47,8 +47,6 @@ class TourismFacilities extends DbTable
 
     // Fields
     public $id;
-    public $facility_type;
-    public $ownership;
     public $name;
     public $description;
     public $municipality;
@@ -64,6 +62,8 @@ class TourismFacilities extends DbTable
     public $is_verified;
     public $is_active;
     public $created_at;
+    public $facility_type_id;
+    public $ownership_type_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -136,54 +136,6 @@ class TourismFacilities extends DbTable
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
-
-        // facility_type
-        $this->facility_type = new DbField(
-            $this, // Table
-            'x_facility_type', // Variable name
-            'facility_type', // Name
-            '"facility_type"', // Expression
-            '"facility_type"', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"facility_type"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->facility_type->InputTextType = "text";
-        $this->facility_type->Nullable = false; // NOT NULL field
-        $this->facility_type->Required = true; // Required field
-        $this->facility_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['facility_type'] = &$this->facility_type;
-
-        // ownership
-        $this->ownership = new DbField(
-            $this, // Table
-            'x_ownership', // Variable name
-            'ownership', // Name
-            '"ownership"', // Expression
-            '"ownership"', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"ownership"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->ownership->InputTextType = "text";
-        $this->ownership->Nullable = false; // NOT NULL field
-        $this->ownership->Required = true; // Required field
-        $this->ownership->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['ownership'] = &$this->ownership;
 
         // name
         $this->name = new DbField(
@@ -525,11 +477,68 @@ class TourismFacilities extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->created_at->addMethod("getAutoUpdateValue", fn() => CurrentDateTime());
         $this->created_at->InputTextType = "text";
         $this->created_at->Raw = true;
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
+
+        // facility_type_id
+        $this->facility_type_id = new DbField(
+            $this, // Table
+            'x_facility_type_id', // Variable name
+            'facility_type_id', // Name
+            '"facility_type_id"', // Expression
+            'CAST("facility_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"facility_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->facility_type_id->InputTextType = "text";
+        $this->facility_type_id->Raw = true;
+        $this->facility_type_id->setSelectMultiple(false); // Select one
+        $this->facility_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->facility_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->facility_type_id->Lookup = new Lookup($this->facility_type_id, 'tourism_facility_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->facility_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->facility_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['facility_type_id'] = &$this->facility_type_id;
+
+        // ownership_type_id
+        $this->ownership_type_id = new DbField(
+            $this, // Table
+            'x_ownership_type_id', // Variable name
+            'ownership_type_id', // Name
+            '"ownership_type_id"', // Expression
+            'CAST("ownership_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"ownership_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->ownership_type_id->InputTextType = "text";
+        $this->ownership_type_id->Raw = true;
+        $this->ownership_type_id->setSelectMultiple(false); // Select one
+        $this->ownership_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->ownership_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->ownership_type_id->Lookup = new Lookup($this->ownership_type_id, 'ownership_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->ownership_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->ownership_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['ownership_type_id'] = &$this->ownership_type_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -1054,8 +1063,6 @@ class TourismFacilities extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->facility_type->DbValue = $row['facility_type'];
-        $this->ownership->DbValue = $row['ownership'];
         $this->name->DbValue = $row['name'];
         $this->description->DbValue = $row['description'];
         $this->municipality->DbValue = $row['municipality'];
@@ -1071,6 +1078,8 @@ class TourismFacilities extends DbTable
         $this->is_verified->DbValue = (ConvertToBool($row['is_verified']) ? "1" : "0");
         $this->is_active->DbValue = (ConvertToBool($row['is_active']) ? "1" : "0");
         $this->created_at->DbValue = $row['created_at'];
+        $this->facility_type_id->DbValue = $row['facility_type_id'];
+        $this->ownership_type_id->DbValue = $row['ownership_type_id'];
     }
 
     // Delete uploaded files
@@ -1431,8 +1440,6 @@ class TourismFacilities extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->facility_type->setDbValue($row['facility_type']);
-        $this->ownership->setDbValue($row['ownership']);
         $this->name->setDbValue($row['name']);
         $this->description->setDbValue($row['description']);
         $this->municipality->setDbValue($row['municipality']);
@@ -1448,6 +1455,8 @@ class TourismFacilities extends DbTable
         $this->is_verified->setDbValue(ConvertToBool($row['is_verified']) ? "1" : "0");
         $this->is_active->setDbValue(ConvertToBool($row['is_active']) ? "1" : "0");
         $this->created_at->setDbValue($row['created_at']);
+        $this->facility_type_id->setDbValue($row['facility_type_id']);
+        $this->ownership_type_id->setDbValue($row['ownership_type_id']);
     }
 
     // Render list content
@@ -1480,10 +1489,6 @@ class TourismFacilities extends DbTable
 
         // id
 
-        // facility_type
-
-        // ownership
-
         // name
 
         // description
@@ -1514,14 +1519,12 @@ class TourismFacilities extends DbTable
 
         // created_at
 
+        // facility_type_id
+
+        // ownership_type_id
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
-
-        // facility_type
-        $this->facility_type->ViewValue = $this->facility_type->CurrentValue;
-
-        // ownership
-        $this->ownership->ViewValue = $this->ownership->CurrentValue;
 
         // name
         $this->name->ViewValue = $this->name->CurrentValue;
@@ -1585,17 +1588,55 @@ class TourismFacilities extends DbTable
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+        // facility_type_id
+        $curVal = strval($this->facility_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->facility_type_id->ViewValue = $this->facility_type_id->lookupCacheOption($curVal);
+            if ($this->facility_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->facility_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->facility_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->facility_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->facility_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->facility_type_id->ViewValue = $this->facility_type_id->displayValue($arwrk);
+                } else {
+                    $this->facility_type_id->ViewValue = FormatNumber($this->facility_type_id->CurrentValue, $this->facility_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->facility_type_id->ViewValue = null;
+        }
+
+        // ownership_type_id
+        $curVal = strval($this->ownership_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->ownership_type_id->ViewValue = $this->ownership_type_id->lookupCacheOption($curVal);
+            if ($this->ownership_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->ownership_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ownership_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->ownership_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->ownership_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->ownership_type_id->ViewValue = $this->ownership_type_id->displayValue($arwrk);
+                } else {
+                    $this->ownership_type_id->ViewValue = FormatNumber($this->ownership_type_id->CurrentValue, $this->ownership_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->ownership_type_id->ViewValue = null;
+        }
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
-
-        // facility_type
-        $this->facility_type->HrefValue = "";
-        $this->facility_type->TooltipValue = "";
-
-        // ownership
-        $this->ownership->HrefValue = "";
-        $this->ownership->TooltipValue = "";
 
         // name
         $this->name->HrefValue = "";
@@ -1674,6 +1715,14 @@ class TourismFacilities extends DbTable
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
 
+        // facility_type_id
+        $this->facility_type_id->HrefValue = "";
+        $this->facility_type_id->TooltipValue = "";
+
+        // ownership_type_id
+        $this->ownership_type_id->HrefValue = "";
+        $this->ownership_type_id->TooltipValue = "";
+
         // Call Row Rendered event
         $this->rowRendered();
 
@@ -1692,22 +1741,6 @@ class TourismFacilities extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
-
-        // facility_type
-        $this->facility_type->setupEditAttributes();
-        if (!$this->facility_type->Raw) {
-            $this->facility_type->CurrentValue = HtmlDecode($this->facility_type->CurrentValue);
-        }
-        $this->facility_type->EditValue = $this->facility_type->CurrentValue;
-        $this->facility_type->PlaceHolder = RemoveHtml($this->facility_type->caption());
-
-        // ownership
-        $this->ownership->setupEditAttributes();
-        if (!$this->ownership->Raw) {
-            $this->ownership->CurrentValue = HtmlDecode($this->ownership->CurrentValue);
-        }
-        $this->ownership->EditValue = $this->ownership->CurrentValue;
-        $this->ownership->PlaceHolder = RemoveHtml($this->ownership->caption());
 
         // name
         $this->name->setupEditAttributes();
@@ -1811,9 +1844,14 @@ class TourismFacilities extends DbTable
         $this->is_active->PlaceHolder = RemoveHtml($this->is_active->caption());
 
         // created_at
-        $this->created_at->setupEditAttributes();
-        $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+        // facility_type_id
+        $this->facility_type_id->setupEditAttributes();
+        $this->facility_type_id->PlaceHolder = RemoveHtml($this->facility_type_id->caption());
+
+        // ownership_type_id
+        $this->ownership_type_id->setupEditAttributes();
+        $this->ownership_type_id->PlaceHolder = RemoveHtml($this->ownership_type_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1844,8 +1882,6 @@ class TourismFacilities extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->facility_type);
-                    $doc->exportCaption($this->ownership);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->description);
                     $doc->exportCaption($this->municipality);
@@ -1861,10 +1897,10 @@ class TourismFacilities extends DbTable
                     $doc->exportCaption($this->is_verified);
                     $doc->exportCaption($this->is_active);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->facility_type_id);
+                    $doc->exportCaption($this->ownership_type_id);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->facility_type);
-                    $doc->exportCaption($this->ownership);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->municipality);
                     $doc->exportCaption($this->contact_number);
@@ -1877,6 +1913,8 @@ class TourismFacilities extends DbTable
                     $doc->exportCaption($this->is_verified);
                     $doc->exportCaption($this->is_active);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->facility_type_id);
+                    $doc->exportCaption($this->ownership_type_id);
                 }
                 $doc->endExportRow();
             }
@@ -1904,8 +1942,6 @@ class TourismFacilities extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->facility_type);
-                        $doc->exportField($this->ownership);
                         $doc->exportField($this->name);
                         $doc->exportField($this->description);
                         $doc->exportField($this->municipality);
@@ -1921,10 +1957,10 @@ class TourismFacilities extends DbTable
                         $doc->exportField($this->is_verified);
                         $doc->exportField($this->is_active);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->facility_type_id);
+                        $doc->exportField($this->ownership_type_id);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->facility_type);
-                        $doc->exportField($this->ownership);
                         $doc->exportField($this->name);
                         $doc->exportField($this->municipality);
                         $doc->exportField($this->contact_number);
@@ -1937,6 +1973,8 @@ class TourismFacilities extends DbTable
                         $doc->exportField($this->is_verified);
                         $doc->exportField($this->is_active);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->facility_type_id);
+                        $doc->exportField($this->ownership_type_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

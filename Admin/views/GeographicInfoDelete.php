@@ -53,9 +53,6 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_geographic_info_id" class="geographic_info_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->info_type->Visible) { // info_type ?>
-        <th class="<?= $Page->info_type->headerCellClass() ?>"><span id="elh_geographic_info_info_type" class="geographic_info_info_type"><?= $Page->info_type->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
         <th class="<?= $Page->name->headerCellClass() ?>"><span id="elh_geographic_info_name" class="geographic_info_name"><?= $Page->name->caption() ?></span></th>
 <?php } ?>
@@ -70,6 +67,9 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_geographic_info_created_at" class="geographic_info_created_at"><?= $Page->created_at->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->info_type_id->Visible) { // info_type_id ?>
+        <th class="<?= $Page->info_type_id->headerCellClass() ?>"><span id="elh_geographic_info_info_type_id" class="geographic_info_info_type_id"><?= $Page->info_type_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -97,14 +97,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->info_type->Visible) { // info_type ?>
-        <td<?= $Page->info_type->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->info_type->viewAttributes() ?>>
-<?= $Page->info_type->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -145,6 +137,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->info_type_id->Visible) { // info_type_id ?>
+        <td<?= $Page->info_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->info_type_id->viewAttributes() ?>>
+<?= $Page->info_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

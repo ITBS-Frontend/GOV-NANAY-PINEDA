@@ -29,14 +29,14 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["disaster_type", [fields.disaster_type.visible && fields.disaster_type.required ? ew.Validators.required(fields.disaster_type.caption) : null], fields.disaster_type.isInvalid],
             ["preparedness_guide", [fields.preparedness_guide.visible && fields.preparedness_guide.required ? ew.Validators.required(fields.preparedness_guide.caption) : null], fields.preparedness_guide.isInvalid],
             ["emergency_hotlines", [fields.emergency_hotlines.visible && fields.emergency_hotlines.required ? ew.Validators.required(fields.emergency_hotlines.caption) : null], fields.emergency_hotlines.isInvalid],
             ["evacuation_centers", [fields.evacuation_centers.visible && fields.evacuation_centers.required ? ew.Validators.required(fields.evacuation_centers.caption) : null], fields.evacuation_centers.isInvalid],
             ["relief_procedures", [fields.relief_procedures.visible && fields.relief_procedures.required ? ew.Validators.required(fields.relief_procedures.caption) : null], fields.relief_procedures.isInvalid],
-            ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.required(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
+            ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.fileRequired(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
             ["display_order", [fields.display_order.visible && fields.display_order.required ? ew.Validators.required(fields.display_order.caption) : null, ew.Validators.integer], fields.display_order.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
+            ["disaster_type_id", [fields.disaster_type_id.visible && fields.disaster_type_id.required ? ew.Validators.required(fields.disaster_type_id.caption) : null], fields.disaster_type_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -52,6 +52,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "disaster_type_id": <?= $Page->disaster_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -84,18 +85,6 @@ loadjs.ready("head", function () {
 <span<?= $Page->id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
 <input type="hidden" data-table="disaster_preparedness" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->disaster_type->Visible) { // disaster_type ?>
-    <div id="r_disaster_type"<?= $Page->disaster_type->rowAttributes() ?>>
-        <label id="elh_disaster_preparedness_disaster_type" for="x_disaster_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->disaster_type->caption() ?><?= $Page->disaster_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->disaster_type->cellAttributes() ?>>
-<span id="el_disaster_preparedness_disaster_type">
-<input type="<?= $Page->disaster_type->getInputTextType() ?>" name="x_disaster_type" id="x_disaster_type" data-table="disaster_preparedness" data-field="x_disaster_type" value="<?= $Page->disaster_type->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->disaster_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->disaster_type->formatPattern()) ?>"<?= $Page->disaster_type->editAttributes() ?> aria-describedby="x_disaster_type_help">
-<?= $Page->disaster_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->disaster_type->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>
@@ -150,12 +139,35 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
     <div id="r_featured_image"<?= $Page->featured_image->rowAttributes() ?>>
-        <label id="elh_disaster_preparedness_featured_image" for="x_featured_image" class="<?= $Page->LeftColumnClass ?>"><?= $Page->featured_image->caption() ?><?= $Page->featured_image->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_disaster_preparedness_featured_image" class="<?= $Page->LeftColumnClass ?>"><?= $Page->featured_image->caption() ?><?= $Page->featured_image->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el_disaster_preparedness_featured_image">
-<input type="<?= $Page->featured_image->getInputTextType() ?>" name="x_featured_image" id="x_featured_image" data-table="disaster_preparedness" data-field="x_featured_image" value="<?= $Page->featured_image->EditValue ?>" size="30" maxlength="500" placeholder="<?= HtmlEncode($Page->featured_image->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->featured_image->formatPattern()) ?>"<?= $Page->featured_image->editAttributes() ?> aria-describedby="x_featured_image_help">
-<?= $Page->featured_image->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->featured_image->getErrorMessage() ?></div>
+<div id="fd_x_featured_image" class="fileinput-button ew-file-drop-zone">
+    <input
+        type="file"
+        id="x_featured_image"
+        name="x_featured_image"
+        class="form-control ew-file-input"
+        title="<?= $Page->featured_image->title() ?>"
+        lang="<?= CurrentLanguageID() ?>"
+        data-table="disaster_preparedness"
+        data-field="x_featured_image"
+        data-size="500"
+        data-accept-file-types="<?= $Page->featured_image->acceptFileTypes() ?>"
+        data-max-file-size="<?= $Page->featured_image->UploadMaxFileSize ?>"
+        data-max-number-of-files="null"
+        data-disable-image-crop="<?= $Page->featured_image->ImageCropper ? 0 : 1 ?>"
+        aria-describedby="x_featured_image_help"
+        <?= ($Page->featured_image->ReadOnly || $Page->featured_image->Disabled) ? " disabled" : "" ?>
+        <?= $Page->featured_image->editAttributes() ?>
+    >
+    <div class="text-body-secondary ew-file-text"><?= $Language->phrase("ChooseFile") ?></div>
+    <?= $Page->featured_image->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->featured_image->getErrorMessage() ?></div>
+</div>
+<input type="hidden" name="fn_x_featured_image" id= "fn_x_featured_image" value="<?= $Page->featured_image->Upload->FileName ?>">
+<input type="hidden" name="fa_x_featured_image" id= "fa_x_featured_image" value="<?= (Post("fa_x_featured_image") == "0") ? "0" : "1" ?>">
+<table id="ft_x_featured_image" class="table table-sm float-start ew-upload-table"><tbody class="files"></tbody></table>
 </span>
 </div></div>
     </div>
@@ -172,40 +184,45 @@ loadjs.ready("head", function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_disaster_preparedness_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_disaster_preparedness_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="disaster_preparedness" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
+<?php if ($Page->disaster_type_id->Visible) { // disaster_type_id ?>
+    <div id="r_disaster_type_id"<?= $Page->disaster_type_id->rowAttributes() ?>>
+        <label id="elh_disaster_preparedness_disaster_type_id" for="x_disaster_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->disaster_type_id->caption() ?><?= $Page->disaster_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->disaster_type_id->cellAttributes() ?>>
+<span id="el_disaster_preparedness_disaster_type_id">
+    <select
+        id="x_disaster_type_id"
+        name="x_disaster_type_id"
+        class="form-select ew-select<?= $Page->disaster_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->disaster_type_id->IsNativeSelect) { ?>
+        data-select2-id="fdisaster_preparednessedit_x_disaster_type_id"
+        <?php } ?>
+        data-table="disaster_preparedness"
+        data-field="x_disaster_type_id"
+        data-value-separator="<?= $Page->disaster_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->disaster_type_id->getPlaceHolder()) ?>"
+        <?= $Page->disaster_type_id->editAttributes() ?>>
+        <?= $Page->disaster_type_id->selectOptionListHtml("x_disaster_type_id") ?>
+    </select>
+    <?= $Page->disaster_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->disaster_type_id->getErrorMessage() ?></div>
+<?= $Page->disaster_type_id->Lookup->getParamTag($Page, "p_x_disaster_type_id") ?>
+<?php if (!$Page->disaster_type_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fdisaster_preparednessedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fdisaster_preparednessedit", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fdisaster_preparednessedit", function() {
+    var options = { name: "x_disaster_type_id", selectId: "fdisaster_preparednessedit_x_disaster_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fdisaster_preparednessedit.lists.disaster_type_id?.lookupOptions.length) {
+        options.data = { id: "x_disaster_type_id", form: "fdisaster_preparednessedit" };
+    } else {
+        options.ajax = { id: "x_disaster_type_id", form: "fdisaster_preparednessedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.disaster_preparedness.fields.disaster_type_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

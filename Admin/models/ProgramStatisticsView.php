@@ -141,11 +141,11 @@ class ProgramStatisticsView extends ProgramStatistics
     {
         $this->id->setVisibility();
         $this->program_id->setVisibility();
-        $this->program_type->setVisibility();
         $this->stat_label->setVisibility();
         $this->stat_value->setVisibility();
         $this->year->setVisibility();
         $this->created_at->setVisibility();
+        $this->program_type_id->setVisibility();
     }
 
     // Constructor
@@ -534,6 +534,9 @@ class ProgramStatisticsView extends ProgramStatistics
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->program_type_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -734,11 +737,11 @@ class ProgramStatisticsView extends ProgramStatistics
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->program_id->setDbValue($row['program_id']);
-        $this->program_type->setDbValue($row['program_type']);
         $this->stat_label->setDbValue($row['stat_label']);
         $this->stat_value->setDbValue($row['stat_value']);
         $this->year->setDbValue($row['year']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->program_type_id->setDbValue($row['program_type_id']);
     }
 
     // Return a row with default values
@@ -747,11 +750,11 @@ class ProgramStatisticsView extends ProgramStatistics
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['program_id'] = $this->program_id->DefaultValue;
-        $row['program_type'] = $this->program_type->DefaultValue;
         $row['stat_label'] = $this->stat_label->DefaultValue;
         $row['stat_value'] = $this->stat_value->DefaultValue;
         $row['year'] = $this->year->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['program_type_id'] = $this->program_type_id->DefaultValue;
         return $row;
     }
 
@@ -777,8 +780,6 @@ class ProgramStatisticsView extends ProgramStatistics
 
         // program_id
 
-        // program_type
-
         // stat_label
 
         // stat_value
@@ -786,6 +787,8 @@ class ProgramStatisticsView extends ProgramStatistics
         // year
 
         // created_at
+
+        // program_type_id
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -795,9 +798,6 @@ class ProgramStatisticsView extends ProgramStatistics
             // program_id
             $this->program_id->ViewValue = $this->program_id->CurrentValue;
             $this->program_id->ViewValue = FormatNumber($this->program_id->ViewValue, $this->program_id->formatPattern());
-
-            // program_type
-            $this->program_type->ViewValue = $this->program_type->CurrentValue;
 
             // stat_label
             $this->stat_label->ViewValue = $this->stat_label->CurrentValue;
@@ -813,6 +813,29 @@ class ProgramStatisticsView extends ProgramStatistics
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // program_type_id
+            $curVal = strval($this->program_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->program_type_id->ViewValue = $this->program_type_id->lookupCacheOption($curVal);
+                if ($this->program_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->program_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->program_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->program_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->program_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->program_type_id->ViewValue = $this->program_type_id->displayValue($arwrk);
+                    } else {
+                        $this->program_type_id->ViewValue = FormatNumber($this->program_type_id->CurrentValue, $this->program_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->program_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -820,10 +843,6 @@ class ProgramStatisticsView extends ProgramStatistics
             // program_id
             $this->program_id->HrefValue = "";
             $this->program_id->TooltipValue = "";
-
-            // program_type
-            $this->program_type->HrefValue = "";
-            $this->program_type->TooltipValue = "";
 
             // stat_label
             $this->stat_label->HrefValue = "";
@@ -840,6 +859,10 @@ class ProgramStatisticsView extends ProgramStatistics
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // program_type_id
+            $this->program_type_id->HrefValue = "";
+            $this->program_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -872,6 +895,8 @@ class ProgramStatisticsView extends ProgramStatistics
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_program_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

@@ -53,9 +53,6 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_demographics_data_id" class="demographics_data_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->data_type->Visible) { // data_type ?>
-        <th class="<?= $Page->data_type->headerCellClass() ?>"><span id="elh_demographics_data_data_type" class="demographics_data_data_type"><?= $Page->data_type->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->label->Visible) { // label ?>
         <th class="<?= $Page->label->headerCellClass() ?>"><span id="elh_demographics_data_label" class="demographics_data_label"><?= $Page->label->caption() ?></span></th>
 <?php } ?>
@@ -73,6 +70,9 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_demographics_data_created_at" class="demographics_data_created_at"><?= $Page->created_at->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->data_type_id->Visible) { // data_type_id ?>
+        <th class="<?= $Page->data_type_id->headerCellClass() ?>"><span id="elh_demographics_data_data_type_id" class="demographics_data_data_type_id"><?= $Page->data_type_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -100,14 +100,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->data_type->Visible) { // data_type ?>
-        <td<?= $Page->data_type->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->data_type->viewAttributes() ?>>
-<?= $Page->data_type->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -156,6 +148,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->data_type_id->Visible) { // data_type_id ?>
+        <td<?= $Page->data_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->data_type_id->viewAttributes() ?>>
+<?= $Page->data_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -730,7 +730,7 @@ class AboutContentAdd extends AboutContent
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         }
@@ -741,7 +741,7 @@ class AboutContentAdd extends AboutContent
             if (IsApi() && $val === null) {
                 $this->updated_at->Visible = false; // Disable update for API request
             } else {
-                $this->updated_at->setFormValue($val, true, $validate);
+                $this->updated_at->setFormValue($val);
             }
             $this->updated_at->CurrentValue = UnFormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern());
         }
@@ -971,14 +971,8 @@ class AboutContentAdd extends AboutContent
             $this->is_active->PlaceHolder = RemoveHtml($this->is_active->caption());
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
 
             // updated_at
-            $this->updated_at->setupEditAttributes();
-            $this->updated_at->EditValue = HtmlEncode(FormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern()));
-            $this->updated_at->PlaceHolder = RemoveHtml($this->updated_at->caption());
 
             // Add refer script
 
@@ -1056,16 +1050,10 @@ class AboutContentAdd extends AboutContent
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
             }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
-            }
             if ($this->updated_at->Visible && $this->updated_at->Required) {
                 if (!$this->updated_at->IsDetailKey && EmptyValue($this->updated_at->FormValue)) {
                     $this->updated_at->addErrorMessage(str_replace("%s", $this->updated_at->caption(), $this->updated_at->RequiredErrorMessage));
                 }
-            }
-            if (!CheckDate($this->updated_at->FormValue, $this->updated_at->formatPattern())) {
-                $this->updated_at->addErrorMessage($this->updated_at->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1158,9 +1146,11 @@ class AboutContentAdd extends AboutContent
         $this->is_active->setDbValueDef($rsnew, $tmpBool, strval($this->is_active->CurrentValue) == "");
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), false);
 
         // updated_at
+        $this->updated_at->CurrentValue = $this->updated_at->getAutoUpdateValue(); // PHP
         $this->updated_at->setDbValueDef($rsnew, UnFormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern()), false);
         return $rsnew;
     }

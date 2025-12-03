@@ -25,7 +25,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["image_path", [fields.image_path.visible && fields.image_path.required ? ew.Validators.fileRequired(fields.image_path.caption) : null], fields.image_path.isInvalid],
             ["image_type", [fields.image_type.visible && fields.image_type.required ? ew.Validators.required(fields.image_type.caption) : null], fields.image_type.isInvalid],
             ["is_primary", [fields.is_primary.visible && fields.is_primary.required ? ew.Validators.required(fields.is_primary.caption) : null], fields.is_primary.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -128,47 +128,6 @@ $Page->showMessage();
     <div class="invalid-feedback"><?= $Page->is_primary->getErrorMessage() ?></div>
 </div>
 <?= $Page->is_primary->getCustomMessage() ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_profile_images_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_profile_images_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="profile_images" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fprofile_imagesadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fprofile_imagesadd", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
 </span>
 </div></div>
     </div>

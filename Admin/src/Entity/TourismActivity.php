@@ -46,14 +46,14 @@ class TourismActivity extends AbstractEntity
     #[Column(type: "string", nullable: true)]
     private ?string $duration;
 
-    #[Column(name: "difficulty_level", type: "string", nullable: true)]
-    private ?string $difficultyLevel;
-
     #[Column(name: "display_order", type: "integer", nullable: true)]
     private ?int $displayOrder;
 
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
+
+    #[Column(name: "difficulty_level_id", type: "integer", nullable: true)]
+    private ?int $difficultyLevelId;
 
     public function __construct()
     {
@@ -115,17 +115,6 @@ class TourismActivity extends AbstractEntity
         return $this;
     }
 
-    public function getDifficultyLevel(): ?string
-    {
-        return HtmlDecode($this->difficultyLevel);
-    }
-
-    public function setDifficultyLevel(?string $value): static
-    {
-        $this->difficultyLevel = RemoveXss($value);
-        return $this;
-    }
-
     public function getDisplayOrder(): ?int
     {
         return $this->displayOrder;
@@ -145,6 +134,17 @@ class TourismActivity extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getDifficultyLevelId(): ?int
+    {
+        return $this->difficultyLevelId;
+    }
+
+    public function setDifficultyLevelId(?int $value): static
+    {
+        $this->difficultyLevelId = $value;
         return $this;
     }
 }

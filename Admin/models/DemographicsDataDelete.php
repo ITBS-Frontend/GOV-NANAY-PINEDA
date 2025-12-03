@@ -122,13 +122,13 @@ class DemographicsDataDelete extends DemographicsData
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->data_type->setVisibility();
         $this->label->setVisibility();
         $this->value->setVisibility();
         $this->year->setVisibility();
         $this->source->setVisibility();
         $this->display_order->setVisibility();
         $this->created_at->setVisibility();
+        $this->data_type_id->setVisibility();
     }
 
     // Constructor
@@ -405,6 +405,9 @@ class DemographicsDataDelete extends DemographicsData
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->data_type_id);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -588,13 +591,13 @@ class DemographicsDataDelete extends DemographicsData
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->data_type->setDbValue($row['data_type']);
         $this->label->setDbValue($row['label']);
         $this->value->setDbValue($row['value']);
         $this->year->setDbValue($row['year']);
         $this->source->setDbValue($row['source']);
         $this->display_order->setDbValue($row['display_order']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->data_type_id->setDbValue($row['data_type_id']);
     }
 
     // Return a row with default values
@@ -602,13 +605,13 @@ class DemographicsDataDelete extends DemographicsData
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['data_type'] = $this->data_type->DefaultValue;
         $row['label'] = $this->label->DefaultValue;
         $row['value'] = $this->value->DefaultValue;
         $row['year'] = $this->year->DefaultValue;
         $row['source'] = $this->source->DefaultValue;
         $row['display_order'] = $this->display_order->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['data_type_id'] = $this->data_type_id->DefaultValue;
         return $row;
     }
 
@@ -626,8 +629,6 @@ class DemographicsDataDelete extends DemographicsData
 
         // id
 
-        // data_type
-
         // label
 
         // value
@@ -640,13 +641,12 @@ class DemographicsDataDelete extends DemographicsData
 
         // created_at
 
+        // data_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // data_type
-            $this->data_type->ViewValue = $this->data_type->CurrentValue;
 
             // label
             $this->label->ViewValue = $this->label->CurrentValue;
@@ -669,13 +669,32 @@ class DemographicsDataDelete extends DemographicsData
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // data_type_id
+            $curVal = strval($this->data_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->data_type_id->ViewValue = $this->data_type_id->lookupCacheOption($curVal);
+                if ($this->data_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->data_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->data_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->data_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->data_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->data_type_id->ViewValue = $this->data_type_id->displayValue($arwrk);
+                    } else {
+                        $this->data_type_id->ViewValue = FormatNumber($this->data_type_id->CurrentValue, $this->data_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->data_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // data_type
-            $this->data_type->HrefValue = "";
-            $this->data_type->TooltipValue = "";
 
             // label
             $this->label->HrefValue = "";
@@ -700,6 +719,10 @@ class DemographicsDataDelete extends DemographicsData
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // data_type_id
+            $this->data_type_id->HrefValue = "";
+            $this->data_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -831,6 +854,8 @@ class DemographicsDataDelete extends DemographicsData
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_data_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

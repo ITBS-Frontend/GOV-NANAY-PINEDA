@@ -62,17 +62,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->info_type->Visible) { // info_type ?>
-    <tr id="r_info_type"<?= $Page->info_type->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_geographic_info_info_type"><?= $Page->info_type->caption() ?></span></td>
-        <td data-name="info_type"<?= $Page->info_type->cellAttributes() ?>>
-<span id="el_geographic_info_info_type">
-<span<?= $Page->info_type->viewAttributes() ?>>
-<?= $Page->info_type->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
     <tr id="r_name"<?= $Page->name->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_geographic_info_name"><?= $Page->name->caption() ?></span></td>
@@ -135,6 +124,17 @@ loadjs.ready("head", function () {
 <span id="el_geographic_info_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->info_type_id->Visible) { // info_type_id ?>
+    <tr id="r_info_type_id"<?= $Page->info_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_geographic_info_info_type_id"><?= $Page->info_type_id->caption() ?></span></td>
+        <td data-name="info_type_id"<?= $Page->info_type_id->cellAttributes() ?>>
+<span id="el_geographic_info_info_type_id">
+<span<?= $Page->info_type_id->viewAttributes() ?>>
+<?= $Page->info_type_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

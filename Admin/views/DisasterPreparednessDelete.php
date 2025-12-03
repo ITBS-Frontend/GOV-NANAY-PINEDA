@@ -53,9 +53,6 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_disaster_preparedness_id" class="disaster_preparedness_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->disaster_type->Visible) { // disaster_type ?>
-        <th class="<?= $Page->disaster_type->headerCellClass() ?>"><span id="elh_disaster_preparedness_disaster_type" class="disaster_preparedness_disaster_type"><?= $Page->disaster_type->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <th class="<?= $Page->featured_image->headerCellClass() ?>"><span id="elh_disaster_preparedness_featured_image" class="disaster_preparedness_featured_image"><?= $Page->featured_image->caption() ?></span></th>
 <?php } ?>
@@ -64,6 +61,9 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_disaster_preparedness_created_at" class="disaster_preparedness_created_at"><?= $Page->created_at->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->disaster_type_id->Visible) { // disaster_type_id ?>
+        <th class="<?= $Page->disaster_type_id->headerCellClass() ?>"><span id="elh_disaster_preparedness_disaster_type_id" class="disaster_preparedness_disaster_type_id"><?= $Page->disaster_type_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -94,19 +94,12 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->disaster_type->Visible) { // disaster_type ?>
-        <td<?= $Page->disaster_type->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->disaster_type->viewAttributes() ?>>
-<?= $Page->disaster_type->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <td<?= $Page->featured_image->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -123,6 +116,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->disaster_type_id->Visible) { // disaster_type_id ?>
+        <td<?= $Page->disaster_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->disaster_type_id->viewAttributes() ?>>
+<?= $Page->disaster_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

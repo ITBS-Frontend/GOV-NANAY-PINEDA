@@ -53,12 +53,6 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_tourism_facilities_id" class="tourism_facilities_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->facility_type->Visible) { // facility_type ?>
-        <th class="<?= $Page->facility_type->headerCellClass() ?>"><span id="elh_tourism_facilities_facility_type" class="tourism_facilities_facility_type"><?= $Page->facility_type->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->ownership->Visible) { // ownership ?>
-        <th class="<?= $Page->ownership->headerCellClass() ?>"><span id="elh_tourism_facilities_ownership" class="tourism_facilities_ownership"><?= $Page->ownership->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
         <th class="<?= $Page->name->headerCellClass() ?>"><span id="elh_tourism_facilities_name" class="tourism_facilities_name"><?= $Page->name->caption() ?></span></th>
 <?php } ?>
@@ -95,6 +89,12 @@ $Page->showMessage();
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_tourism_facilities_created_at" class="tourism_facilities_created_at"><?= $Page->created_at->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->facility_type_id->Visible) { // facility_type_id ?>
+        <th class="<?= $Page->facility_type_id->headerCellClass() ?>"><span id="elh_tourism_facilities_facility_type_id" class="tourism_facilities_facility_type_id"><?= $Page->facility_type_id->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->ownership_type_id->Visible) { // ownership_type_id ?>
+        <th class="<?= $Page->ownership_type_id->headerCellClass() ?>"><span id="elh_tourism_facilities_ownership_type_id" class="tourism_facilities_ownership_type_id"><?= $Page->ownership_type_id->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -121,22 +121,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->facility_type->Visible) { // facility_type ?>
-        <td<?= $Page->facility_type->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->facility_type->viewAttributes() ?>>
-<?= $Page->facility_type->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->ownership->Visible) { // ownership ?>
-        <td<?= $Page->ownership->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->ownership->viewAttributes() ?>>
-<?= $Page->ownership->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -236,6 +220,22 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->facility_type_id->Visible) { // facility_type_id ?>
+        <td<?= $Page->facility_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->facility_type_id->viewAttributes() ?>>
+<?= $Page->facility_type_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->ownership_type_id->Visible) { // ownership_type_id ?>
+        <td<?= $Page->ownership_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->ownership_type_id->viewAttributes() ?>>
+<?= $Page->ownership_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -125,8 +125,8 @@ class CategoriesEdit extends Categories
         $this->name->setVisibility();
         $this->color_code->setVisibility();
         $this->created_at->setVisibility();
-        $this->category_type->setVisibility();
         $this->parent_id->setVisibility();
+        $this->category_type_id->setVisibility();
     }
 
     // Constructor
@@ -514,6 +514,9 @@ class CategoriesEdit extends Categories
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->category_type_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -732,16 +735,6 @@ class CategoriesEdit extends Categories
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         }
 
-        // Check field name 'category_type' first before field var 'x_category_type'
-        $val = $CurrentForm->hasValue("category_type") ? $CurrentForm->getValue("category_type") : $CurrentForm->getValue("x_category_type");
-        if (!$this->category_type->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->category_type->Visible = false; // Disable update for API request
-            } else {
-                $this->category_type->setFormValue($val);
-            }
-        }
-
         // Check field name 'parent_id' first before field var 'x_parent_id'
         $val = $CurrentForm->hasValue("parent_id") ? $CurrentForm->getValue("parent_id") : $CurrentForm->getValue("x_parent_id");
         if (!$this->parent_id->IsDetailKey) {
@@ -749,6 +742,16 @@ class CategoriesEdit extends Categories
                 $this->parent_id->Visible = false; // Disable update for API request
             } else {
                 $this->parent_id->setFormValue($val, true, $validate);
+            }
+        }
+
+        // Check field name 'category_type_id' first before field var 'x_category_type_id'
+        $val = $CurrentForm->hasValue("category_type_id") ? $CurrentForm->getValue("category_type_id") : $CurrentForm->getValue("x_category_type_id");
+        if (!$this->category_type_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->category_type_id->Visible = false; // Disable update for API request
+            } else {
+                $this->category_type_id->setFormValue($val);
             }
         }
     }
@@ -762,8 +765,8 @@ class CategoriesEdit extends Categories
         $this->color_code->CurrentValue = $this->color_code->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->category_type->CurrentValue = $this->category_type->FormValue;
         $this->parent_id->CurrentValue = $this->parent_id->FormValue;
+        $this->category_type_id->CurrentValue = $this->category_type_id->FormValue;
     }
 
     /**
@@ -808,8 +811,8 @@ class CategoriesEdit extends Categories
         $this->name->setDbValue($row['name']);
         $this->color_code->setDbValue($row['color_code']);
         $this->created_at->setDbValue($row['created_at']);
-        $this->category_type->setDbValue($row['category_type']);
         $this->parent_id->setDbValue($row['parent_id']);
+        $this->category_type_id->setDbValue($row['category_type_id']);
     }
 
     // Return a row with default values
@@ -820,8 +823,8 @@ class CategoriesEdit extends Categories
         $row['name'] = $this->name->DefaultValue;
         $row['color_code'] = $this->color_code->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
-        $row['category_type'] = $this->category_type->DefaultValue;
         $row['parent_id'] = $this->parent_id->DefaultValue;
+        $row['category_type_id'] = $this->category_type_id->DefaultValue;
         return $row;
     }
 
@@ -868,11 +871,11 @@ class CategoriesEdit extends Categories
         // created_at
         $this->created_at->RowCssClass = "row";
 
-        // category_type
-        $this->category_type->RowCssClass = "row";
-
         // parent_id
         $this->parent_id->RowCssClass = "row";
+
+        // category_type_id
+        $this->category_type_id->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -889,12 +892,32 @@ class CategoriesEdit extends Categories
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
-            // category_type
-            $this->category_type->ViewValue = $this->category_type->CurrentValue;
-
             // parent_id
             $this->parent_id->ViewValue = $this->parent_id->CurrentValue;
             $this->parent_id->ViewValue = FormatNumber($this->parent_id->ViewValue, $this->parent_id->formatPattern());
+
+            // category_type_id
+            $curVal = strval($this->category_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->category_type_id->ViewValue = $this->category_type_id->lookupCacheOption($curVal);
+                if ($this->category_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->category_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->category_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->category_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->category_type_id->ViewValue = $this->category_type_id->displayValue($arwrk);
+                    } else {
+                        $this->category_type_id->ViewValue = FormatNumber($this->category_type_id->CurrentValue, $this->category_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->category_type_id->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
@@ -908,11 +931,11 @@ class CategoriesEdit extends Categories
             // created_at
             $this->created_at->HrefValue = "";
 
-            // category_type
-            $this->category_type->HrefValue = "";
-
             // parent_id
             $this->parent_id->HrefValue = "";
+
+            // category_type_id
+            $this->category_type_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -939,14 +962,6 @@ class CategoriesEdit extends Categories
             $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
             $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
 
-            // category_type
-            $this->category_type->setupEditAttributes();
-            if (!$this->category_type->Raw) {
-                $this->category_type->CurrentValue = HtmlDecode($this->category_type->CurrentValue);
-            }
-            $this->category_type->EditValue = HtmlEncode($this->category_type->CurrentValue);
-            $this->category_type->PlaceHolder = RemoveHtml($this->category_type->caption());
-
             // parent_id
             $this->parent_id->setupEditAttributes();
             $this->parent_id->EditValue = $this->parent_id->CurrentValue;
@@ -954,6 +969,33 @@ class CategoriesEdit extends Categories
             if (strval($this->parent_id->EditValue) != "" && is_numeric($this->parent_id->EditValue)) {
                 $this->parent_id->EditValue = FormatNumber($this->parent_id->EditValue, null);
             }
+
+            // category_type_id
+            $this->category_type_id->setupEditAttributes();
+            $curVal = trim(strval($this->category_type_id->CurrentValue));
+            if ($curVal != "") {
+                $this->category_type_id->ViewValue = $this->category_type_id->lookupCacheOption($curVal);
+            } else {
+                $this->category_type_id->ViewValue = $this->category_type_id->Lookup !== null && is_array($this->category_type_id->lookupOptions()) && count($this->category_type_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->category_type_id->ViewValue !== null) { // Load from cache
+                $this->category_type_id->EditValue = array_values($this->category_type_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->category_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->category_type_id->CurrentValue, $this->category_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->category_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->category_type_id->EditValue = $arwrk;
+            }
+            $this->category_type_id->PlaceHolder = RemoveHtml($this->category_type_id->caption());
 
             // Edit refer script
 
@@ -969,11 +1011,11 @@ class CategoriesEdit extends Categories
             // created_at
             $this->created_at->HrefValue = "";
 
-            // category_type
-            $this->category_type->HrefValue = "";
-
             // parent_id
             $this->parent_id->HrefValue = "";
+
+            // category_type_id
+            $this->category_type_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1018,11 +1060,6 @@ class CategoriesEdit extends Categories
             if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
                 $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
             }
-            if ($this->category_type->Visible && $this->category_type->Required) {
-                if (!$this->category_type->IsDetailKey && EmptyValue($this->category_type->FormValue)) {
-                    $this->category_type->addErrorMessage(str_replace("%s", $this->category_type->caption(), $this->category_type->RequiredErrorMessage));
-                }
-            }
             if ($this->parent_id->Visible && $this->parent_id->Required) {
                 if (!$this->parent_id->IsDetailKey && EmptyValue($this->parent_id->FormValue)) {
                     $this->parent_id->addErrorMessage(str_replace("%s", $this->parent_id->caption(), $this->parent_id->RequiredErrorMessage));
@@ -1030,6 +1067,11 @@ class CategoriesEdit extends Categories
             }
             if (!CheckInteger($this->parent_id->FormValue)) {
                 $this->parent_id->addErrorMessage($this->parent_id->getErrorMessage(false));
+            }
+            if ($this->category_type_id->Visible && $this->category_type_id->Required) {
+                if (!$this->category_type_id->IsDetailKey && EmptyValue($this->category_type_id->FormValue)) {
+                    $this->category_type_id->addErrorMessage(str_replace("%s", $this->category_type_id->caption(), $this->category_type_id->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1129,11 +1171,11 @@ class CategoriesEdit extends Categories
         // created_at
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), $this->created_at->ReadOnly);
 
-        // category_type
-        $this->category_type->setDbValueDef($rsnew, $this->category_type->CurrentValue, $this->category_type->ReadOnly);
-
         // parent_id
         $this->parent_id->setDbValueDef($rsnew, $this->parent_id->CurrentValue, $this->parent_id->ReadOnly);
+
+        // category_type_id
+        $this->category_type_id->setDbValueDef($rsnew, $this->category_type_id->CurrentValue, $this->category_type_id->ReadOnly);
         return $rsnew;
     }
 
@@ -1152,11 +1194,11 @@ class CategoriesEdit extends Categories
         if (isset($row['created_at'])) { // created_at
             $this->created_at->CurrentValue = $row['created_at'];
         }
-        if (isset($row['category_type'])) { // category_type
-            $this->category_type->CurrentValue = $row['category_type'];
-        }
         if (isset($row['parent_id'])) { // parent_id
             $this->parent_id->CurrentValue = $row['parent_id'];
+        }
+        if (isset($row['category_type_id'])) { // category_type_id
+            $this->category_type_id->CurrentValue = $row['category_type_id'];
         }
     }
 
@@ -1184,6 +1226,8 @@ class CategoriesEdit extends Categories
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_category_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

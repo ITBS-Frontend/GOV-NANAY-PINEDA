@@ -95,17 +95,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->category_type->Visible) { // category_type ?>
-    <tr id="r_category_type"<?= $Page->category_type->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_categories_category_type"><?= $Page->category_type->caption() ?></span></td>
-        <td data-name="category_type"<?= $Page->category_type->cellAttributes() ?>>
-<span id="el_categories_category_type">
-<span<?= $Page->category_type->viewAttributes() ?>>
-<?= $Page->category_type->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->parent_id->Visible) { // parent_id ?>
     <tr id="r_parent_id"<?= $Page->parent_id->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_categories_parent_id"><?= $Page->parent_id->caption() ?></span></td>
@@ -113,6 +102,17 @@ loadjs.ready("head", function () {
 <span id="el_categories_parent_id">
 <span<?= $Page->parent_id->viewAttributes() ?>>
 <?= $Page->parent_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->category_type_id->Visible) { // category_type_id ?>
+    <tr id="r_category_type_id"<?= $Page->category_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_categories_category_type_id"><?= $Page->category_type_id->caption() ?></span></td>
+        <td data-name="category_type_id"<?= $Page->category_type_id->cellAttributes() ?>>
+<span id="el_categories_category_type_id">
+<span<?= $Page->category_type_id->viewAttributes() ?>>
+<?= $Page->category_type_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

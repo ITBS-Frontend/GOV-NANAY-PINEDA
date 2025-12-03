@@ -141,14 +141,14 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
     {
         $this->id->setVisibility();
         $this->program_name->setVisibility();
-        $this->program_type->setVisibility();
         $this->description->setVisibility();
         $this->objectives->setVisibility();
         $this->coverage_area->setVisibility();
         $this->implementation_date->setVisibility();
-        $this->status->setVisibility();
         $this->featured_image->setVisibility();
         $this->created_at->setVisibility();
+        $this->program_type_id->setVisibility();
+        $this->status_id->setVisibility();
     }
 
     // Constructor
@@ -321,6 +321,8 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
         if (is_object($rs)) { // Result set
             while ($row = $rs->fetch()) {
                 $this->loadRowValues($row); // Set up DbValue/CurrentValue
+                $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+                $this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
                 $row = $this->getRecordFromArray($row);
                 if ($current) {
                     return $row;
@@ -537,6 +539,10 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->program_type_id);
+        $this->setupLookupOptions($this->status_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -737,14 +743,15 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->program_name->setDbValue($row['program_name']);
-        $this->program_type->setDbValue($row['program_type']);
         $this->description->setDbValue($row['description']);
         $this->objectives->setDbValue($row['objectives']);
         $this->coverage_area->setDbValue($row['coverage_area']);
         $this->implementation_date->setDbValue($row['implementation_date']);
-        $this->status->setDbValue($row['status']);
-        $this->featured_image->setDbValue($row['featured_image']);
+        $this->featured_image->Upload->DbValue = $row['featured_image'];
+        $this->featured_image->setDbValue($this->featured_image->Upload->DbValue);
         $this->created_at->setDbValue($row['created_at']);
+        $this->program_type_id->setDbValue($row['program_type_id']);
+        $this->status_id->setDbValue($row['status_id']);
     }
 
     // Return a row with default values
@@ -753,14 +760,14 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['program_name'] = $this->program_name->DefaultValue;
-        $row['program_type'] = $this->program_type->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['objectives'] = $this->objectives->DefaultValue;
         $row['coverage_area'] = $this->coverage_area->DefaultValue;
         $row['implementation_date'] = $this->implementation_date->DefaultValue;
-        $row['status'] = $this->status->DefaultValue;
         $row['featured_image'] = $this->featured_image->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['program_type_id'] = $this->program_type_id->DefaultValue;
+        $row['status_id'] = $this->status_id->DefaultValue;
         return $row;
     }
 
@@ -786,8 +793,6 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
 
         // program_name
 
-        // program_type
-
         // description
 
         // objectives
@@ -796,11 +801,13 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
 
         // implementation_date
 
-        // status
-
         // featured_image
 
         // created_at
+
+        // program_type_id
+
+        // status_id
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -809,9 +816,6 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
 
             // program_name
             $this->program_name->ViewValue = $this->program_name->CurrentValue;
-
-            // program_type
-            $this->program_type->ViewValue = $this->program_type->CurrentValue;
 
             // description
             $this->description->ViewValue = $this->description->CurrentValue;
@@ -826,15 +830,65 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
             $this->implementation_date->ViewValue = $this->implementation_date->CurrentValue;
             $this->implementation_date->ViewValue = FormatDateTime($this->implementation_date->ViewValue, $this->implementation_date->formatPattern());
 
-            // status
-            $this->status->ViewValue = $this->status->CurrentValue;
-
             // featured_image
-            $this->featured_image->ViewValue = $this->featured_image->CurrentValue;
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->ImageAlt = $this->featured_image->alt();
+                $this->featured_image->ImageCssClass = "ew-image";
+                $this->featured_image->ViewValue = $this->featured_image->Upload->DbValue;
+            } else {
+                $this->featured_image->ViewValue = "";
+            }
 
             // created_at
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
+
+            // program_type_id
+            $curVal = strval($this->program_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->program_type_id->ViewValue = $this->program_type_id->lookupCacheOption($curVal);
+                if ($this->program_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->program_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->program_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->program_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->program_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->program_type_id->ViewValue = $this->program_type_id->displayValue($arwrk);
+                    } else {
+                        $this->program_type_id->ViewValue = FormatNumber($this->program_type_id->CurrentValue, $this->program_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->program_type_id->ViewValue = null;
+            }
+
+            // status_id
+            $curVal = strval($this->status_id->CurrentValue);
+            if ($curVal != "") {
+                $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
+                if ($this->status_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->status_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->status_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->status_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->status_id->ViewValue = $this->status_id->displayValue($arwrk);
+                    } else {
+                        $this->status_id->ViewValue = FormatNumber($this->status_id->CurrentValue, $this->status_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->status_id->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
@@ -843,10 +897,6 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
             // program_name
             $this->program_name->HrefValue = "";
             $this->program_name->TooltipValue = "";
-
-            // program_type
-            $this->program_type->HrefValue = "";
-            $this->program_type->TooltipValue = "";
 
             // description
             $this->description->HrefValue = "";
@@ -864,17 +914,38 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
             $this->implementation_date->HrefValue = "";
             $this->implementation_date->TooltipValue = "";
 
-            // status
-            $this->status->HrefValue = "";
-            $this->status->TooltipValue = "";
-
             // featured_image
-            $this->featured_image->HrefValue = "";
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->HrefValue = GetFileUploadUrl($this->featured_image, $this->featured_image->htmlDecode($this->featured_image->Upload->DbValue)); // Add prefix/suffix
+                $this->featured_image->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->featured_image->HrefValue = FullUrl($this->featured_image->HrefValue, "href");
+                }
+            } else {
+                $this->featured_image->HrefValue = "";
+            }
+            $this->featured_image->ExportHrefValue = $this->featured_image->UploadPath . $this->featured_image->Upload->DbValue;
             $this->featured_image->TooltipValue = "";
+            if ($this->featured_image->UseColorbox) {
+                if (EmptyValue($this->featured_image->TooltipValue)) {
+                    $this->featured_image->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
+                }
+                $this->featured_image->LinkAttrs["data-rel"] = "environmental_programs_x_featured_image";
+                $this->featured_image->LinkAttrs->appendClass("ew-lightbox");
+            }
 
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // program_type_id
+            $this->program_type_id->HrefValue = "";
+            $this->program_type_id->TooltipValue = "";
+
+            // status_id
+            $this->status_id->HrefValue = "";
+            $this->status_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -907,6 +978,10 @@ class EnvironmentalProgramsView extends EnvironmentalPrograms
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_program_type_id":
+                    break;
+                case "x_status_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

@@ -62,17 +62,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->data_type->Visible) { // data_type ?>
-    <tr id="r_data_type"<?= $Page->data_type->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_demographics_data_data_type"><?= $Page->data_type->caption() ?></span></td>
-        <td data-name="data_type"<?= $Page->data_type->cellAttributes() ?>>
-<span id="el_demographics_data_data_type">
-<span<?= $Page->data_type->viewAttributes() ?>>
-<?= $Page->data_type->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->label->Visible) { // label ?>
     <tr id="r_label"<?= $Page->label->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_demographics_data_label"><?= $Page->label->caption() ?></span></td>
@@ -135,6 +124,17 @@ loadjs.ready("head", function () {
 <span id="el_demographics_data_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->data_type_id->Visible) { // data_type_id ?>
+    <tr id="r_data_type_id"<?= $Page->data_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_demographics_data_data_type_id"><?= $Page->data_type_id->caption() ?></span></td>
+        <td data-name="data_type_id"<?= $Page->data_type_id->cellAttributes() ?>>
+<span id="el_demographics_data_data_type_id">
+<span<?= $Page->data_type_id->viewAttributes() ?>>
+<?= $Page->data_type_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

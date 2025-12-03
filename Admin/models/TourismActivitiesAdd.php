@@ -126,9 +126,9 @@ class TourismActivitiesAdd extends TourismActivities
         $this->activity_name->setVisibility();
         $this->description->setVisibility();
         $this->duration->setVisibility();
-        $this->difficulty_level->setVisibility();
         $this->display_order->setVisibility();
         $this->created_at->setVisibility();
+        $this->difficulty_level_id->setVisibility();
     }
 
     // Constructor
@@ -510,6 +510,9 @@ class TourismActivitiesAdd extends TourismActivities
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->difficulty_level_id);
+
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -711,16 +714,6 @@ class TourismActivitiesAdd extends TourismActivities
             }
         }
 
-        // Check field name 'difficulty_level' first before field var 'x_difficulty_level'
-        $val = $CurrentForm->hasValue("difficulty_level") ? $CurrentForm->getValue("difficulty_level") : $CurrentForm->getValue("x_difficulty_level");
-        if (!$this->difficulty_level->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->difficulty_level->Visible = false; // Disable update for API request
-            } else {
-                $this->difficulty_level->setFormValue($val);
-            }
-        }
-
         // Check field name 'display_order' first before field var 'x_display_order'
         $val = $CurrentForm->hasValue("display_order") ? $CurrentForm->getValue("display_order") : $CurrentForm->getValue("x_display_order");
         if (!$this->display_order->IsDetailKey) {
@@ -737,9 +730,19 @@ class TourismActivitiesAdd extends TourismActivities
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        }
+
+        // Check field name 'difficulty_level_id' first before field var 'x_difficulty_level_id'
+        $val = $CurrentForm->hasValue("difficulty_level_id") ? $CurrentForm->getValue("difficulty_level_id") : $CurrentForm->getValue("x_difficulty_level_id");
+        if (!$this->difficulty_level_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->difficulty_level_id->Visible = false; // Disable update for API request
+            } else {
+                $this->difficulty_level_id->setFormValue($val);
+            }
         }
 
         // Check field name 'id' first before field var 'x_id'
@@ -754,10 +757,10 @@ class TourismActivitiesAdd extends TourismActivities
         $this->activity_name->CurrentValue = $this->activity_name->FormValue;
         $this->description->CurrentValue = $this->description->FormValue;
         $this->duration->CurrentValue = $this->duration->FormValue;
-        $this->difficulty_level->CurrentValue = $this->difficulty_level->FormValue;
         $this->display_order->CurrentValue = $this->display_order->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->difficulty_level_id->CurrentValue = $this->difficulty_level_id->FormValue;
     }
 
     /**
@@ -803,9 +806,9 @@ class TourismActivitiesAdd extends TourismActivities
         $this->activity_name->setDbValue($row['activity_name']);
         $this->description->setDbValue($row['description']);
         $this->duration->setDbValue($row['duration']);
-        $this->difficulty_level->setDbValue($row['difficulty_level']);
         $this->display_order->setDbValue($row['display_order']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->difficulty_level_id->setDbValue($row['difficulty_level_id']);
     }
 
     // Return a row with default values
@@ -817,9 +820,9 @@ class TourismActivitiesAdd extends TourismActivities
         $row['activity_name'] = $this->activity_name->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['duration'] = $this->duration->DefaultValue;
-        $row['difficulty_level'] = $this->difficulty_level->DefaultValue;
         $row['display_order'] = $this->display_order->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['difficulty_level_id'] = $this->difficulty_level_id->DefaultValue;
         return $row;
     }
 
@@ -869,14 +872,14 @@ class TourismActivitiesAdd extends TourismActivities
         // duration
         $this->duration->RowCssClass = "row";
 
-        // difficulty_level
-        $this->difficulty_level->RowCssClass = "row";
-
         // display_order
         $this->display_order->RowCssClass = "row";
 
         // created_at
         $this->created_at->RowCssClass = "row";
+
+        // difficulty_level_id
+        $this->difficulty_level_id->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -896,9 +899,6 @@ class TourismActivitiesAdd extends TourismActivities
             // duration
             $this->duration->ViewValue = $this->duration->CurrentValue;
 
-            // difficulty_level
-            $this->difficulty_level->ViewValue = $this->difficulty_level->CurrentValue;
-
             // display_order
             $this->display_order->ViewValue = $this->display_order->CurrentValue;
             $this->display_order->ViewValue = FormatNumber($this->display_order->ViewValue, $this->display_order->formatPattern());
@@ -906,6 +906,29 @@ class TourismActivitiesAdd extends TourismActivities
             // created_at
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
+
+            // difficulty_level_id
+            $curVal = strval($this->difficulty_level_id->CurrentValue);
+            if ($curVal != "") {
+                $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->lookupCacheOption($curVal);
+                if ($this->difficulty_level_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->difficulty_level_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->difficulty_level_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->displayValue($arwrk);
+                    } else {
+                        $this->difficulty_level_id->ViewValue = FormatNumber($this->difficulty_level_id->CurrentValue, $this->difficulty_level_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->difficulty_level_id->ViewValue = null;
+            }
 
             // destination_id
             $this->destination_id->HrefValue = "";
@@ -919,14 +942,14 @@ class TourismActivitiesAdd extends TourismActivities
             // duration
             $this->duration->HrefValue = "";
 
-            // difficulty_level
-            $this->difficulty_level->HrefValue = "";
-
             // display_order
             $this->display_order->HrefValue = "";
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // difficulty_level_id
+            $this->difficulty_level_id->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // destination_id
             $this->destination_id->setupEditAttributes();
@@ -957,14 +980,6 @@ class TourismActivitiesAdd extends TourismActivities
             $this->duration->EditValue = HtmlEncode($this->duration->CurrentValue);
             $this->duration->PlaceHolder = RemoveHtml($this->duration->caption());
 
-            // difficulty_level
-            $this->difficulty_level->setupEditAttributes();
-            if (!$this->difficulty_level->Raw) {
-                $this->difficulty_level->CurrentValue = HtmlDecode($this->difficulty_level->CurrentValue);
-            }
-            $this->difficulty_level->EditValue = HtmlEncode($this->difficulty_level->CurrentValue);
-            $this->difficulty_level->PlaceHolder = RemoveHtml($this->difficulty_level->caption());
-
             // display_order
             $this->display_order->setupEditAttributes();
             $this->display_order->EditValue = $this->display_order->CurrentValue;
@@ -974,9 +989,33 @@ class TourismActivitiesAdd extends TourismActivities
             }
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+            // difficulty_level_id
+            $this->difficulty_level_id->setupEditAttributes();
+            $curVal = trim(strval($this->difficulty_level_id->CurrentValue));
+            if ($curVal != "") {
+                $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->lookupCacheOption($curVal);
+            } else {
+                $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->Lookup !== null && is_array($this->difficulty_level_id->lookupOptions()) && count($this->difficulty_level_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->difficulty_level_id->ViewValue !== null) { // Load from cache
+                $this->difficulty_level_id->EditValue = array_values($this->difficulty_level_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->difficulty_level_id->CurrentValue, $this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->difficulty_level_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->difficulty_level_id->EditValue = $arwrk;
+            }
+            $this->difficulty_level_id->PlaceHolder = RemoveHtml($this->difficulty_level_id->caption());
 
             // Add refer script
 
@@ -992,14 +1031,14 @@ class TourismActivitiesAdd extends TourismActivities
             // duration
             $this->duration->HrefValue = "";
 
-            // difficulty_level
-            $this->difficulty_level->HrefValue = "";
-
             // display_order
             $this->display_order->HrefValue = "";
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // difficulty_level_id
+            $this->difficulty_level_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1044,11 +1083,6 @@ class TourismActivitiesAdd extends TourismActivities
                     $this->duration->addErrorMessage(str_replace("%s", $this->duration->caption(), $this->duration->RequiredErrorMessage));
                 }
             }
-            if ($this->difficulty_level->Visible && $this->difficulty_level->Required) {
-                if (!$this->difficulty_level->IsDetailKey && EmptyValue($this->difficulty_level->FormValue)) {
-                    $this->difficulty_level->addErrorMessage(str_replace("%s", $this->difficulty_level->caption(), $this->difficulty_level->RequiredErrorMessage));
-                }
-            }
             if ($this->display_order->Visible && $this->display_order->Required) {
                 if (!$this->display_order->IsDetailKey && EmptyValue($this->display_order->FormValue)) {
                     $this->display_order->addErrorMessage(str_replace("%s", $this->display_order->caption(), $this->display_order->RequiredErrorMessage));
@@ -1062,8 +1096,10 @@ class TourismActivitiesAdd extends TourismActivities
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
             }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
+            if ($this->difficulty_level_id->Visible && $this->difficulty_level_id->Required) {
+                if (!$this->difficulty_level_id->IsDetailKey && EmptyValue($this->difficulty_level_id->FormValue)) {
+                    $this->difficulty_level_id->addErrorMessage(str_replace("%s", $this->difficulty_level_id->caption(), $this->difficulty_level_id->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1148,14 +1184,15 @@ class TourismActivitiesAdd extends TourismActivities
         // duration
         $this->duration->setDbValueDef($rsnew, $this->duration->CurrentValue, false);
 
-        // difficulty_level
-        $this->difficulty_level->setDbValueDef($rsnew, $this->difficulty_level->CurrentValue, false);
-
         // display_order
         $this->display_order->setDbValueDef($rsnew, $this->display_order->CurrentValue, strval($this->display_order->CurrentValue) == "");
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), false);
+
+        // difficulty_level_id
+        $this->difficulty_level_id->setDbValueDef($rsnew, $this->difficulty_level_id->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1177,14 +1214,14 @@ class TourismActivitiesAdd extends TourismActivities
         if (isset($row['duration'])) { // duration
             $this->duration->setFormValue($row['duration']);
         }
-        if (isset($row['difficulty_level'])) { // difficulty_level
-            $this->difficulty_level->setFormValue($row['difficulty_level']);
-        }
         if (isset($row['display_order'])) { // display_order
             $this->display_order->setFormValue($row['display_order']);
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->setFormValue($row['created_at']);
+        }
+        if (isset($row['difficulty_level_id'])) { // difficulty_level_id
+            $this->difficulty_level_id->setFormValue($row['difficulty_level_id']);
         }
     }
 
@@ -1212,6 +1249,8 @@ class TourismActivitiesAdd extends TourismActivities
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_difficulty_level_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

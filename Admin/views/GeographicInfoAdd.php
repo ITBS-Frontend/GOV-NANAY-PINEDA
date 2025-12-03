@@ -22,13 +22,13 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["info_type", [fields.info_type.visible && fields.info_type.required ? ew.Validators.required(fields.info_type.caption) : null], fields.info_type.isInvalid],
             ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
             ["description", [fields.description.visible && fields.description.required ? ew.Validators.required(fields.description.caption) : null], fields.description.isInvalid],
             ["coordinates", [fields.coordinates.visible && fields.coordinates.required ? ew.Validators.required(fields.coordinates.caption) : null], fields.coordinates.isInvalid],
             ["area_sqkm", [fields.area_sqkm.visible && fields.area_sqkm.required ? ew.Validators.required(fields.area_sqkm.caption) : null, ew.Validators.float], fields.area_sqkm.isInvalid],
             ["population", [fields.population.visible && fields.population.required ? ew.Validators.required(fields.population.caption) : null, ew.Validators.integer], fields.population.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
+            ["info_type_id", [fields.info_type_id.visible && fields.info_type_id.required ? ew.Validators.required(fields.info_type_id.caption) : null], fields.info_type_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -44,6 +44,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "info_type_id": <?= $Page->info_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -73,18 +74,6 @@ $Page->showMessage();
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
 <div class="ew-add-div"><!-- page* -->
-<?php if ($Page->info_type->Visible) { // info_type ?>
-    <div id="r_info_type"<?= $Page->info_type->rowAttributes() ?>>
-        <label id="elh_geographic_info_info_type" for="x_info_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->info_type->caption() ?><?= $Page->info_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->info_type->cellAttributes() ?>>
-<span id="el_geographic_info_info_type">
-<input type="<?= $Page->info_type->getInputTextType() ?>" name="x_info_type" id="x_info_type" data-table="geographic_info" data-field="x_info_type" value="<?= $Page->info_type->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->info_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->info_type->formatPattern()) ?>"<?= $Page->info_type->editAttributes() ?> aria-describedby="x_info_type_help">
-<?= $Page->info_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->info_type->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
     <div id="r_name"<?= $Page->name->rowAttributes() ?>>
         <label id="elh_geographic_info_name" for="x_name" class="<?= $Page->LeftColumnClass ?>"><?= $Page->name->caption() ?><?= $Page->name->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -145,40 +134,45 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_geographic_info_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_geographic_info_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="geographic_info" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
+<?php if ($Page->info_type_id->Visible) { // info_type_id ?>
+    <div id="r_info_type_id"<?= $Page->info_type_id->rowAttributes() ?>>
+        <label id="elh_geographic_info_info_type_id" for="x_info_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->info_type_id->caption() ?><?= $Page->info_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->info_type_id->cellAttributes() ?>>
+<span id="el_geographic_info_info_type_id">
+    <select
+        id="x_info_type_id"
+        name="x_info_type_id"
+        class="form-select ew-select<?= $Page->info_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->info_type_id->IsNativeSelect) { ?>
+        data-select2-id="fgeographic_infoadd_x_info_type_id"
+        <?php } ?>
+        data-table="geographic_info"
+        data-field="x_info_type_id"
+        data-value-separator="<?= $Page->info_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->info_type_id->getPlaceHolder()) ?>"
+        <?= $Page->info_type_id->editAttributes() ?>>
+        <?= $Page->info_type_id->selectOptionListHtml("x_info_type_id") ?>
+    </select>
+    <?= $Page->info_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->info_type_id->getErrorMessage() ?></div>
+<?= $Page->info_type_id->Lookup->getParamTag($Page, "p_x_info_type_id") ?>
+<?php if (!$Page->info_type_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fgeographic_infoadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fgeographic_infoadd", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fgeographic_infoadd", function() {
+    var options = { name: "x_info_type_id", selectId: "fgeographic_infoadd_x_info_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fgeographic_infoadd.lists.info_type_id?.lookupOptions.length) {
+        options.data = { id: "x_info_type_id", form: "fgeographic_infoadd" };
+    } else {
+        options.ajax = { id: "x_info_type_id", form: "fgeographic_infoadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.geographic_info.fields.info_type_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

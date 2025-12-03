@@ -37,9 +37,6 @@ class EnvironmentalProgram extends AbstractEntity
     #[Column(name: "program_name", type: "string")]
     private string $programName;
 
-    #[Column(name: "program_type", type: "string", nullable: true)]
-    private ?string $programType;
-
     #[Column(type: "text")]
     private string $description;
 
@@ -52,19 +49,17 @@ class EnvironmentalProgram extends AbstractEntity
     #[Column(name: "implementation_date", type: "date", nullable: true)]
     private ?DateTime $implementationDate;
 
-    #[Column(type: "string", nullable: true)]
-    private ?string $status;
-
     #[Column(name: "featured_image", type: "string", nullable: true)]
     private ?string $featuredImage;
 
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
-    public function __construct()
-    {
-        $this->status = "active";
-    }
+    #[Column(name: "program_type_id", type: "integer", nullable: true)]
+    private ?int $programTypeId;
+
+    #[Column(name: "status_id", type: "integer", nullable: true)]
+    private ?int $statusId;
 
     public function getId(): int
     {
@@ -85,17 +80,6 @@ class EnvironmentalProgram extends AbstractEntity
     public function setProgramName(string $value): static
     {
         $this->programName = RemoveXss($value);
-        return $this;
-    }
-
-    public function getProgramType(): ?string
-    {
-        return HtmlDecode($this->programType);
-    }
-
-    public function setProgramType(?string $value): static
-    {
-        $this->programType = RemoveXss($value);
         return $this;
     }
 
@@ -143,17 +127,6 @@ class EnvironmentalProgram extends AbstractEntity
         return $this;
     }
 
-    public function getStatus(): ?string
-    {
-        return HtmlDecode($this->status);
-    }
-
-    public function setStatus(?string $value): static
-    {
-        $this->status = RemoveXss($value);
-        return $this;
-    }
-
     public function getFeaturedImage(): ?string
     {
         return HtmlDecode($this->featuredImage);
@@ -173,6 +146,28 @@ class EnvironmentalProgram extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getProgramTypeId(): ?int
+    {
+        return $this->programTypeId;
+    }
+
+    public function setProgramTypeId(?int $value): static
+    {
+        $this->programTypeId = $value;
+        return $this;
+    }
+
+    public function getStatusId(): ?int
+    {
+        return $this->statusId;
+    }
+
+    public function setStatusId(?int $value): static
+    {
+        $this->statusId = $value;
         return $this;
     }
 }

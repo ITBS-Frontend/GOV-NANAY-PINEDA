@@ -86,14 +86,14 @@ $Page->showMessage();
 <?php if ($Page->status->Visible) { // status ?>
         <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_projects_status" class="projects_status"><?= $Page->status->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->project_type->Visible) { // project_type ?>
-        <th class="<?= $Page->project_type->headerCellClass() ?>"><span id="elh_projects_project_type" class="projects_project_type"><?= $Page->project_type->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->municipality->Visible) { // municipality ?>
         <th class="<?= $Page->municipality->headerCellClass() ?>"><span id="elh_projects_municipality" class="projects_municipality"><?= $Page->municipality->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->coordinates->Visible) { // coordinates ?>
         <th class="<?= $Page->coordinates->headerCellClass() ?>"><span id="elh_projects_coordinates" class="projects_coordinates"><?= $Page->coordinates->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->project_type_id->Visible) { // project_type_id ?>
+        <th class="<?= $Page->project_type_id->headerCellClass() ?>"><span id="elh_projects_project_type_id" class="projects_project_type_id"><?= $Page->project_type_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -214,14 +214,6 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->project_type->Visible) { // project_type ?>
-        <td<?= $Page->project_type->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->project_type->viewAttributes() ?>>
-<?= $Page->project_type->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->municipality->Visible) { // municipality ?>
         <td<?= $Page->municipality->cellAttributes() ?>>
 <span id="">
@@ -235,6 +227,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->coordinates->viewAttributes() ?>>
 <?= $Page->coordinates->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->project_type_id->Visible) { // project_type_id ?>
+        <td<?= $Page->project_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->project_type_id->viewAttributes() ?>>
+<?= $Page->project_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -159,14 +159,14 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->duration->Visible) { // duration ?>
         <th data-name="duration" class="<?= $Page->duration->headerCellClass() ?>"><div id="elh_tourism_activities_duration" class="tourism_activities_duration"><?= $Page->renderFieldHeader($Page->duration) ?></div></th>
 <?php } ?>
-<?php if ($Page->difficulty_level->Visible) { // difficulty_level ?>
-        <th data-name="difficulty_level" class="<?= $Page->difficulty_level->headerCellClass() ?>"><div id="elh_tourism_activities_difficulty_level" class="tourism_activities_difficulty_level"><?= $Page->renderFieldHeader($Page->difficulty_level) ?></div></th>
-<?php } ?>
 <?php if ($Page->display_order->Visible) { // display_order ?>
         <th data-name="display_order" class="<?= $Page->display_order->headerCellClass() ?>"><div id="elh_tourism_activities_display_order" class="tourism_activities_display_order"><?= $Page->renderFieldHeader($Page->display_order) ?></div></th>
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_tourism_activities_created_at" class="tourism_activities_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->difficulty_level_id->Visible) { // difficulty_level_id ?>
+        <th data-name="difficulty_level_id" class="<?= $Page->difficulty_level_id->headerCellClass() ?>"><div id="elh_tourism_activities_difficulty_level_id" class="tourism_activities_difficulty_level_id"><?= $Page->renderFieldHeader($Page->difficulty_level_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -227,14 +227,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->difficulty_level->Visible) { // difficulty_level ?>
-        <td data-name="difficulty_level"<?= $Page->difficulty_level->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_tourism_activities_difficulty_level" class="el_tourism_activities_difficulty_level">
-<span<?= $Page->difficulty_level->viewAttributes() ?>>
-<?= $Page->difficulty_level->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->display_order->Visible) { // display_order ?>
         <td data-name="display_order"<?= $Page->display_order->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_tourism_activities_display_order" class="el_tourism_activities_display_order">
@@ -248,6 +240,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_tourism_activities_created_at" class="el_tourism_activities_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->difficulty_level_id->Visible) { // difficulty_level_id ?>
+        <td data-name="difficulty_level_id"<?= $Page->difficulty_level_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_tourism_activities_difficulty_level_id" class="el_tourism_activities_difficulty_level_id">
+<span<?= $Page->difficulty_level_id->viewAttributes() ?>>
+<?= $Page->difficulty_level_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

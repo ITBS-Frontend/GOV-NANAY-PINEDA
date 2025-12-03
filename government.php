@@ -498,10 +498,7 @@ $additionalCSS = ['css/government.css'];
                             `}
                             
                             <div class="facility-content">
-                                <span class="facility-type" style="background: ${color}">
-                                    <i class="${icon}"></i>
-                                    ${facility.facility_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                </span>
+                                 <span class="facility-type">${facility.facility_type || 'N/A'}</span>
                                 
                                 <h3 class="facility-name">${facility.name}</h3>
                                 

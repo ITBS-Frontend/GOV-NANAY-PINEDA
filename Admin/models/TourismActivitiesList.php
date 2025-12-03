@@ -150,9 +150,9 @@ class TourismActivitiesList extends TourismActivities
         $this->activity_name->setVisibility();
         $this->description->Visible = false;
         $this->duration->setVisibility();
-        $this->difficulty_level->setVisibility();
         $this->display_order->setVisibility();
         $this->created_at->setVisibility();
+        $this->difficulty_level_id->setVisibility();
     }
 
     // Constructor
@@ -460,6 +460,9 @@ class TourismActivitiesList extends TourismActivities
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
     }
 
     // Lookup data
@@ -692,6 +695,9 @@ class TourismActivitiesList extends TourismActivities
 
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->difficulty_level_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1034,9 +1040,9 @@ class TourismActivitiesList extends TourismActivities
         $filterList = Concat($filterList, $this->activity_name->AdvancedSearch->toJson(), ","); // Field activity_name
         $filterList = Concat($filterList, $this->description->AdvancedSearch->toJson(), ","); // Field description
         $filterList = Concat($filterList, $this->duration->AdvancedSearch->toJson(), ","); // Field duration
-        $filterList = Concat($filterList, $this->difficulty_level->AdvancedSearch->toJson(), ","); // Field difficulty_level
         $filterList = Concat($filterList, $this->display_order->AdvancedSearch->toJson(), ","); // Field display_order
         $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
+        $filterList = Concat($filterList, $this->difficulty_level_id->AdvancedSearch->toJson(), ","); // Field difficulty_level_id
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1116,14 +1122,6 @@ class TourismActivitiesList extends TourismActivities
         $this->duration->AdvancedSearch->SearchOperator2 = @$filter["w_duration"];
         $this->duration->AdvancedSearch->save();
 
-        // Field difficulty_level
-        $this->difficulty_level->AdvancedSearch->SearchValue = @$filter["x_difficulty_level"];
-        $this->difficulty_level->AdvancedSearch->SearchOperator = @$filter["z_difficulty_level"];
-        $this->difficulty_level->AdvancedSearch->SearchCondition = @$filter["v_difficulty_level"];
-        $this->difficulty_level->AdvancedSearch->SearchValue2 = @$filter["y_difficulty_level"];
-        $this->difficulty_level->AdvancedSearch->SearchOperator2 = @$filter["w_difficulty_level"];
-        $this->difficulty_level->AdvancedSearch->save();
-
         // Field display_order
         $this->display_order->AdvancedSearch->SearchValue = @$filter["x_display_order"];
         $this->display_order->AdvancedSearch->SearchOperator = @$filter["z_display_order"];
@@ -1139,6 +1137,14 @@ class TourismActivitiesList extends TourismActivities
         $this->created_at->AdvancedSearch->SearchValue2 = @$filter["y_created_at"];
         $this->created_at->AdvancedSearch->SearchOperator2 = @$filter["w_created_at"];
         $this->created_at->AdvancedSearch->save();
+
+        // Field difficulty_level_id
+        $this->difficulty_level_id->AdvancedSearch->SearchValue = @$filter["x_difficulty_level_id"];
+        $this->difficulty_level_id->AdvancedSearch->SearchOperator = @$filter["z_difficulty_level_id"];
+        $this->difficulty_level_id->AdvancedSearch->SearchCondition = @$filter["v_difficulty_level_id"];
+        $this->difficulty_level_id->AdvancedSearch->SearchValue2 = @$filter["y_difficulty_level_id"];
+        $this->difficulty_level_id->AdvancedSearch->SearchOperator2 = @$filter["w_difficulty_level_id"];
+        $this->difficulty_level_id->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1181,7 +1187,6 @@ class TourismActivitiesList extends TourismActivities
         $searchFlds[] = &$this->activity_name;
         $searchFlds[] = &$this->description;
         $searchFlds[] = &$this->duration;
-        $searchFlds[] = &$this->difficulty_level;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1264,9 +1269,9 @@ class TourismActivitiesList extends TourismActivities
             $this->updateSort($this->destination_id); // destination_id
             $this->updateSort($this->activity_name); // activity_name
             $this->updateSort($this->duration); // duration
-            $this->updateSort($this->difficulty_level); // difficulty_level
             $this->updateSort($this->display_order); // display_order
             $this->updateSort($this->created_at); // created_at
+            $this->updateSort($this->difficulty_level_id); // difficulty_level_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1296,9 +1301,9 @@ class TourismActivitiesList extends TourismActivities
                 $this->activity_name->setSort("");
                 $this->description->setSort("");
                 $this->duration->setSort("");
-                $this->difficulty_level->setSort("");
                 $this->display_order->setSort("");
                 $this->created_at->setSort("");
+                $this->difficulty_level_id->setSort("");
             }
 
             // Reset start position
@@ -1537,9 +1542,9 @@ class TourismActivitiesList extends TourismActivities
             $this->createColumnOption($option, "destination_id");
             $this->createColumnOption($option, "activity_name");
             $this->createColumnOption($option, "duration");
-            $this->createColumnOption($option, "difficulty_level");
             $this->createColumnOption($option, "display_order");
             $this->createColumnOption($option, "created_at");
+            $this->createColumnOption($option, "difficulty_level_id");
         }
 
         // Set up custom actions
@@ -1983,9 +1988,9 @@ class TourismActivitiesList extends TourismActivities
         $this->activity_name->setDbValue($row['activity_name']);
         $this->description->setDbValue($row['description']);
         $this->duration->setDbValue($row['duration']);
-        $this->difficulty_level->setDbValue($row['difficulty_level']);
         $this->display_order->setDbValue($row['display_order']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->difficulty_level_id->setDbValue($row['difficulty_level_id']);
     }
 
     // Return a row with default values
@@ -1997,9 +2002,9 @@ class TourismActivitiesList extends TourismActivities
         $row['activity_name'] = $this->activity_name->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['duration'] = $this->duration->DefaultValue;
-        $row['difficulty_level'] = $this->difficulty_level->DefaultValue;
         $row['display_order'] = $this->display_order->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['difficulty_level_id'] = $this->difficulty_level_id->DefaultValue;
         return $row;
     }
 
@@ -2050,11 +2055,11 @@ class TourismActivitiesList extends TourismActivities
 
         // duration
 
-        // difficulty_level
-
         // display_order
 
         // created_at
+
+        // difficulty_level_id
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2071,9 +2076,6 @@ class TourismActivitiesList extends TourismActivities
             // duration
             $this->duration->ViewValue = $this->duration->CurrentValue;
 
-            // difficulty_level
-            $this->difficulty_level->ViewValue = $this->difficulty_level->CurrentValue;
-
             // display_order
             $this->display_order->ViewValue = $this->display_order->CurrentValue;
             $this->display_order->ViewValue = FormatNumber($this->display_order->ViewValue, $this->display_order->formatPattern());
@@ -2081,6 +2083,29 @@ class TourismActivitiesList extends TourismActivities
             // created_at
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
+
+            // difficulty_level_id
+            $curVal = strval($this->difficulty_level_id->CurrentValue);
+            if ($curVal != "") {
+                $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->lookupCacheOption($curVal);
+                if ($this->difficulty_level_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->difficulty_level_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->difficulty_level_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->displayValue($arwrk);
+                    } else {
+                        $this->difficulty_level_id->ViewValue = FormatNumber($this->difficulty_level_id->CurrentValue, $this->difficulty_level_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->difficulty_level_id->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
@@ -2098,10 +2123,6 @@ class TourismActivitiesList extends TourismActivities
             $this->duration->HrefValue = "";
             $this->duration->TooltipValue = "";
 
-            // difficulty_level
-            $this->difficulty_level->HrefValue = "";
-            $this->difficulty_level->TooltipValue = "";
-
             // display_order
             $this->display_order->HrefValue = "";
             $this->display_order->TooltipValue = "";
@@ -2109,6 +2130,10 @@ class TourismActivitiesList extends TourismActivities
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // difficulty_level_id
+            $this->difficulty_level_id->HrefValue = "";
+            $this->difficulty_level_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2196,6 +2221,8 @@ class TourismActivitiesList extends TourismActivities
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_difficulty_level_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

@@ -62,17 +62,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->facility_type->Visible) { // facility_type ?>
-    <tr id="r_facility_type"<?= $Page->facility_type->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_emergency_facilities_facility_type"><?= $Page->facility_type->caption() ?></span></td>
-        <td data-name="facility_type"<?= $Page->facility_type->cellAttributes() ?>>
-<span id="el_emergency_facilities_facility_type">
-<span<?= $Page->facility_type->viewAttributes() ?>>
-<?= $Page->facility_type->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
     <tr id="r_name"<?= $Page->name->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_emergency_facilities_name"><?= $Page->name->caption() ?></span></td>
@@ -158,6 +147,17 @@ loadjs.ready("head", function () {
 <span id="el_emergency_facilities_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->facility_type_id->Visible) { // facility_type_id ?>
+    <tr id="r_facility_type_id"<?= $Page->facility_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_emergency_facilities_facility_type_id"><?= $Page->facility_type_id->caption() ?></span></td>
+        <td data-name="facility_type_id"<?= $Page->facility_type_id->cellAttributes() ?>>
+<span id="el_emergency_facilities_facility_type_id">
+<span<?= $Page->facility_type_id->viewAttributes() ?>>
+<?= $Page->facility_type_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

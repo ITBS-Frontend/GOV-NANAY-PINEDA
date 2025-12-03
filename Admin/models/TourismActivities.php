@@ -51,9 +51,9 @@ class TourismActivities extends DbTable
     public $activity_name;
     public $description;
     public $duration;
-    public $difficulty_level;
     public $display_order;
     public $created_at;
+    public $difficulty_level_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -219,28 +219,6 @@ class TourismActivities extends DbTable
         $this->duration->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['duration'] = &$this->duration;
 
-        // difficulty_level
-        $this->difficulty_level = new DbField(
-            $this, // Table
-            'x_difficulty_level', // Variable name
-            'difficulty_level', // Name
-            '"difficulty_level"', // Expression
-            '"difficulty_level"', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"difficulty_level"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->difficulty_level->InputTextType = "text";
-        $this->difficulty_level->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['difficulty_level'] = &$this->difficulty_level;
-
         // display_order
         $this->display_order = new DbField(
             $this, // Table
@@ -284,11 +262,40 @@ class TourismActivities extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->created_at->addMethod("getAutoUpdateValue", fn() => CurrentDateTime());
         $this->created_at->InputTextType = "text";
         $this->created_at->Raw = true;
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
+
+        // difficulty_level_id
+        $this->difficulty_level_id = new DbField(
+            $this, // Table
+            'x_difficulty_level_id', // Variable name
+            'difficulty_level_id', // Name
+            '"difficulty_level_id"', // Expression
+            'CAST("difficulty_level_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"difficulty_level_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->difficulty_level_id->InputTextType = "text";
+        $this->difficulty_level_id->Raw = true;
+        $this->difficulty_level_id->setSelectMultiple(false); // Select one
+        $this->difficulty_level_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->difficulty_level_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->difficulty_level_id->Lookup = new Lookup($this->difficulty_level_id, 'difficulty_levels', false, 'id', ["level_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"level_name\"");
+        $this->difficulty_level_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->difficulty_level_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['difficulty_level_id'] = &$this->difficulty_level_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -817,9 +824,9 @@ class TourismActivities extends DbTable
         $this->activity_name->DbValue = $row['activity_name'];
         $this->description->DbValue = $row['description'];
         $this->duration->DbValue = $row['duration'];
-        $this->difficulty_level->DbValue = $row['difficulty_level'];
         $this->display_order->DbValue = $row['display_order'];
         $this->created_at->DbValue = $row['created_at'];
+        $this->difficulty_level_id->DbValue = $row['difficulty_level_id'];
     }
 
     // Delete uploaded files
@@ -1177,9 +1184,9 @@ class TourismActivities extends DbTable
         $this->activity_name->setDbValue($row['activity_name']);
         $this->description->setDbValue($row['description']);
         $this->duration->setDbValue($row['duration']);
-        $this->difficulty_level->setDbValue($row['difficulty_level']);
         $this->display_order->setDbValue($row['display_order']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->difficulty_level_id->setDbValue($row['difficulty_level_id']);
     }
 
     // Render list content
@@ -1220,11 +1227,11 @@ class TourismActivities extends DbTable
 
         // duration
 
-        // difficulty_level
-
         // display_order
 
         // created_at
+
+        // difficulty_level_id
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1242,9 +1249,6 @@ class TourismActivities extends DbTable
         // duration
         $this->duration->ViewValue = $this->duration->CurrentValue;
 
-        // difficulty_level
-        $this->difficulty_level->ViewValue = $this->difficulty_level->CurrentValue;
-
         // display_order
         $this->display_order->ViewValue = $this->display_order->CurrentValue;
         $this->display_order->ViewValue = FormatNumber($this->display_order->ViewValue, $this->display_order->formatPattern());
@@ -1252,6 +1256,29 @@ class TourismActivities extends DbTable
         // created_at
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
+
+        // difficulty_level_id
+        $curVal = strval($this->difficulty_level_id->CurrentValue);
+        if ($curVal != "") {
+            $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->lookupCacheOption($curVal);
+            if ($this->difficulty_level_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->difficulty_level_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->difficulty_level_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->displayValue($arwrk);
+                } else {
+                    $this->difficulty_level_id->ViewValue = FormatNumber($this->difficulty_level_id->CurrentValue, $this->difficulty_level_id->formatPattern());
+                }
+            }
+        } else {
+            $this->difficulty_level_id->ViewValue = null;
+        }
 
         // id
         $this->id->HrefValue = "";
@@ -1273,10 +1300,6 @@ class TourismActivities extends DbTable
         $this->duration->HrefValue = "";
         $this->duration->TooltipValue = "";
 
-        // difficulty_level
-        $this->difficulty_level->HrefValue = "";
-        $this->difficulty_level->TooltipValue = "";
-
         // display_order
         $this->display_order->HrefValue = "";
         $this->display_order->TooltipValue = "";
@@ -1284,6 +1307,10 @@ class TourismActivities extends DbTable
         // created_at
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
+
+        // difficulty_level_id
+        $this->difficulty_level_id->HrefValue = "";
+        $this->difficulty_level_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1333,14 +1360,6 @@ class TourismActivities extends DbTable
         $this->duration->EditValue = $this->duration->CurrentValue;
         $this->duration->PlaceHolder = RemoveHtml($this->duration->caption());
 
-        // difficulty_level
-        $this->difficulty_level->setupEditAttributes();
-        if (!$this->difficulty_level->Raw) {
-            $this->difficulty_level->CurrentValue = HtmlDecode($this->difficulty_level->CurrentValue);
-        }
-        $this->difficulty_level->EditValue = $this->difficulty_level->CurrentValue;
-        $this->difficulty_level->PlaceHolder = RemoveHtml($this->difficulty_level->caption());
-
         // display_order
         $this->display_order->setupEditAttributes();
         $this->display_order->EditValue = $this->display_order->CurrentValue;
@@ -1350,9 +1369,10 @@ class TourismActivities extends DbTable
         }
 
         // created_at
-        $this->created_at->setupEditAttributes();
-        $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+        // difficulty_level_id
+        $this->difficulty_level_id->setupEditAttributes();
+        $this->difficulty_level_id->PlaceHolder = RemoveHtml($this->difficulty_level_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1387,17 +1407,17 @@ class TourismActivities extends DbTable
                     $doc->exportCaption($this->activity_name);
                     $doc->exportCaption($this->description);
                     $doc->exportCaption($this->duration);
-                    $doc->exportCaption($this->difficulty_level);
                     $doc->exportCaption($this->display_order);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->difficulty_level_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->destination_id);
                     $doc->exportCaption($this->activity_name);
                     $doc->exportCaption($this->duration);
-                    $doc->exportCaption($this->difficulty_level);
                     $doc->exportCaption($this->display_order);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->difficulty_level_id);
                 }
                 $doc->endExportRow();
             }
@@ -1429,17 +1449,17 @@ class TourismActivities extends DbTable
                         $doc->exportField($this->activity_name);
                         $doc->exportField($this->description);
                         $doc->exportField($this->duration);
-                        $doc->exportField($this->difficulty_level);
                         $doc->exportField($this->display_order);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->difficulty_level_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->destination_id);
                         $doc->exportField($this->activity_name);
                         $doc->exportField($this->duration);
-                        $doc->exportField($this->difficulty_level);
                         $doc->exportField($this->display_order);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->difficulty_level_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

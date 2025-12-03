@@ -47,7 +47,6 @@ class DisasterIncidents extends DbTable
 
     // Fields
     public $id;
-    public $incident_type;
     public $incident_name;
     public $occurrence_date;
     public $affected_areas;
@@ -56,6 +55,7 @@ class DisasterIncidents extends DbTable
     public $response_actions;
     public $lessons_learned;
     public $created_at;
+    public $incident_type_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -128,30 +128,6 @@ class DisasterIncidents extends DbTable
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
-
-        // incident_type
-        $this->incident_type = new DbField(
-            $this, // Table
-            'x_incident_type', // Variable name
-            'incident_type', // Name
-            '"incident_type"', // Expression
-            '"incident_type"', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"incident_type"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->incident_type->InputTextType = "text";
-        $this->incident_type->Nullable = false; // NOT NULL field
-        $this->incident_type->Required = true; // Required field
-        $this->incident_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['incident_type'] = &$this->incident_type;
 
         // incident_name
         $this->incident_name = new DbField(
@@ -334,11 +310,40 @@ class DisasterIncidents extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->created_at->addMethod("getAutoUpdateValue", fn() => CurrentDateTime());
         $this->created_at->InputTextType = "text";
         $this->created_at->Raw = true;
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
+
+        // incident_type_id
+        $this->incident_type_id = new DbField(
+            $this, // Table
+            'x_incident_type_id', // Variable name
+            'incident_type_id', // Name
+            '"incident_type_id"', // Expression
+            'CAST("incident_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"incident_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->incident_type_id->InputTextType = "text";
+        $this->incident_type_id->Raw = true;
+        $this->incident_type_id->setSelectMultiple(false); // Select one
+        $this->incident_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->incident_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->incident_type_id->Lookup = new Lookup($this->incident_type_id, 'disaster_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->incident_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->incident_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['incident_type_id'] = &$this->incident_type_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -863,7 +868,6 @@ class DisasterIncidents extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->incident_type->DbValue = $row['incident_type'];
         $this->incident_name->DbValue = $row['incident_name'];
         $this->occurrence_date->DbValue = $row['occurrence_date'];
         $this->affected_areas->DbValue = $row['affected_areas'];
@@ -872,6 +876,7 @@ class DisasterIncidents extends DbTable
         $this->response_actions->DbValue = $row['response_actions'];
         $this->lessons_learned->DbValue = $row['lessons_learned'];
         $this->created_at->DbValue = $row['created_at'];
+        $this->incident_type_id->DbValue = $row['incident_type_id'];
     }
 
     // Delete uploaded files
@@ -1225,7 +1230,6 @@ class DisasterIncidents extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->incident_type->setDbValue($row['incident_type']);
         $this->incident_name->setDbValue($row['incident_name']);
         $this->occurrence_date->setDbValue($row['occurrence_date']);
         $this->affected_areas->setDbValue($row['affected_areas']);
@@ -1234,6 +1238,7 @@ class DisasterIncidents extends DbTable
         $this->response_actions->setDbValue($row['response_actions']);
         $this->lessons_learned->setDbValue($row['lessons_learned']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->incident_type_id->setDbValue($row['incident_type_id']);
     }
 
     // Render list content
@@ -1266,8 +1271,6 @@ class DisasterIncidents extends DbTable
 
         // id
 
-        // incident_type
-
         // incident_name
 
         // occurrence_date
@@ -1284,11 +1287,10 @@ class DisasterIncidents extends DbTable
 
         // created_at
 
+        // incident_type_id
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
-
-        // incident_type
-        $this->incident_type->ViewValue = $this->incident_type->CurrentValue;
 
         // incident_name
         $this->incident_name->ViewValue = $this->incident_name->CurrentValue;
@@ -1318,13 +1320,32 @@ class DisasterIncidents extends DbTable
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+        // incident_type_id
+        $curVal = strval($this->incident_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->incident_type_id->ViewValue = $this->incident_type_id->lookupCacheOption($curVal);
+            if ($this->incident_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->incident_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->incident_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->incident_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->incident_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->incident_type_id->ViewValue = $this->incident_type_id->displayValue($arwrk);
+                } else {
+                    $this->incident_type_id->ViewValue = FormatNumber($this->incident_type_id->CurrentValue, $this->incident_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->incident_type_id->ViewValue = null;
+        }
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
-
-        // incident_type
-        $this->incident_type->HrefValue = "";
-        $this->incident_type->TooltipValue = "";
 
         // incident_name
         $this->incident_name->HrefValue = "";
@@ -1358,6 +1379,10 @@ class DisasterIncidents extends DbTable
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
 
+        // incident_type_id
+        $this->incident_type_id->HrefValue = "";
+        $this->incident_type_id->TooltipValue = "";
+
         // Call Row Rendered event
         $this->rowRendered();
 
@@ -1376,14 +1401,6 @@ class DisasterIncidents extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
-
-        // incident_type
-        $this->incident_type->setupEditAttributes();
-        if (!$this->incident_type->Raw) {
-            $this->incident_type->CurrentValue = HtmlDecode($this->incident_type->CurrentValue);
-        }
-        $this->incident_type->EditValue = $this->incident_type->CurrentValue;
-        $this->incident_type->PlaceHolder = RemoveHtml($this->incident_type->caption());
 
         // incident_name
         $this->incident_name->setupEditAttributes();
@@ -1430,9 +1447,10 @@ class DisasterIncidents extends DbTable
         $this->lessons_learned->PlaceHolder = RemoveHtml($this->lessons_learned->caption());
 
         // created_at
-        $this->created_at->setupEditAttributes();
-        $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+        // incident_type_id
+        $this->incident_type_id->setupEditAttributes();
+        $this->incident_type_id->PlaceHolder = RemoveHtml($this->incident_type_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1463,7 +1481,6 @@ class DisasterIncidents extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->incident_type);
                     $doc->exportCaption($this->incident_name);
                     $doc->exportCaption($this->occurrence_date);
                     $doc->exportCaption($this->affected_areas);
@@ -1472,14 +1489,15 @@ class DisasterIncidents extends DbTable
                     $doc->exportCaption($this->response_actions);
                     $doc->exportCaption($this->lessons_learned);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->incident_type_id);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->incident_type);
                     $doc->exportCaption($this->incident_name);
                     $doc->exportCaption($this->occurrence_date);
                     $doc->exportCaption($this->casualties);
                     $doc->exportCaption($this->damages_estimated);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->incident_type_id);
                 }
                 $doc->endExportRow();
             }
@@ -1507,7 +1525,6 @@ class DisasterIncidents extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->incident_type);
                         $doc->exportField($this->incident_name);
                         $doc->exportField($this->occurrence_date);
                         $doc->exportField($this->affected_areas);
@@ -1516,14 +1533,15 @@ class DisasterIncidents extends DbTable
                         $doc->exportField($this->response_actions);
                         $doc->exportField($this->lessons_learned);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->incident_type_id);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->incident_type);
                         $doc->exportField($this->incident_name);
                         $doc->exportField($this->occurrence_date);
                         $doc->exportField($this->casualties);
                         $doc->exportField($this->damages_estimated);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->incident_type_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

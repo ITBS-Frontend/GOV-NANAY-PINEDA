@@ -176,13 +176,14 @@ class TourismService
             
             $sql = "
                 SELECT 
-                    activity_name,
-                    description,
-                    duration,
-                    difficulty_level
-                FROM tourism_activities
-                WHERE destination_id = ?
-                ORDER BY display_order ASC
+                    ta.activity_name,
+                    ta.description,
+                    ta.duration,
+                    dl.level_name as difficulty_level
+                FROM tourism_activities ta
+                LEFT JOIN difficulty_levels dl ON ta.difficulty_level_id = dl.id
+                WHERE ta.destination_id = ?
+                ORDER BY ta.display_order ASC
             ";
             
             return $conn->executeQuery($sql, [$destinationId])->fetchAllAssociative();
@@ -195,26 +196,26 @@ class TourismService
     /**
      * Get tourism facilities
      */
-    public function getFacilities($facilityType = null, $ownership = null, $municipality = null) 
+    public function getFacilities($facilityTypeId = null, $ownershipTypeId = null, $municipality = null) 
     {
         try {
             $conn = Conn();
             
-            $whereClauses = ["is_active = true"];
+            $whereClauses = ["tf.is_active = true"];
             $params = [];
             
-            if ($facilityType) {
-                $whereClauses[] = "facility_type = ?";
-                $params[] = $facilityType;
+            if ($facilityTypeId) {
+                $whereClauses[] = "tf.facility_type_id = ?";
+                $params[] = $facilityTypeId;
             }
             
-            if ($ownership) {
-                $whereClauses[] = "ownership = ?";
-                $params[] = $ownership;
+            if ($ownershipTypeId) {
+                $whereClauses[] = "tf.ownership_type_id = ?";
+                $params[] = $ownershipTypeId;
             }
             
             if ($municipality) {
-                $whereClauses[] = "municipality = ?";
+                $whereClauses[] = "tf.municipality = ?";
                 $params[] = $municipality;
             }
             
@@ -222,25 +223,27 @@ class TourismService
             
             $sql = "
                 SELECT 
-                    id,
-                    facility_type,
-                    ownership,
-                    name,
-                    description,
-                    municipality,
-                    address,
-                    contact_number,
-                    email,
-                    website,
-                    price_range,
-                    amenities,
-                    coordinates,
-                    featured_image,
-                    rating,
-                    is_verified
-                FROM tourism_facilities
+                    tf.id,
+                    tft.type_name as facility_type,
+                    ot.type_name as ownership,
+                    tf.name,
+                    tf.description,
+                    tf.municipality,
+                    tf.address,
+                    tf.contact_number,
+                    tf.email,
+                    tf.website,
+                    tf.price_range,
+                    tf.amenities,
+                    tf.coordinates,
+                    tf.featured_image,
+                    tf.rating,
+                    tf.is_verified
+                FROM tourism_facilities tf
+                LEFT JOIN tourism_facility_types tft ON tf.facility_type_id = tft.id
+                LEFT JOIN ownership_types ot ON tf.ownership_type_id = ot.id
                 WHERE $whereClause
-                ORDER BY is_verified DESC, rating DESC, name ASC
+                ORDER BY tf.is_verified DESC, tf.rating DESC, tf.name ASC
             ";
             
             $facilities = $conn->executeQuery($sql, $params)->fetchAllAssociative();

@@ -140,7 +140,6 @@ class EmergencyFacilitiesView extends EmergencyFacilities
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->facility_type->setVisibility();
         $this->name->setVisibility();
         $this->municipality->setVisibility();
         $this->address->setVisibility();
@@ -149,6 +148,7 @@ class EmergencyFacilitiesView extends EmergencyFacilities
         $this->coordinates->setVisibility();
         $this->is_active->setVisibility();
         $this->created_at->setVisibility();
+        $this->facility_type_id->setVisibility();
     }
 
     // Constructor
@@ -539,6 +539,7 @@ class EmergencyFacilitiesView extends EmergencyFacilities
 
         // Set up lookup cache
         $this->setupLookupOptions($this->is_active);
+        $this->setupLookupOptions($this->facility_type_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -739,7 +740,6 @@ class EmergencyFacilitiesView extends EmergencyFacilities
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->facility_type->setDbValue($row['facility_type']);
         $this->name->setDbValue($row['name']);
         $this->municipality->setDbValue($row['municipality']);
         $this->address->setDbValue($row['address']);
@@ -748,6 +748,7 @@ class EmergencyFacilitiesView extends EmergencyFacilities
         $this->coordinates->setDbValue($row['coordinates']);
         $this->is_active->setDbValue((ConvertToBool($row['is_active']) ? "1" : "0"));
         $this->created_at->setDbValue($row['created_at']);
+        $this->facility_type_id->setDbValue($row['facility_type_id']);
     }
 
     // Return a row with default values
@@ -755,7 +756,6 @@ class EmergencyFacilitiesView extends EmergencyFacilities
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['facility_type'] = $this->facility_type->DefaultValue;
         $row['name'] = $this->name->DefaultValue;
         $row['municipality'] = $this->municipality->DefaultValue;
         $row['address'] = $this->address->DefaultValue;
@@ -764,6 +764,7 @@ class EmergencyFacilitiesView extends EmergencyFacilities
         $row['coordinates'] = $this->coordinates->DefaultValue;
         $row['is_active'] = $this->is_active->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['facility_type_id'] = $this->facility_type_id->DefaultValue;
         return $row;
     }
 
@@ -787,8 +788,6 @@ class EmergencyFacilitiesView extends EmergencyFacilities
 
         // id
 
-        // facility_type
-
         // name
 
         // municipality
@@ -805,13 +804,12 @@ class EmergencyFacilitiesView extends EmergencyFacilities
 
         // created_at
 
+        // facility_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // facility_type
-            $this->facility_type->ViewValue = $this->facility_type->CurrentValue;
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
@@ -843,13 +841,32 @@ class EmergencyFacilitiesView extends EmergencyFacilities
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // facility_type_id
+            $curVal = strval($this->facility_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->facility_type_id->ViewValue = $this->facility_type_id->lookupCacheOption($curVal);
+                if ($this->facility_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->facility_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->facility_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->facility_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->facility_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->facility_type_id->ViewValue = $this->facility_type_id->displayValue($arwrk);
+                    } else {
+                        $this->facility_type_id->ViewValue = FormatNumber($this->facility_type_id->CurrentValue, $this->facility_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->facility_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // facility_type
-            $this->facility_type->HrefValue = "";
-            $this->facility_type->TooltipValue = "";
 
             // name
             $this->name->HrefValue = "";
@@ -882,6 +899,10 @@ class EmergencyFacilitiesView extends EmergencyFacilities
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // facility_type_id
+            $this->facility_type_id->HrefValue = "";
+            $this->facility_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -915,6 +936,8 @@ class EmergencyFacilitiesView extends EmergencyFacilities
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_is_active":
+                    break;
+                case "x_facility_type_id":
                     break;
                 default:
                     $lookupFilter = "";

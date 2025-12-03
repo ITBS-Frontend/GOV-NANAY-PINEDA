@@ -62,14 +62,14 @@ $Page->showMessage();
 <?php if ($Page->duration->Visible) { // duration ?>
         <th class="<?= $Page->duration->headerCellClass() ?>"><span id="elh_tourism_activities_duration" class="tourism_activities_duration"><?= $Page->duration->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->difficulty_level->Visible) { // difficulty_level ?>
-        <th class="<?= $Page->difficulty_level->headerCellClass() ?>"><span id="elh_tourism_activities_difficulty_level" class="tourism_activities_difficulty_level"><?= $Page->difficulty_level->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->display_order->Visible) { // display_order ?>
         <th class="<?= $Page->display_order->headerCellClass() ?>"><span id="elh_tourism_activities_display_order" class="tourism_activities_display_order"><?= $Page->display_order->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_tourism_activities_created_at" class="tourism_activities_created_at"><?= $Page->created_at->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->difficulty_level_id->Visible) { // difficulty_level_id ?>
+        <th class="<?= $Page->difficulty_level_id->headerCellClass() ?>"><span id="elh_tourism_activities_difficulty_level_id" class="tourism_activities_difficulty_level_id"><?= $Page->difficulty_level_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -124,14 +124,6 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->difficulty_level->Visible) { // difficulty_level ?>
-        <td<?= $Page->difficulty_level->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->difficulty_level->viewAttributes() ?>>
-<?= $Page->difficulty_level->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->display_order->Visible) { // display_order ?>
         <td<?= $Page->display_order->cellAttributes() ?>>
 <span id="">
@@ -145,6 +137,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->difficulty_level_id->Visible) { // difficulty_level_id ?>
+        <td<?= $Page->difficulty_level_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->difficulty_level_id->viewAttributes() ?>>
+<?= $Page->difficulty_level_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

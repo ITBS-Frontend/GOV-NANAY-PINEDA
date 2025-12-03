@@ -122,7 +122,6 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->facility_type->setVisibility();
         $this->name->setVisibility();
         $this->address->setVisibility();
         $this->municipality->setVisibility();
@@ -134,6 +133,7 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         $this->featured_image->setVisibility();
         $this->is_active->setVisibility();
         $this->created_at->setVisibility();
+        $this->facility_type_id->setVisibility();
     }
 
     // Constructor
@@ -517,6 +517,7 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
 
         // Set up lookup cache
         $this->setupLookupOptions($this->is_active);
+        $this->setupLookupOptions($this->facility_type_id);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -677,16 +678,6 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'facility_type' first before field var 'x_facility_type'
-        $val = $CurrentForm->hasValue("facility_type") ? $CurrentForm->getValue("facility_type") : $CurrentForm->getValue("x_facility_type");
-        if (!$this->facility_type->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->facility_type->Visible = false; // Disable update for API request
-            } else {
-                $this->facility_type->setFormValue($val);
-            }
-        }
-
         // Check field name 'name' first before field var 'x_name'
         $val = $CurrentForm->hasValue("name") ? $CurrentForm->getValue("name") : $CurrentForm->getValue("x_name");
         if (!$this->name->IsDetailKey) {
@@ -793,9 +784,19 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        }
+
+        // Check field name 'facility_type_id' first before field var 'x_facility_type_id'
+        $val = $CurrentForm->hasValue("facility_type_id") ? $CurrentForm->getValue("facility_type_id") : $CurrentForm->getValue("x_facility_type_id");
+        if (!$this->facility_type_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->facility_type_id->Visible = false; // Disable update for API request
+            } else {
+                $this->facility_type_id->setFormValue($val);
+            }
         }
 
         // Check field name 'id' first before field var 'x_id'
@@ -806,7 +807,6 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
     public function restoreFormValues()
     {
         global $CurrentForm;
-        $this->facility_type->CurrentValue = $this->facility_type->FormValue;
         $this->name->CurrentValue = $this->name->FormValue;
         $this->address->CurrentValue = $this->address->FormValue;
         $this->municipality->CurrentValue = $this->municipality->FormValue;
@@ -819,6 +819,7 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         $this->is_active->CurrentValue = $this->is_active->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->facility_type_id->CurrentValue = $this->facility_type_id->FormValue;
     }
 
     /**
@@ -860,7 +861,6 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->facility_type->setDbValue($row['facility_type']);
         $this->name->setDbValue($row['name']);
         $this->address->setDbValue($row['address']);
         $this->municipality->setDbValue($row['municipality']);
@@ -872,6 +872,7 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         $this->featured_image->setDbValue($row['featured_image']);
         $this->is_active->setDbValue((ConvertToBool($row['is_active']) ? "1" : "0"));
         $this->created_at->setDbValue($row['created_at']);
+        $this->facility_type_id->setDbValue($row['facility_type_id']);
     }
 
     // Return a row with default values
@@ -879,7 +880,6 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['facility_type'] = $this->facility_type->DefaultValue;
         $row['name'] = $this->name->DefaultValue;
         $row['address'] = $this->address->DefaultValue;
         $row['municipality'] = $this->municipality->DefaultValue;
@@ -891,6 +891,7 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         $row['featured_image'] = $this->featured_image->DefaultValue;
         $row['is_active'] = $this->is_active->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['facility_type_id'] = $this->facility_type_id->DefaultValue;
         return $row;
     }
 
@@ -928,9 +929,6 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         // id
         $this->id->RowCssClass = "row";
 
-        // facility_type
-        $this->facility_type->RowCssClass = "row";
-
         // name
         $this->name->RowCssClass = "row";
 
@@ -964,13 +962,13 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         // created_at
         $this->created_at->RowCssClass = "row";
 
+        // facility_type_id
+        $this->facility_type_id->RowCssClass = "row";
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // facility_type
-            $this->facility_type->ViewValue = $this->facility_type->CurrentValue;
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
@@ -1010,8 +1008,28 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
-            // facility_type
-            $this->facility_type->HrefValue = "";
+            // facility_type_id
+            $curVal = strval($this->facility_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->facility_type_id->ViewValue = $this->facility_type_id->lookupCacheOption($curVal);
+                if ($this->facility_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->facility_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->facility_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->facility_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->facility_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->facility_type_id->ViewValue = $this->facility_type_id->displayValue($arwrk);
+                    } else {
+                        $this->facility_type_id->ViewValue = FormatNumber($this->facility_type_id->CurrentValue, $this->facility_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->facility_type_id->ViewValue = null;
+            }
 
             // name
             $this->name->HrefValue = "";
@@ -1045,15 +1063,10 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
 
             // created_at
             $this->created_at->HrefValue = "";
-        } elseif ($this->RowType == RowType::ADD) {
-            // facility_type
-            $this->facility_type->setupEditAttributes();
-            if (!$this->facility_type->Raw) {
-                $this->facility_type->CurrentValue = HtmlDecode($this->facility_type->CurrentValue);
-            }
-            $this->facility_type->EditValue = HtmlEncode($this->facility_type->CurrentValue);
-            $this->facility_type->PlaceHolder = RemoveHtml($this->facility_type->caption());
 
+            // facility_type_id
+            $this->facility_type_id->HrefValue = "";
+        } elseif ($this->RowType == RowType::ADD) {
             // name
             $this->name->setupEditAttributes();
             if (!$this->name->Raw) {
@@ -1125,14 +1138,35 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
             $this->is_active->PlaceHolder = RemoveHtml($this->is_active->caption());
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+            // facility_type_id
+            $this->facility_type_id->setupEditAttributes();
+            $curVal = trim(strval($this->facility_type_id->CurrentValue));
+            if ($curVal != "") {
+                $this->facility_type_id->ViewValue = $this->facility_type_id->lookupCacheOption($curVal);
+            } else {
+                $this->facility_type_id->ViewValue = $this->facility_type_id->Lookup !== null && is_array($this->facility_type_id->lookupOptions()) && count($this->facility_type_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->facility_type_id->ViewValue !== null) { // Load from cache
+                $this->facility_type_id->EditValue = array_values($this->facility_type_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->facility_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->facility_type_id->CurrentValue, $this->facility_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->facility_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->facility_type_id->EditValue = $arwrk;
+            }
+            $this->facility_type_id->PlaceHolder = RemoveHtml($this->facility_type_id->caption());
 
             // Add refer script
-
-            // facility_type
-            $this->facility_type->HrefValue = "";
 
             // name
             $this->name->HrefValue = "";
@@ -1166,6 +1200,9 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // facility_type_id
+            $this->facility_type_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1187,11 +1224,6 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
             return true;
         }
         $validateForm = true;
-            if ($this->facility_type->Visible && $this->facility_type->Required) {
-                if (!$this->facility_type->IsDetailKey && EmptyValue($this->facility_type->FormValue)) {
-                    $this->facility_type->addErrorMessage(str_replace("%s", $this->facility_type->caption(), $this->facility_type->RequiredErrorMessage));
-                }
-            }
             if ($this->name->Visible && $this->name->Required) {
                 if (!$this->name->IsDetailKey && EmptyValue($this->name->FormValue)) {
                     $this->name->addErrorMessage(str_replace("%s", $this->name->caption(), $this->name->RequiredErrorMessage));
@@ -1247,8 +1279,10 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
             }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
+            if ($this->facility_type_id->Visible && $this->facility_type_id->Required) {
+                if (!$this->facility_type_id->IsDetailKey && EmptyValue($this->facility_type_id->FormValue)) {
+                    $this->facility_type_id->addErrorMessage(str_replace("%s", $this->facility_type_id->caption(), $this->facility_type_id->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1321,9 +1355,6 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         global $Security;
         $rsnew = [];
 
-        // facility_type
-        $this->facility_type->setDbValueDef($rsnew, $this->facility_type->CurrentValue, false);
-
         // name
         $this->name->setDbValueDef($rsnew, $this->name->CurrentValue, false);
 
@@ -1359,7 +1390,11 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         $this->is_active->setDbValueDef($rsnew, $tmpBool, strval($this->is_active->CurrentValue) == "");
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), false);
+
+        // facility_type_id
+        $this->facility_type_id->setDbValueDef($rsnew, $this->facility_type_id->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1369,9 +1404,6 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['facility_type'])) { // facility_type
-            $this->facility_type->setFormValue($row['facility_type']);
-        }
         if (isset($row['name'])) { // name
             $this->name->setFormValue($row['name']);
         }
@@ -1405,6 +1437,9 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
         if (isset($row['created_at'])) { // created_at
             $this->created_at->setFormValue($row['created_at']);
         }
+        if (isset($row['facility_type_id'])) { // facility_type_id
+            $this->facility_type_id->setFormValue($row['facility_type_id']);
+        }
     }
 
     // Set up Breadcrumb
@@ -1432,6 +1467,8 @@ class GovernmentFacilitiesAdd extends GovernmentFacilities
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_is_active":
+                    break;
+                case "x_facility_type_id":
                     break;
                 default:
                     $lookupFilter = "";

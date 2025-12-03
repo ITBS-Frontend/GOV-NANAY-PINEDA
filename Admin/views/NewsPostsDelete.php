@@ -86,8 +86,8 @@ $Page->showMessage();
 <?php if ($Page->updated_at->Visible) { // updated_at ?>
         <th class="<?= $Page->updated_at->headerCellClass() ?>"><span id="elh_news_posts_updated_at" class="news_posts_updated_at"><?= $Page->updated_at->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->news_type->Visible) { // news_type ?>
-        <th class="<?= $Page->news_type->headerCellClass() ?>"><span id="elh_news_posts_news_type" class="news_posts_news_type"><?= $Page->news_type->caption() ?></span></th>
+<?php if ($Page->news_type_id->Visible) { // news_type_id ?>
+        <th class="<?= $Page->news_type_id->headerCellClass() ?>"><span id="elh_news_posts_news_type_id" class="news_posts_news_type_id"><?= $Page->news_type_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -209,11 +209,11 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->news_type->Visible) { // news_type ?>
-        <td<?= $Page->news_type->cellAttributes() ?>>
+<?php if ($Page->news_type_id->Visible) { // news_type_id ?>
+        <td<?= $Page->news_type_id->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->news_type->viewAttributes() ?>>
-<?= $Page->news_type->getViewValue() ?></span>
+<span<?= $Page->news_type_id->viewAttributes() ?>>
+<?= $Page->news_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

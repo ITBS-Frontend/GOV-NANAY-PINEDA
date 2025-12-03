@@ -53,9 +53,6 @@ $Page->showMessage();
 <?php if ($Page->id->Visible) { // id ?>
         <th class="<?= $Page->id->headerCellClass() ?>"><span id="elh_government_facilities_id" class="government_facilities_id"><?= $Page->id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->facility_type->Visible) { // facility_type ?>
-        <th class="<?= $Page->facility_type->headerCellClass() ?>"><span id="elh_government_facilities_facility_type" class="government_facilities_facility_type"><?= $Page->facility_type->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
         <th class="<?= $Page->name->headerCellClass() ?>"><span id="elh_government_facilities_name" class="government_facilities_name"><?= $Page->name->caption() ?></span></th>
 <?php } ?>
@@ -83,6 +80,9 @@ $Page->showMessage();
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_government_facilities_created_at" class="government_facilities_created_at"><?= $Page->created_at->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->facility_type_id->Visible) { // facility_type_id ?>
+        <th class="<?= $Page->facility_type_id->headerCellClass() ?>"><span id="elh_government_facilities_facility_type_id" class="government_facilities_facility_type_id"><?= $Page->facility_type_id->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -109,14 +109,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->facility_type->Visible) { // facility_type ?>
-        <td<?= $Page->facility_type->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->facility_type->viewAttributes() ?>>
-<?= $Page->facility_type->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -190,6 +182,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->facility_type_id->Visible) { // facility_type_id ?>
+        <td<?= $Page->facility_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->facility_type_id->viewAttributes() ?>>
+<?= $Page->facility_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

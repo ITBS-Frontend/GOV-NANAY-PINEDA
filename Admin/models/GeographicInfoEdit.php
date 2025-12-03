@@ -122,13 +122,13 @@ class GeographicInfoEdit extends GeographicInfo
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->info_type->setVisibility();
         $this->name->setVisibility();
         $this->description->setVisibility();
         $this->coordinates->setVisibility();
         $this->area_sqkm->setVisibility();
         $this->population->setVisibility();
         $this->created_at->setVisibility();
+        $this->info_type_id->setVisibility();
     }
 
     // Constructor
@@ -516,6 +516,9 @@ class GeographicInfoEdit extends GeographicInfo
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->info_type_id);
+
         // Check modal
         if ($this->IsModal) {
             $SkipHeaderFooter = true;
@@ -703,16 +706,6 @@ class GeographicInfoEdit extends GeographicInfo
             $this->id->setFormValue($val);
         }
 
-        // Check field name 'info_type' first before field var 'x_info_type'
-        $val = $CurrentForm->hasValue("info_type") ? $CurrentForm->getValue("info_type") : $CurrentForm->getValue("x_info_type");
-        if (!$this->info_type->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->info_type->Visible = false; // Disable update for API request
-            } else {
-                $this->info_type->setFormValue($val);
-            }
-        }
-
         // Check field name 'name' first before field var 'x_name'
         $val = $CurrentForm->hasValue("name") ? $CurrentForm->getValue("name") : $CurrentForm->getValue("x_name");
         if (!$this->name->IsDetailKey) {
@@ -769,9 +762,19 @@ class GeographicInfoEdit extends GeographicInfo
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        }
+
+        // Check field name 'info_type_id' first before field var 'x_info_type_id'
+        $val = $CurrentForm->hasValue("info_type_id") ? $CurrentForm->getValue("info_type_id") : $CurrentForm->getValue("x_info_type_id");
+        if (!$this->info_type_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->info_type_id->Visible = false; // Disable update for API request
+            } else {
+                $this->info_type_id->setFormValue($val);
+            }
         }
     }
 
@@ -780,7 +783,6 @@ class GeographicInfoEdit extends GeographicInfo
     {
         global $CurrentForm;
         $this->id->CurrentValue = $this->id->FormValue;
-        $this->info_type->CurrentValue = $this->info_type->FormValue;
         $this->name->CurrentValue = $this->name->FormValue;
         $this->description->CurrentValue = $this->description->FormValue;
         $this->coordinates->CurrentValue = $this->coordinates->FormValue;
@@ -788,6 +790,7 @@ class GeographicInfoEdit extends GeographicInfo
         $this->population->CurrentValue = $this->population->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->info_type_id->CurrentValue = $this->info_type_id->FormValue;
     }
 
     /**
@@ -829,13 +832,13 @@ class GeographicInfoEdit extends GeographicInfo
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->info_type->setDbValue($row['info_type']);
         $this->name->setDbValue($row['name']);
         $this->description->setDbValue($row['description']);
         $this->coordinates->setDbValue($row['coordinates']);
         $this->area_sqkm->setDbValue($row['area_sqkm']);
         $this->population->setDbValue($row['population']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->info_type_id->setDbValue($row['info_type_id']);
     }
 
     // Return a row with default values
@@ -843,13 +846,13 @@ class GeographicInfoEdit extends GeographicInfo
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['info_type'] = $this->info_type->DefaultValue;
         $row['name'] = $this->name->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['coordinates'] = $this->coordinates->DefaultValue;
         $row['area_sqkm'] = $this->area_sqkm->DefaultValue;
         $row['population'] = $this->population->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['info_type_id'] = $this->info_type_id->DefaultValue;
         return $row;
     }
 
@@ -887,9 +890,6 @@ class GeographicInfoEdit extends GeographicInfo
         // id
         $this->id->RowCssClass = "row";
 
-        // info_type
-        $this->info_type->RowCssClass = "row";
-
         // name
         $this->name->RowCssClass = "row";
 
@@ -908,13 +908,13 @@ class GeographicInfoEdit extends GeographicInfo
         // created_at
         $this->created_at->RowCssClass = "row";
 
+        // info_type_id
+        $this->info_type_id->RowCssClass = "row";
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // info_type
-            $this->info_type->ViewValue = $this->info_type->CurrentValue;
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
@@ -937,11 +937,31 @@ class GeographicInfoEdit extends GeographicInfo
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // info_type_id
+            $curVal = strval($this->info_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->info_type_id->ViewValue = $this->info_type_id->lookupCacheOption($curVal);
+                if ($this->info_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->info_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->info_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->info_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->info_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->info_type_id->ViewValue = $this->info_type_id->displayValue($arwrk);
+                    } else {
+                        $this->info_type_id->ViewValue = FormatNumber($this->info_type_id->CurrentValue, $this->info_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->info_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
-
-            // info_type
-            $this->info_type->HrefValue = "";
 
             // name
             $this->name->HrefValue = "";
@@ -960,18 +980,13 @@ class GeographicInfoEdit extends GeographicInfo
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // info_type_id
+            $this->info_type_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
             $this->id->EditValue = $this->id->CurrentValue;
-
-            // info_type
-            $this->info_type->setupEditAttributes();
-            if (!$this->info_type->Raw) {
-                $this->info_type->CurrentValue = HtmlDecode($this->info_type->CurrentValue);
-            }
-            $this->info_type->EditValue = HtmlEncode($this->info_type->CurrentValue);
-            $this->info_type->PlaceHolder = RemoveHtml($this->info_type->caption());
 
             // name
             $this->name->setupEditAttributes();
@@ -1011,17 +1026,38 @@ class GeographicInfoEdit extends GeographicInfo
             }
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+            // info_type_id
+            $this->info_type_id->setupEditAttributes();
+            $curVal = trim(strval($this->info_type_id->CurrentValue));
+            if ($curVal != "") {
+                $this->info_type_id->ViewValue = $this->info_type_id->lookupCacheOption($curVal);
+            } else {
+                $this->info_type_id->ViewValue = $this->info_type_id->Lookup !== null && is_array($this->info_type_id->lookupOptions()) && count($this->info_type_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->info_type_id->ViewValue !== null) { // Load from cache
+                $this->info_type_id->EditValue = array_values($this->info_type_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->info_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->info_type_id->CurrentValue, $this->info_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->info_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->info_type_id->EditValue = $arwrk;
+            }
+            $this->info_type_id->PlaceHolder = RemoveHtml($this->info_type_id->caption());
 
             // Edit refer script
 
             // id
             $this->id->HrefValue = "";
-
-            // info_type
-            $this->info_type->HrefValue = "";
 
             // name
             $this->name->HrefValue = "";
@@ -1040,6 +1076,9 @@ class GeographicInfoEdit extends GeographicInfo
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // info_type_id
+            $this->info_type_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1064,11 +1103,6 @@ class GeographicInfoEdit extends GeographicInfo
             if ($this->id->Visible && $this->id->Required) {
                 if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
                     $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
-                }
-            }
-            if ($this->info_type->Visible && $this->info_type->Required) {
-                if (!$this->info_type->IsDetailKey && EmptyValue($this->info_type->FormValue)) {
-                    $this->info_type->addErrorMessage(str_replace("%s", $this->info_type->caption(), $this->info_type->RequiredErrorMessage));
                 }
             }
             if ($this->name->Visible && $this->name->Required) {
@@ -1107,8 +1141,10 @@ class GeographicInfoEdit extends GeographicInfo
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
             }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
+            if ($this->info_type_id->Visible && $this->info_type_id->Required) {
+                if (!$this->info_type_id->IsDetailKey && EmptyValue($this->info_type_id->FormValue)) {
+                    $this->info_type_id->addErrorMessage(str_replace("%s", $this->info_type_id->caption(), $this->info_type_id->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1199,9 +1235,6 @@ class GeographicInfoEdit extends GeographicInfo
         global $Security;
         $rsnew = [];
 
-        // info_type
-        $this->info_type->setDbValueDef($rsnew, $this->info_type->CurrentValue, $this->info_type->ReadOnly);
-
         // name
         $this->name->setDbValueDef($rsnew, $this->name->CurrentValue, $this->name->ReadOnly);
 
@@ -1218,7 +1251,11 @@ class GeographicInfoEdit extends GeographicInfo
         $this->population->setDbValueDef($rsnew, $this->population->CurrentValue, $this->population->ReadOnly);
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), $this->created_at->ReadOnly);
+
+        // info_type_id
+        $this->info_type_id->setDbValueDef($rsnew, $this->info_type_id->CurrentValue, $this->info_type_id->ReadOnly);
         return $rsnew;
     }
 
@@ -1228,9 +1265,6 @@ class GeographicInfoEdit extends GeographicInfo
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['info_type'])) { // info_type
-            $this->info_type->CurrentValue = $row['info_type'];
-        }
         if (isset($row['name'])) { // name
             $this->name->CurrentValue = $row['name'];
         }
@@ -1248,6 +1282,9 @@ class GeographicInfoEdit extends GeographicInfo
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->CurrentValue = $row['created_at'];
+        }
+        if (isset($row['info_type_id'])) { // info_type_id
+            $this->info_type_id->CurrentValue = $row['info_type_id'];
         }
     }
 
@@ -1275,6 +1312,8 @@ class GeographicInfoEdit extends GeographicInfo
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_info_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

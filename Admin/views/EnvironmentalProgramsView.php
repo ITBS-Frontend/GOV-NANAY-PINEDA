@@ -73,17 +73,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->program_type->Visible) { // program_type ?>
-    <tr id="r_program_type"<?= $Page->program_type->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_environmental_programs_program_type"><?= $Page->program_type->caption() ?></span></td>
-        <td data-name="program_type"<?= $Page->program_type->cellAttributes() ?>>
-<span id="el_environmental_programs_program_type">
-<span<?= $Page->program_type->viewAttributes() ?>>
-<?= $Page->program_type->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->description->Visible) { // description ?>
     <tr id="r_description"<?= $Page->description->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_environmental_programs_description"><?= $Page->description->caption() ?></span></td>
@@ -128,24 +117,14 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_environmental_programs_status"><?= $Page->status->caption() ?></span></td>
-        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
-<span id="el_environmental_programs_status">
-<span<?= $Page->status->viewAttributes() ?>>
-<?= $Page->status->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
     <tr id="r_featured_image"<?= $Page->featured_image->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_environmental_programs_featured_image"><?= $Page->featured_image->caption() ?></span></td>
         <td data-name="featured_image"<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el_environmental_programs_featured_image">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     </tr>
@@ -157,6 +136,28 @@ loadjs.ready("head", function () {
 <span id="el_environmental_programs_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+    <tr id="r_program_type_id"<?= $Page->program_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_environmental_programs_program_type_id"><?= $Page->program_type_id->caption() ?></span></td>
+        <td data-name="program_type_id"<?= $Page->program_type_id->cellAttributes() ?>>
+<span id="el_environmental_programs_program_type_id">
+<span<?= $Page->program_type_id->viewAttributes() ?>>
+<?= $Page->program_type_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+    <tr id="r_status_id"<?= $Page->status_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_environmental_programs_status_id"><?= $Page->status_id->caption() ?></span></td>
+        <td data-name="status_id"<?= $Page->status_id->cellAttributes() ?>>
+<span id="el_environmental_programs_status_id">
+<span<?= $Page->status_id->viewAttributes() ?>>
+<?= $Page->status_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

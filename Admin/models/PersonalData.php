@@ -44,7 +44,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "TourismFacilitiesDelete";
+    public $CurrentPageName = "Dashboard2Controller";
 
     // Page headings
     public $Heading = "";

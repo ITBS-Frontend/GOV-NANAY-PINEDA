@@ -34,9 +34,6 @@ class DisasterPreparedness extends AbstractEntity
     #[SequenceGenerator(sequenceName: "disaster_preparedness_id_seq")]
     private int $id;
 
-    #[Column(name: "disaster_type", type: "string")]
-    private string $disasterType;
-
     #[Column(name: "preparedness_guide", type: "text")]
     private string $preparednessGuide;
 
@@ -58,6 +55,9 @@ class DisasterPreparedness extends AbstractEntity
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
+    #[Column(name: "disaster_type_id", type: "integer", nullable: true)]
+    private ?int $disasterTypeId;
+
     public function __construct()
     {
         $this->displayOrder = 0;
@@ -71,17 +71,6 @@ class DisasterPreparedness extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
-        return $this;
-    }
-
-    public function getDisasterType(): string
-    {
-        return HtmlDecode($this->disasterType);
-    }
-
-    public function setDisasterType(string $value): static
-    {
-        $this->disasterType = RemoveXss($value);
         return $this;
     }
 
@@ -159,6 +148,17 @@ class DisasterPreparedness extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getDisasterTypeId(): ?int
+    {
+        return $this->disasterTypeId;
+    }
+
+    public function setDisasterTypeId(?int $value): static
+    {
+        $this->disasterTypeId = $value;
         return $this;
     }
 }

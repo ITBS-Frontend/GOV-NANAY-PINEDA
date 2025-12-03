@@ -122,7 +122,6 @@ class DisasterPreparednessAdd extends DisasterPreparedness
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->disaster_type->setVisibility();
         $this->preparedness_guide->setVisibility();
         $this->emergency_hotlines->setVisibility();
         $this->evacuation_centers->setVisibility();
@@ -130,6 +129,7 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         $this->featured_image->setVisibility();
         $this->display_order->setVisibility();
         $this->created_at->setVisibility();
+        $this->disaster_type_id->setVisibility();
     }
 
     // Constructor
@@ -295,6 +295,8 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         if (is_object($rs)) { // Result set
             while ($row = $rs->fetch()) {
                 $this->loadRowValues($row); // Set up DbValue/CurrentValue
+                $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+                $this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
                 $row = $this->getRecordFromArray($row);
                 if ($current) {
                     return $row;
@@ -511,6 +513,9 @@ class DisasterPreparednessAdd extends DisasterPreparedness
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->disaster_type_id);
+
         // Load default values for add
         $this->loadDefaultValues();
 
@@ -656,6 +661,9 @@ class DisasterPreparednessAdd extends DisasterPreparedness
     protected function getUploadFiles()
     {
         global $CurrentForm, $Language;
+        $this->featured_image->Upload->Index = $CurrentForm->Index;
+        $this->featured_image->Upload->uploadFile();
+        $this->featured_image->CurrentValue = $this->featured_image->Upload->FileName;
     }
 
     // Load default values
@@ -671,16 +679,6 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         // Load from form
         global $CurrentForm;
         $validate = !Config("SERVER_VALIDATE");
-
-        // Check field name 'disaster_type' first before field var 'x_disaster_type'
-        $val = $CurrentForm->hasValue("disaster_type") ? $CurrentForm->getValue("disaster_type") : $CurrentForm->getValue("x_disaster_type");
-        if (!$this->disaster_type->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->disaster_type->Visible = false; // Disable update for API request
-            } else {
-                $this->disaster_type->setFormValue($val);
-            }
-        }
 
         // Check field name 'preparedness_guide' first before field var 'x_preparedness_guide'
         $val = $CurrentForm->hasValue("preparedness_guide") ? $CurrentForm->getValue("preparedness_guide") : $CurrentForm->getValue("x_preparedness_guide");
@@ -722,16 +720,6 @@ class DisasterPreparednessAdd extends DisasterPreparedness
             }
         }
 
-        // Check field name 'featured_image' first before field var 'x_featured_image'
-        $val = $CurrentForm->hasValue("featured_image") ? $CurrentForm->getValue("featured_image") : $CurrentForm->getValue("x_featured_image");
-        if (!$this->featured_image->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->featured_image->Visible = false; // Disable update for API request
-            } else {
-                $this->featured_image->setFormValue($val);
-            }
-        }
-
         // Check field name 'display_order' first before field var 'x_display_order'
         $val = $CurrentForm->hasValue("display_order") ? $CurrentForm->getValue("display_order") : $CurrentForm->getValue("x_display_order");
         if (!$this->display_order->IsDetailKey) {
@@ -748,28 +736,40 @@ class DisasterPreparednessAdd extends DisasterPreparedness
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         }
 
+        // Check field name 'disaster_type_id' first before field var 'x_disaster_type_id'
+        $val = $CurrentForm->hasValue("disaster_type_id") ? $CurrentForm->getValue("disaster_type_id") : $CurrentForm->getValue("x_disaster_type_id");
+        if (!$this->disaster_type_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->disaster_type_id->Visible = false; // Disable update for API request
+            } else {
+                $this->disaster_type_id->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+		$this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+		$this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
+        $this->getUploadFiles(); // Get upload files
     }
 
     // Restore form values
     public function restoreFormValues()
     {
         global $CurrentForm;
-        $this->disaster_type->CurrentValue = $this->disaster_type->FormValue;
         $this->preparedness_guide->CurrentValue = $this->preparedness_guide->FormValue;
         $this->emergency_hotlines->CurrentValue = $this->emergency_hotlines->FormValue;
         $this->evacuation_centers->CurrentValue = $this->evacuation_centers->FormValue;
         $this->relief_procedures->CurrentValue = $this->relief_procedures->FormValue;
-        $this->featured_image->CurrentValue = $this->featured_image->FormValue;
         $this->display_order->CurrentValue = $this->display_order->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->disaster_type_id->CurrentValue = $this->disaster_type_id->FormValue;
     }
 
     /**
@@ -811,14 +811,15 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->disaster_type->setDbValue($row['disaster_type']);
         $this->preparedness_guide->setDbValue($row['preparedness_guide']);
         $this->emergency_hotlines->setDbValue($row['emergency_hotlines']);
         $this->evacuation_centers->setDbValue($row['evacuation_centers']);
         $this->relief_procedures->setDbValue($row['relief_procedures']);
-        $this->featured_image->setDbValue($row['featured_image']);
+        $this->featured_image->Upload->DbValue = $row['featured_image'];
+        $this->featured_image->setDbValue($this->featured_image->Upload->DbValue);
         $this->display_order->setDbValue($row['display_order']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->disaster_type_id->setDbValue($row['disaster_type_id']);
     }
 
     // Return a row with default values
@@ -826,7 +827,6 @@ class DisasterPreparednessAdd extends DisasterPreparedness
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['disaster_type'] = $this->disaster_type->DefaultValue;
         $row['preparedness_guide'] = $this->preparedness_guide->DefaultValue;
         $row['emergency_hotlines'] = $this->emergency_hotlines->DefaultValue;
         $row['evacuation_centers'] = $this->evacuation_centers->DefaultValue;
@@ -834,6 +834,7 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         $row['featured_image'] = $this->featured_image->DefaultValue;
         $row['display_order'] = $this->display_order->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['disaster_type_id'] = $this->disaster_type_id->DefaultValue;
         return $row;
     }
 
@@ -871,9 +872,6 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         // id
         $this->id->RowCssClass = "row";
 
-        // disaster_type
-        $this->disaster_type->RowCssClass = "row";
-
         // preparedness_guide
         $this->preparedness_guide->RowCssClass = "row";
 
@@ -895,13 +893,13 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         // created_at
         $this->created_at->RowCssClass = "row";
 
+        // disaster_type_id
+        $this->disaster_type_id->RowCssClass = "row";
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // disaster_type
-            $this->disaster_type->ViewValue = $this->disaster_type->CurrentValue;
 
             // preparedness_guide
             $this->preparedness_guide->ViewValue = $this->preparedness_guide->CurrentValue;
@@ -916,7 +914,14 @@ class DisasterPreparednessAdd extends DisasterPreparedness
             $this->relief_procedures->ViewValue = $this->relief_procedures->CurrentValue;
 
             // featured_image
-            $this->featured_image->ViewValue = $this->featured_image->CurrentValue;
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->ImageAlt = $this->featured_image->alt();
+                $this->featured_image->ImageCssClass = "ew-image";
+                $this->featured_image->ViewValue = $this->featured_image->Upload->DbValue;
+            } else {
+                $this->featured_image->ViewValue = "";
+            }
 
             // display_order
             $this->display_order->ViewValue = $this->display_order->CurrentValue;
@@ -926,8 +931,28 @@ class DisasterPreparednessAdd extends DisasterPreparedness
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
-            // disaster_type
-            $this->disaster_type->HrefValue = "";
+            // disaster_type_id
+            $curVal = strval($this->disaster_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->disaster_type_id->ViewValue = $this->disaster_type_id->lookupCacheOption($curVal);
+                if ($this->disaster_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->disaster_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->disaster_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->disaster_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->disaster_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->disaster_type_id->ViewValue = $this->disaster_type_id->displayValue($arwrk);
+                    } else {
+                        $this->disaster_type_id->ViewValue = FormatNumber($this->disaster_type_id->CurrentValue, $this->disaster_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->disaster_type_id->ViewValue = null;
+            }
 
             // preparedness_guide
             $this->preparedness_guide->HrefValue = "";
@@ -942,22 +967,27 @@ class DisasterPreparednessAdd extends DisasterPreparedness
             $this->relief_procedures->HrefValue = "";
 
             // featured_image
-            $this->featured_image->HrefValue = "";
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->HrefValue = GetFileUploadUrl($this->featured_image, $this->featured_image->htmlDecode($this->featured_image->Upload->DbValue)); // Add prefix/suffix
+                $this->featured_image->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->featured_image->HrefValue = FullUrl($this->featured_image->HrefValue, "href");
+                }
+            } else {
+                $this->featured_image->HrefValue = "";
+            }
+            $this->featured_image->ExportHrefValue = $this->featured_image->UploadPath . $this->featured_image->Upload->DbValue;
 
             // display_order
             $this->display_order->HrefValue = "";
 
             // created_at
             $this->created_at->HrefValue = "";
-        } elseif ($this->RowType == RowType::ADD) {
-            // disaster_type
-            $this->disaster_type->setupEditAttributes();
-            if (!$this->disaster_type->Raw) {
-                $this->disaster_type->CurrentValue = HtmlDecode($this->disaster_type->CurrentValue);
-            }
-            $this->disaster_type->EditValue = HtmlEncode($this->disaster_type->CurrentValue);
-            $this->disaster_type->PlaceHolder = RemoveHtml($this->disaster_type->caption());
 
+            // disaster_type_id
+            $this->disaster_type_id->HrefValue = "";
+        } elseif ($this->RowType == RowType::ADD) {
             // preparedness_guide
             $this->preparedness_guide->setupEditAttributes();
             $this->preparedness_guide->EditValue = HtmlEncode($this->preparedness_guide->CurrentValue);
@@ -980,11 +1010,23 @@ class DisasterPreparednessAdd extends DisasterPreparedness
 
             // featured_image
             $this->featured_image->setupEditAttributes();
-            if (!$this->featured_image->Raw) {
-                $this->featured_image->CurrentValue = HtmlDecode($this->featured_image->CurrentValue);
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->ImageAlt = $this->featured_image->alt();
+                $this->featured_image->ImageCssClass = "ew-image";
+                $this->featured_image->EditValue = $this->featured_image->Upload->DbValue;
+            } else {
+                $this->featured_image->EditValue = "";
             }
-            $this->featured_image->EditValue = HtmlEncode($this->featured_image->CurrentValue);
-            $this->featured_image->PlaceHolder = RemoveHtml($this->featured_image->caption());
+            if (!EmptyValue($this->featured_image->CurrentValue)) {
+                $this->featured_image->Upload->FileName = $this->featured_image->CurrentValue;
+            }
+            if (!Config("CREATE_UPLOAD_FILE_ON_COPY")) {
+                $this->featured_image->Upload->DbValue = null;
+            }
+            if ($this->isShow() || $this->isCopy()) {
+                RenderUploadField($this->featured_image);
+            }
 
             // display_order
             $this->display_order->setupEditAttributes();
@@ -995,14 +1037,35 @@ class DisasterPreparednessAdd extends DisasterPreparedness
             }
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+            // disaster_type_id
+            $this->disaster_type_id->setupEditAttributes();
+            $curVal = trim(strval($this->disaster_type_id->CurrentValue));
+            if ($curVal != "") {
+                $this->disaster_type_id->ViewValue = $this->disaster_type_id->lookupCacheOption($curVal);
+            } else {
+                $this->disaster_type_id->ViewValue = $this->disaster_type_id->Lookup !== null && is_array($this->disaster_type_id->lookupOptions()) && count($this->disaster_type_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->disaster_type_id->ViewValue !== null) { // Load from cache
+                $this->disaster_type_id->EditValue = array_values($this->disaster_type_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->disaster_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->disaster_type_id->CurrentValue, $this->disaster_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->disaster_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->disaster_type_id->EditValue = $arwrk;
+            }
+            $this->disaster_type_id->PlaceHolder = RemoveHtml($this->disaster_type_id->caption());
 
             // Add refer script
-
-            // disaster_type
-            $this->disaster_type->HrefValue = "";
 
             // preparedness_guide
             $this->preparedness_guide->HrefValue = "";
@@ -1017,13 +1080,26 @@ class DisasterPreparednessAdd extends DisasterPreparedness
             $this->relief_procedures->HrefValue = "";
 
             // featured_image
-            $this->featured_image->HrefValue = "";
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->HrefValue = GetFileUploadUrl($this->featured_image, $this->featured_image->htmlDecode($this->featured_image->Upload->DbValue)); // Add prefix/suffix
+                $this->featured_image->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->featured_image->HrefValue = FullUrl($this->featured_image->HrefValue, "href");
+                }
+            } else {
+                $this->featured_image->HrefValue = "";
+            }
+            $this->featured_image->ExportHrefValue = $this->featured_image->UploadPath . $this->featured_image->Upload->DbValue;
 
             // display_order
             $this->display_order->HrefValue = "";
 
             // created_at
             $this->created_at->HrefValue = "";
+
+            // disaster_type_id
+            $this->disaster_type_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1045,11 +1121,6 @@ class DisasterPreparednessAdd extends DisasterPreparedness
             return true;
         }
         $validateForm = true;
-            if ($this->disaster_type->Visible && $this->disaster_type->Required) {
-                if (!$this->disaster_type->IsDetailKey && EmptyValue($this->disaster_type->FormValue)) {
-                    $this->disaster_type->addErrorMessage(str_replace("%s", $this->disaster_type->caption(), $this->disaster_type->RequiredErrorMessage));
-                }
-            }
             if ($this->preparedness_guide->Visible && $this->preparedness_guide->Required) {
                 if (!$this->preparedness_guide->IsDetailKey && EmptyValue($this->preparedness_guide->FormValue)) {
                     $this->preparedness_guide->addErrorMessage(str_replace("%s", $this->preparedness_guide->caption(), $this->preparedness_guide->RequiredErrorMessage));
@@ -1071,7 +1142,7 @@ class DisasterPreparednessAdd extends DisasterPreparedness
                 }
             }
             if ($this->featured_image->Visible && $this->featured_image->Required) {
-                if (!$this->featured_image->IsDetailKey && EmptyValue($this->featured_image->FormValue)) {
+                if ($this->featured_image->Upload->FileName == "" && !$this->featured_image->Upload->KeepFile) {
                     $this->featured_image->addErrorMessage(str_replace("%s", $this->featured_image->caption(), $this->featured_image->RequiredErrorMessage));
                 }
             }
@@ -1088,8 +1159,10 @@ class DisasterPreparednessAdd extends DisasterPreparedness
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
             }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
+            if ($this->disaster_type_id->Visible && $this->disaster_type_id->Required) {
+                if (!$this->disaster_type_id->IsDetailKey && EmptyValue($this->disaster_type_id->FormValue)) {
+                    $this->disaster_type_id->addErrorMessage(str_replace("%s", $this->disaster_type_id->caption(), $this->disaster_type_id->RequiredErrorMessage));
+                }
             }
 
         // Return validate result
@@ -1111,6 +1184,14 @@ class DisasterPreparednessAdd extends DisasterPreparedness
 
         // Get new row
         $rsnew = $this->getAddRow();
+        if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath();
+            if (!EmptyValue($this->featured_image->Upload->FileName)) {
+                $this->featured_image->Upload->DbValue = null;
+                FixUploadFileNames($this->featured_image);
+                $this->featured_image->setDbValueDef($rsnew, $this->featured_image->Upload->FileName, false);
+            }
+        }
 
         // Update current values
         $this->setCurrentValues($rsnew);
@@ -1118,12 +1199,21 @@ class DisasterPreparednessAdd extends DisasterPreparedness
 
         // Load db values from old row
         $this->loadDbValues($rsold);
+        $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+        $this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
         if ($insertRow) {
             $addRow = $this->insert($rsnew);
             if ($addRow) {
+                if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
+                    $this->featured_image->Upload->DbValue = null;
+                    if (!SaveUploadFiles($this->featured_image, $rsnew['featured_image'], false)) {
+                        $this->setFailureMessage($Language->phrase("UploadError7"));
+                        return false;
+                    }
+                }
             } elseif (!EmptyValue($this->DbErrorMessage)) { // Show database error
                 $this->setFailureMessage($this->DbErrorMessage);
             }
@@ -1162,9 +1252,6 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         global $Security;
         $rsnew = [];
 
-        // disaster_type
-        $this->disaster_type->setDbValueDef($rsnew, $this->disaster_type->CurrentValue, false);
-
         // preparedness_guide
         $this->preparedness_guide->setDbValueDef($rsnew, $this->preparedness_guide->CurrentValue, false);
 
@@ -1178,13 +1265,24 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         $this->relief_procedures->setDbValueDef($rsnew, $this->relief_procedures->CurrentValue, false);
 
         // featured_image
-        $this->featured_image->setDbValueDef($rsnew, $this->featured_image->CurrentValue, false);
+        if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
+            if ($this->featured_image->Upload->FileName == "") {
+                $rsnew['featured_image'] = null;
+            } else {
+                FixUploadTempFileNames($this->featured_image);
+                $rsnew['featured_image'] = $this->featured_image->Upload->FileName;
+            }
+        }
 
         // display_order
         $this->display_order->setDbValueDef($rsnew, $this->display_order->CurrentValue, strval($this->display_order->CurrentValue) == "");
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), false);
+
+        // disaster_type_id
+        $this->disaster_type_id->setDbValueDef($rsnew, $this->disaster_type_id->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1194,9 +1292,6 @@ class DisasterPreparednessAdd extends DisasterPreparedness
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['disaster_type'])) { // disaster_type
-            $this->disaster_type->setFormValue($row['disaster_type']);
-        }
         if (isset($row['preparedness_guide'])) { // preparedness_guide
             $this->preparedness_guide->setFormValue($row['preparedness_guide']);
         }
@@ -1217,6 +1312,9 @@ class DisasterPreparednessAdd extends DisasterPreparedness
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->setFormValue($row['created_at']);
+        }
+        if (isset($row['disaster_type_id'])) { // disaster_type_id
+            $this->disaster_type_id->setFormValue($row['disaster_type_id']);
         }
     }
 
@@ -1244,6 +1342,8 @@ class DisasterPreparednessAdd extends DisasterPreparedness
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_disaster_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

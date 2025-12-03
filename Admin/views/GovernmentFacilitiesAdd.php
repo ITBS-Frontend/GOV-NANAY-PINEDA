@@ -22,7 +22,6 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["facility_type", [fields.facility_type.visible && fields.facility_type.required ? ew.Validators.required(fields.facility_type.caption) : null], fields.facility_type.isInvalid],
             ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
             ["address", [fields.address.visible && fields.address.required ? ew.Validators.required(fields.address.caption) : null], fields.address.isInvalid],
             ["municipality", [fields.municipality.visible && fields.municipality.required ? ew.Validators.required(fields.municipality.caption) : null], fields.municipality.isInvalid],
@@ -33,7 +32,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["coordinates", [fields.coordinates.visible && fields.coordinates.required ? ew.Validators.required(fields.coordinates.caption) : null], fields.coordinates.isInvalid],
             ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.required(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
             ["is_active", [fields.is_active.visible && fields.is_active.required ? ew.Validators.required(fields.is_active.caption) : null], fields.is_active.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
+            ["facility_type_id", [fields.facility_type_id.visible && fields.facility_type_id.required ? ew.Validators.required(fields.facility_type_id.caption) : null], fields.facility_type_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -50,6 +50,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "is_active": <?= $Page->is_active->toClientList($Page) ?>,
+            "facility_type_id": <?= $Page->facility_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -79,18 +80,6 @@ $Page->showMessage();
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
 <div class="ew-add-div"><!-- page* -->
-<?php if ($Page->facility_type->Visible) { // facility_type ?>
-    <div id="r_facility_type"<?= $Page->facility_type->rowAttributes() ?>>
-        <label id="elh_government_facilities_facility_type" for="x_facility_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->facility_type->caption() ?><?= $Page->facility_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->facility_type->cellAttributes() ?>>
-<span id="el_government_facilities_facility_type">
-<input type="<?= $Page->facility_type->getInputTextType() ?>" name="x_facility_type" id="x_facility_type" data-table="government_facilities" data-field="x_facility_type" value="<?= $Page->facility_type->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->facility_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->facility_type->formatPattern()) ?>"<?= $Page->facility_type->editAttributes() ?> aria-describedby="x_facility_type_help">
-<?= $Page->facility_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->facility_type->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
     <div id="r_name"<?= $Page->name->rowAttributes() ?>>
         <label id="elh_government_facilities_name" for="x_name" class="<?= $Page->LeftColumnClass ?>"><?= $Page->name->caption() ?><?= $Page->name->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -213,40 +202,45 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_government_facilities_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_government_facilities_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="government_facilities" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
+<?php if ($Page->facility_type_id->Visible) { // facility_type_id ?>
+    <div id="r_facility_type_id"<?= $Page->facility_type_id->rowAttributes() ?>>
+        <label id="elh_government_facilities_facility_type_id" for="x_facility_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->facility_type_id->caption() ?><?= $Page->facility_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->facility_type_id->cellAttributes() ?>>
+<span id="el_government_facilities_facility_type_id">
+    <select
+        id="x_facility_type_id"
+        name="x_facility_type_id"
+        class="form-select ew-select<?= $Page->facility_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->facility_type_id->IsNativeSelect) { ?>
+        data-select2-id="fgovernment_facilitiesadd_x_facility_type_id"
+        <?php } ?>
+        data-table="government_facilities"
+        data-field="x_facility_type_id"
+        data-value-separator="<?= $Page->facility_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->facility_type_id->getPlaceHolder()) ?>"
+        <?= $Page->facility_type_id->editAttributes() ?>>
+        <?= $Page->facility_type_id->selectOptionListHtml("x_facility_type_id") ?>
+    </select>
+    <?= $Page->facility_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->facility_type_id->getErrorMessage() ?></div>
+<?= $Page->facility_type_id->Lookup->getParamTag($Page, "p_x_facility_type_id") ?>
+<?php if (!$Page->facility_type_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fgovernment_facilitiesadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fgovernment_facilitiesadd", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fgovernment_facilitiesadd", function() {
+    var options = { name: "x_facility_type_id", selectId: "fgovernment_facilitiesadd_x_facility_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fgovernment_facilitiesadd.lists.facility_type_id?.lookupOptions.length) {
+        options.data = { id: "x_facility_type_id", form: "fgovernment_facilitiesadd" };
+    } else {
+        options.ajax = { id: "x_facility_type_id", form: "fgovernment_facilitiesadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.government_facilities.fields.facility_type_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

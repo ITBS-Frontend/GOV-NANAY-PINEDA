@@ -56,15 +56,16 @@ class ProvinceService
             
             $sql = "
                 SELECT 
-                    id,
-                    data_type,
-                    label,
-                    value,
-                    year,
-                    source,
-                    display_order
-                FROM demographics_data
-                ORDER BY display_order ASC
+                    dd.id,
+                    dt.type_name as data_type,
+                    dd.label,
+                    dd.value,
+                    dd.year,
+                    dd.source,
+                    dd.display_order
+                FROM demographics_data dd
+                LEFT JOIN demographics_types dt ON dd.data_type_id = dt.id
+                ORDER BY dd.display_order ASC
             ";
             
             $demographics = $conn->executeQuery($sql)->fetchAllAssociative();
@@ -101,22 +102,18 @@ class ProvinceService
             
             $sql = "
                 SELECT 
-                    id,
-                    info_type,
-                    name,
-                    description,
-                    coordinates,
-                    area_sqkm,
-                    population
-                FROM geographic_info
+                    gi.id,
+                    git.type_name as info_type,
+                    gi.name,
+                    gi.description,
+                    gi.coordinates,
+                    gi.area_sqkm,
+                    gi.population
+                FROM geographic_info gi
+                LEFT JOIN geographic_info_types git ON gi.info_type_id = git.id
                 ORDER BY 
-                    CASE info_type
-                        WHEN 'municipality' THEN 1
-                        WHEN 'landmark' THEN 2
-                        WHEN 'boundary' THEN 3
-                        ELSE 4
-                    END,
-                    name ASC
+                    git.display_order ASC,
+                    gi.name ASC
             ";
             
             $geography = $conn->executeQuery($sql)->fetchAllAssociative();

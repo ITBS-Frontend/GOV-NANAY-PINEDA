@@ -159,11 +159,11 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_categories_created_at" class="categories_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
 <?php } ?>
-<?php if ($Page->category_type->Visible) { // category_type ?>
-        <th data-name="category_type" class="<?= $Page->category_type->headerCellClass() ?>"><div id="elh_categories_category_type" class="categories_category_type"><?= $Page->renderFieldHeader($Page->category_type) ?></div></th>
-<?php } ?>
 <?php if ($Page->parent_id->Visible) { // parent_id ?>
         <th data-name="parent_id" class="<?= $Page->parent_id->headerCellClass() ?>"><div id="elh_categories_parent_id" class="categories_parent_id"><?= $Page->renderFieldHeader($Page->parent_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->category_type_id->Visible) { // category_type_id ?>
+        <th data-name="category_type_id" class="<?= $Page->category_type_id->headerCellClass() ?>"><div id="elh_categories_category_type_id" class="categories_category_type_id"><?= $Page->renderFieldHeader($Page->category_type_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -224,19 +224,19 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->category_type->Visible) { // category_type ?>
-        <td data-name="category_type"<?= $Page->category_type->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_categories_category_type" class="el_categories_category_type">
-<span<?= $Page->category_type->viewAttributes() ?>>
-<?= $Page->category_type->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->parent_id->Visible) { // parent_id ?>
         <td data-name="parent_id"<?= $Page->parent_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_categories_parent_id" class="el_categories_parent_id">
 <span<?= $Page->parent_id->viewAttributes() ?>>
 <?= $Page->parent_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->category_type_id->Visible) { // category_type_id ?>
+        <td data-name="category_type_id"<?= $Page->category_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_categories_category_type_id" class="el_categories_category_type_id">
+<span<?= $Page->category_type_id->viewAttributes() ?>>
+<?= $Page->category_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

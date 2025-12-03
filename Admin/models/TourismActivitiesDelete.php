@@ -126,9 +126,9 @@ class TourismActivitiesDelete extends TourismActivities
         $this->activity_name->setVisibility();
         $this->description->Visible = false;
         $this->duration->setVisibility();
-        $this->difficulty_level->setVisibility();
         $this->display_order->setVisibility();
         $this->created_at->setVisibility();
+        $this->difficulty_level_id->setVisibility();
     }
 
     // Constructor
@@ -405,6 +405,9 @@ class TourismActivitiesDelete extends TourismActivities
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->difficulty_level_id);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -592,9 +595,9 @@ class TourismActivitiesDelete extends TourismActivities
         $this->activity_name->setDbValue($row['activity_name']);
         $this->description->setDbValue($row['description']);
         $this->duration->setDbValue($row['duration']);
-        $this->difficulty_level->setDbValue($row['difficulty_level']);
         $this->display_order->setDbValue($row['display_order']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->difficulty_level_id->setDbValue($row['difficulty_level_id']);
     }
 
     // Return a row with default values
@@ -606,9 +609,9 @@ class TourismActivitiesDelete extends TourismActivities
         $row['activity_name'] = $this->activity_name->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['duration'] = $this->duration->DefaultValue;
-        $row['difficulty_level'] = $this->difficulty_level->DefaultValue;
         $row['display_order'] = $this->display_order->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['difficulty_level_id'] = $this->difficulty_level_id->DefaultValue;
         return $row;
     }
 
@@ -634,11 +637,11 @@ class TourismActivitiesDelete extends TourismActivities
 
         // duration
 
-        // difficulty_level
-
         // display_order
 
         // created_at
+
+        // difficulty_level_id
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -655,9 +658,6 @@ class TourismActivitiesDelete extends TourismActivities
             // duration
             $this->duration->ViewValue = $this->duration->CurrentValue;
 
-            // difficulty_level
-            $this->difficulty_level->ViewValue = $this->difficulty_level->CurrentValue;
-
             // display_order
             $this->display_order->ViewValue = $this->display_order->CurrentValue;
             $this->display_order->ViewValue = FormatNumber($this->display_order->ViewValue, $this->display_order->formatPattern());
@@ -665,6 +665,29 @@ class TourismActivitiesDelete extends TourismActivities
             // created_at
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
+
+            // difficulty_level_id
+            $curVal = strval($this->difficulty_level_id->CurrentValue);
+            if ($curVal != "") {
+                $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->lookupCacheOption($curVal);
+                if ($this->difficulty_level_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->difficulty_level_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->difficulty_level_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->displayValue($arwrk);
+                    } else {
+                        $this->difficulty_level_id->ViewValue = FormatNumber($this->difficulty_level_id->CurrentValue, $this->difficulty_level_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->difficulty_level_id->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
@@ -682,10 +705,6 @@ class TourismActivitiesDelete extends TourismActivities
             $this->duration->HrefValue = "";
             $this->duration->TooltipValue = "";
 
-            // difficulty_level
-            $this->difficulty_level->HrefValue = "";
-            $this->difficulty_level->TooltipValue = "";
-
             // display_order
             $this->display_order->HrefValue = "";
             $this->display_order->TooltipValue = "";
@@ -693,6 +712,10 @@ class TourismActivitiesDelete extends TourismActivities
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // difficulty_level_id
+            $this->difficulty_level_id->HrefValue = "";
+            $this->difficulty_level_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -824,6 +847,8 @@ class TourismActivitiesDelete extends TourismActivities
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_difficulty_level_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

@@ -65,9 +65,6 @@ $Page->showMessage();
 <?php if ($Page->implementation_date->Visible) { // implementation_date ?>
         <th class="<?= $Page->implementation_date->headerCellClass() ?>"><span id="elh_health_programs_implementation_date" class="health_programs_implementation_date"><?= $Page->implementation_date->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-        <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_health_programs_status" class="health_programs_status"><?= $Page->status->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <th class="<?= $Page->featured_image->headerCellClass() ?>"><span id="elh_health_programs_featured_image" class="health_programs_featured_image"><?= $Page->featured_image->caption() ?></span></th>
 <?php } ?>
@@ -76,6 +73,9 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_health_programs_created_at" class="health_programs_created_at"><?= $Page->created_at->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+        <th class="<?= $Page->status_id->headerCellClass() ?>"><span id="elh_health_programs_status_id" class="health_programs_status_id"><?= $Page->status_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -138,19 +138,12 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-        <td<?= $Page->status->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->status->viewAttributes() ?>>
-<?= $Page->status->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <td<?= $Page->featured_image->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -168,6 +161,14 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+        <td<?= $Page->status_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->status_id->viewAttributes() ?>>
+<?= $Page->status_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -47,13 +47,13 @@ class GeographicInfo extends DbTable
 
     // Fields
     public $id;
-    public $info_type;
     public $name;
     public $description;
     public $coordinates;
     public $area_sqkm;
     public $population;
     public $created_at;
+    public $info_type_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -126,30 +126,6 @@ class GeographicInfo extends DbTable
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
-
-        // info_type
-        $this->info_type = new DbField(
-            $this, // Table
-            'x_info_type', // Variable name
-            'info_type', // Name
-            '"info_type"', // Expression
-            '"info_type"', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"info_type"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->info_type->InputTextType = "text";
-        $this->info_type->Nullable = false; // NOT NULL field
-        $this->info_type->Required = true; // Required field
-        $this->info_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['info_type'] = &$this->info_type;
 
         // name
         $this->name = new DbField(
@@ -285,11 +261,40 @@ class GeographicInfo extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->created_at->addMethod("getAutoUpdateValue", fn() => CurrentDateTime());
         $this->created_at->InputTextType = "text";
         $this->created_at->Raw = true;
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
+
+        // info_type_id
+        $this->info_type_id = new DbField(
+            $this, // Table
+            'x_info_type_id', // Variable name
+            'info_type_id', // Name
+            '"info_type_id"', // Expression
+            'CAST("info_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"info_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->info_type_id->InputTextType = "text";
+        $this->info_type_id->Raw = true;
+        $this->info_type_id->setSelectMultiple(false); // Select one
+        $this->info_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->info_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->info_type_id->Lookup = new Lookup($this->info_type_id, 'geographic_info_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->info_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->info_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['info_type_id'] = &$this->info_type_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -814,13 +819,13 @@ class GeographicInfo extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->info_type->DbValue = $row['info_type'];
         $this->name->DbValue = $row['name'];
         $this->description->DbValue = $row['description'];
         $this->coordinates->DbValue = $row['coordinates'];
         $this->area_sqkm->DbValue = $row['area_sqkm'];
         $this->population->DbValue = $row['population'];
         $this->created_at->DbValue = $row['created_at'];
+        $this->info_type_id->DbValue = $row['info_type_id'];
     }
 
     // Delete uploaded files
@@ -1174,13 +1179,13 @@ class GeographicInfo extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->info_type->setDbValue($row['info_type']);
         $this->name->setDbValue($row['name']);
         $this->description->setDbValue($row['description']);
         $this->coordinates->setDbValue($row['coordinates']);
         $this->area_sqkm->setDbValue($row['area_sqkm']);
         $this->population->setDbValue($row['population']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->info_type_id->setDbValue($row['info_type_id']);
     }
 
     // Render list content
@@ -1213,8 +1218,6 @@ class GeographicInfo extends DbTable
 
         // id
 
-        // info_type
-
         // name
 
         // description
@@ -1227,11 +1230,10 @@ class GeographicInfo extends DbTable
 
         // created_at
 
+        // info_type_id
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
-
-        // info_type
-        $this->info_type->ViewValue = $this->info_type->CurrentValue;
 
         // name
         $this->name->ViewValue = $this->name->CurrentValue;
@@ -1254,13 +1256,32 @@ class GeographicInfo extends DbTable
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+        // info_type_id
+        $curVal = strval($this->info_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->info_type_id->ViewValue = $this->info_type_id->lookupCacheOption($curVal);
+            if ($this->info_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->info_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->info_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->info_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->info_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->info_type_id->ViewValue = $this->info_type_id->displayValue($arwrk);
+                } else {
+                    $this->info_type_id->ViewValue = FormatNumber($this->info_type_id->CurrentValue, $this->info_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->info_type_id->ViewValue = null;
+        }
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
-
-        // info_type
-        $this->info_type->HrefValue = "";
-        $this->info_type->TooltipValue = "";
 
         // name
         $this->name->HrefValue = "";
@@ -1286,6 +1307,10 @@ class GeographicInfo extends DbTable
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
 
+        // info_type_id
+        $this->info_type_id->HrefValue = "";
+        $this->info_type_id->TooltipValue = "";
+
         // Call Row Rendered event
         $this->rowRendered();
 
@@ -1304,14 +1329,6 @@ class GeographicInfo extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
-
-        // info_type
-        $this->info_type->setupEditAttributes();
-        if (!$this->info_type->Raw) {
-            $this->info_type->CurrentValue = HtmlDecode($this->info_type->CurrentValue);
-        }
-        $this->info_type->EditValue = $this->info_type->CurrentValue;
-        $this->info_type->PlaceHolder = RemoveHtml($this->info_type->caption());
 
         // name
         $this->name->setupEditAttributes();
@@ -1351,9 +1368,10 @@ class GeographicInfo extends DbTable
         }
 
         // created_at
-        $this->created_at->setupEditAttributes();
-        $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+        // info_type_id
+        $this->info_type_id->setupEditAttributes();
+        $this->info_type_id->PlaceHolder = RemoveHtml($this->info_type_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1384,21 +1402,21 @@ class GeographicInfo extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->info_type);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->description);
                     $doc->exportCaption($this->coordinates);
                     $doc->exportCaption($this->area_sqkm);
                     $doc->exportCaption($this->population);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->info_type_id);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->info_type);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->coordinates);
                     $doc->exportCaption($this->area_sqkm);
                     $doc->exportCaption($this->population);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->info_type_id);
                 }
                 $doc->endExportRow();
             }
@@ -1426,21 +1444,21 @@ class GeographicInfo extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->info_type);
                         $doc->exportField($this->name);
                         $doc->exportField($this->description);
                         $doc->exportField($this->coordinates);
                         $doc->exportField($this->area_sqkm);
                         $doc->exportField($this->population);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->info_type_id);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->info_type);
                         $doc->exportField($this->name);
                         $doc->exportField($this->coordinates);
                         $doc->exportField($this->area_sqkm);
                         $doc->exportField($this->population);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->info_type_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

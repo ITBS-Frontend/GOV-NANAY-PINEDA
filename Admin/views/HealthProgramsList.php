@@ -162,9 +162,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->implementation_date->Visible) { // implementation_date ?>
         <th data-name="implementation_date" class="<?= $Page->implementation_date->headerCellClass() ?>"><div id="elh_health_programs_implementation_date" class="health_programs_implementation_date"><?= $Page->renderFieldHeader($Page->implementation_date) ?></div></th>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-        <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_health_programs_status" class="health_programs_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <th data-name="featured_image" class="<?= $Page->featured_image->headerCellClass() ?>"><div id="elh_health_programs_featured_image" class="health_programs_featured_image"><?= $Page->renderFieldHeader($Page->featured_image) ?></div></th>
 <?php } ?>
@@ -173,6 +170,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_health_programs_created_at" class="health_programs_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+        <th data-name="status_id" class="<?= $Page->status_id->headerCellClass() ?>"><div id="elh_health_programs_status_id" class="health_programs_status_id"><?= $Page->renderFieldHeader($Page->status_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -241,19 +241,12 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->status->Visible) { // status ?>
-        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_health_programs_status" class="el_health_programs_status">
-<span<?= $Page->status->viewAttributes() ?>>
-<?= $Page->status->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <td data-name="featured_image"<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_health_programs_featured_image" class="el_health_programs_featured_image">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     <?php } ?>
@@ -271,6 +264,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_health_programs_created_at" class="el_health_programs_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->status_id->Visible) { // status_id ?>
+        <td data-name="status_id"<?= $Page->status_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_health_programs_status_id" class="el_health_programs_status_id">
+<span<?= $Page->status_id->viewAttributes() ?>>
+<?= $Page->status_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

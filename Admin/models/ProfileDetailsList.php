@@ -460,6 +460,9 @@ class ProfileDetailsList extends ProfileDetails
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
     }
 
     // Lookup data

@@ -34,12 +34,6 @@ class TourismFacility extends AbstractEntity
     #[SequenceGenerator(sequenceName: "tourism_facilities_id_seq")]
     private int $id;
 
-    #[Column(name: "facility_type", type: "string")]
-    private string $facilityType;
-
-    #[Column(type: "string")]
-    private string $ownership;
-
     #[Column(type: "string")]
     private string $name;
 
@@ -85,6 +79,12 @@ class TourismFacility extends AbstractEntity
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
+    #[Column(name: "facility_type_id", type: "integer", nullable: true)]
+    private ?int $facilityTypeId;
+
+    #[Column(name: "ownership_type_id", type: "integer", nullable: true)]
+    private ?int $ownershipTypeId;
+
     public function __construct()
     {
         $this->rating = "0";
@@ -98,28 +98,6 @@ class TourismFacility extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
-        return $this;
-    }
-
-    public function getFacilityType(): string
-    {
-        return HtmlDecode($this->facilityType);
-    }
-
-    public function setFacilityType(string $value): static
-    {
-        $this->facilityType = RemoveXss($value);
-        return $this;
-    }
-
-    public function getOwnership(): string
-    {
-        return HtmlDecode($this->ownership);
-    }
-
-    public function setOwnership(string $value): static
-    {
-        $this->ownership = RemoveXss($value);
         return $this;
     }
 
@@ -285,6 +263,28 @@ class TourismFacility extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getFacilityTypeId(): ?int
+    {
+        return $this->facilityTypeId;
+    }
+
+    public function setFacilityTypeId(?int $value): static
+    {
+        $this->facilityTypeId = $value;
+        return $this;
+    }
+
+    public function getOwnershipTypeId(): ?int
+    {
+        return $this->ownershipTypeId;
+    }
+
+    public function setOwnershipTypeId(?int $value): static
+    {
+        $this->ownershipTypeId = $value;
         return $this;
     }
 }

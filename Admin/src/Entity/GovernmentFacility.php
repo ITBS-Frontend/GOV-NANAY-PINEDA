@@ -34,9 +34,6 @@ class GovernmentFacility extends AbstractEntity
     #[SequenceGenerator(sequenceName: "government_facilities_id_seq")]
     private int $id;
 
-    #[Column(name: "facility_type", type: "string")]
-    private string $facilityType;
-
     #[Column(type: "string")]
     private string $name;
 
@@ -70,6 +67,9 @@ class GovernmentFacility extends AbstractEntity
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
+    #[Column(name: "facility_type_id", type: "integer", nullable: true)]
+    private ?int $facilityTypeId;
+
     public function getId(): int
     {
         return $this->id;
@@ -78,17 +78,6 @@ class GovernmentFacility extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
-        return $this;
-    }
-
-    public function getFacilityType(): string
-    {
-        return HtmlDecode($this->facilityType);
-    }
-
-    public function setFacilityType(string $value): static
-    {
-        $this->facilityType = RemoveXss($value);
         return $this;
     }
 
@@ -210,6 +199,17 @@ class GovernmentFacility extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getFacilityTypeId(): ?int
+    {
+        return $this->facilityTypeId;
+    }
+
+    public function setFacilityTypeId(?int $value): static
+    {
+        $this->facilityTypeId = $value;
         return $this;
     }
 }

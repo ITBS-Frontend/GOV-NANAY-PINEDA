@@ -6,7 +6,7 @@ class EnvironmentService
     /**
      * Get environmental programs
      */
-    public function getPrograms($programType = null, $status = null) 
+    public function getPrograms($programTypeId = null, $statusId = null) 
     {
         try {
             $conn = Conn();
@@ -14,38 +14,37 @@ class EnvironmentService
             $whereClauses = [];
             $params = [];
             
-            if ($programType) {
-                $whereClauses[] = "program_type = ?";
-                $params[] = $programType;
+            if ($programTypeId) {
+                $whereClauses[] = "ep.program_type_id = ?";
+                $params[] = $programTypeId;
             }
             
-            if ($status) {
-                $whereClauses[] = "status = ?";
-                $params[] = $status;
+            if ($statusId) {
+                $whereClauses[] = "ep.status_id = ?";
+                $params[] = $statusId;
             }
             
             $whereClause = count($whereClauses) > 0 ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
             
             $sql = "
                 SELECT 
-                    id,
-                    program_name,
-                    program_type,
-                    description,
-                    objectives,
-                    coverage_area,
-                    implementation_date,
-                    status,
-                    featured_image
-                FROM environmental_programs
+                    ep.id,
+                    ep.program_name,
+                    ept.type_name as program_type,
+                    st.type_name as status,
+                    st.color_code as status_color,
+                    ep.description,
+                    ep.objectives,
+                    ep.coverage_area,
+                    ep.implementation_date,
+                    ep.featured_image
+                FROM environmental_programs ep
+                LEFT JOIN environmental_program_types ept ON ep.program_type_id = ept.id
+                LEFT JOIN status_types st ON ep.status_id = st.id
                 $whereClause
                 ORDER BY 
-                    CASE status
-                        WHEN 'Active' THEN 1
-                        WHEN 'Planned' THEN 2
-                        WHEN 'Completed' THEN 3
-                    END,
-                    implementation_date DESC
+                    st.display_order ASC,
+                    ep.implementation_date DESC
             ";
             
             $programs = $conn->executeQuery($sql, $params)->fetchAllAssociative();
@@ -80,16 +79,18 @@ class EnvironmentService
             // Get disaster preparedness guides
             $prepSql = "
                 SELECT 
-                    id,
-                    disaster_type,
-                    preparedness_guide,
-                    emergency_hotlines,
-                    evacuation_centers,
-                    relief_procedures,
-                    featured_image,
-                    display_order
-                FROM disaster_preparedness
-                ORDER BY display_order ASC
+                    dp.id,
+                    dt.type_name as disaster_type,
+                    dt.icon_class,
+                    dp.preparedness_guide,
+                    dp.emergency_hotlines,
+                    dp.evacuation_centers,
+                    dp.relief_procedures,
+                    dp.featured_image,
+                    dp.display_order
+                FROM disaster_preparedness dp
+                LEFT JOIN disaster_types dt ON dp.disaster_type_id = dt.id
+                ORDER BY dp.display_order ASC
             ";
             
             $preparedness = $conn->executeQuery($prepSql)->fetchAllAssociative();
@@ -105,17 +106,19 @@ class EnvironmentService
             // Get emergency facilities
             $facilitiesSql = "
                 SELECT 
-                    id,
-                    facility_type,
-                    name,
-                    municipality,
-                    address,
-                    capacity,
-                    contact_number,
-                    coordinates
-                FROM emergency_facilities
-                WHERE is_active = true
-                ORDER BY municipality ASC, name ASC
+                    ef.id,
+                    eft.type_name as facility_type,
+                    eft.icon_class,
+                    ef.name,
+                    ef.municipality,
+                    ef.address,
+                    ef.capacity,
+                    ef.contact_number,
+                    ef.coordinates
+                FROM emergency_facilities ef
+                LEFT JOIN emergency_facility_types eft ON ef.facility_type_id = eft.id
+                WHERE ef.is_active = true
+                ORDER BY ef.municipality ASC, eft.display_order ASC, ef.name ASC
             ";
             
             $facilities = $conn->executeQuery($facilitiesSql)->fetchAllAssociative();
@@ -123,16 +126,17 @@ class EnvironmentService
             // Get historical incidents (last 5)
             $incidentsSql = "
                 SELECT 
-                    id,
-                    incident_type,
-                    incident_name,
-                    occurrence_date,
-                    affected_areas,
-                    casualties,
-                    damages_estimated,
-                    response_actions
-                FROM disaster_incidents
-                ORDER BY occurrence_date DESC
+                    di.id,
+                    dt.type_name as incident_type,
+                    di.incident_name,
+                    di.occurrence_date,
+                    di.affected_areas,
+                    di.casualties,
+                    di.damages_estimated,
+                    di.response_actions
+                FROM disaster_incidents di
+                LEFT JOIN disaster_types dt ON di.incident_type_id = dt.id
+                ORDER BY di.occurrence_date DESC
                 LIMIT 5
             ";
             
@@ -156,21 +160,21 @@ class EnvironmentService
     /**
      * Get emergency facilities by type
      */
-    public function getEmergencyFacilities($facilityType = null, $municipality = null) 
+    public function getEmergencyFacilities($facilityTypeId = null, $municipality = null) 
     {
         try {
             $conn = Conn();
             
-            $whereClauses = ["is_active = true"];
+            $whereClauses = ["ef.is_active = true"];
             $params = [];
             
-            if ($facilityType) {
-                $whereClauses[] = "facility_type = ?";
-                $params[] = $facilityType;
+            if ($facilityTypeId) {
+                $whereClauses[] = "ef.facility_type_id = ?";
+                $params[] = $facilityTypeId;
             }
             
             if ($municipality) {
-                $whereClauses[] = "municipality = ?";
+                $whereClauses[] = "ef.municipality = ?";
                 $params[] = $municipality;
             }
             
@@ -178,17 +182,19 @@ class EnvironmentService
             
             $sql = "
                 SELECT 
-                    id,
-                    facility_type,
-                    name,
-                    municipality,
-                    address,
-                    capacity,
-                    contact_number,
-                    coordinates
-                FROM emergency_facilities
+                    ef.id,
+                    eft.type_name as facility_type,
+                    eft.icon_class,
+                    ef.name,
+                    ef.municipality,
+                    ef.address,
+                    ef.capacity,
+                    ef.contact_number,
+                    ef.coordinates
+                FROM emergency_facilities ef
+                LEFT JOIN emergency_facility_types eft ON ef.facility_type_id = eft.id
                 WHERE $whereClause
-                ORDER BY municipality ASC, facility_type ASC, name ASC
+                ORDER BY ef.municipality ASC, eft.display_order ASC, ef.name ASC
             ";
             
             $facilities = $conn->executeQuery($sql, $params)->fetchAllAssociative();
@@ -207,7 +213,7 @@ class EnvironmentService
     /**
      * Get disaster incidents history
      */
-    public function getDisasterIncidents($incidentType = null, $year = null) 
+    public function getDisasterIncidents($incidentTypeId = null, $year = null) 
     {
         try {
             $conn = Conn();
@@ -215,13 +221,13 @@ class EnvironmentService
             $whereClauses = [];
             $params = [];
             
-            if ($incidentType) {
-                $whereClauses[] = "incident_type = ?";
-                $params[] = $incidentType;
+            if ($incidentTypeId) {
+                $whereClauses[] = "di.incident_type_id = ?";
+                $params[] = $incidentTypeId;
             }
             
             if ($year) {
-                $whereClauses[] = "EXTRACT(YEAR FROM occurrence_date) = ?";
+                $whereClauses[] = "EXTRACT(YEAR FROM di.occurrence_date) = ?";
                 $params[] = $year;
             }
             
@@ -229,18 +235,19 @@ class EnvironmentService
             
             $sql = "
                 SELECT 
-                    id,
-                    incident_type,
-                    incident_name,
-                    occurrence_date,
-                    affected_areas,
-                    casualties,
-                    damages_estimated,
-                    response_actions,
-                    lessons_learned
-                FROM disaster_incidents
+                    di.id,
+                    dt.type_name as incident_type,
+                    di.incident_name,
+                    di.occurrence_date,
+                    di.affected_areas,
+                    di.casualties,
+                    di.damages_estimated,
+                    di.response_actions,
+                    di.lessons_learned
+                FROM disaster_incidents di
+                LEFT JOIN disaster_types dt ON di.incident_type_id = dt.id
                 $whereClause
-                ORDER BY occurrence_date DESC
+                ORDER BY di.occurrence_date DESC
             ";
             
             $incidents = $conn->executeQuery($sql, $params)->fetchAllAssociative();

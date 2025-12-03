@@ -34,9 +34,6 @@ class DisasterIncident extends AbstractEntity
     #[SequenceGenerator(sequenceName: "disaster_incidents_id_seq")]
     private int $id;
 
-    #[Column(name: "incident_type", type: "string")]
-    private string $incidentType;
-
     #[Column(name: "incident_name", type: "string", nullable: true)]
     private ?string $incidentName;
 
@@ -61,6 +58,9 @@ class DisasterIncident extends AbstractEntity
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
+    #[Column(name: "incident_type_id", type: "integer", nullable: true)]
+    private ?int $incidentTypeId;
+
     public function __construct()
     {
         $this->casualties = 0;
@@ -74,17 +74,6 @@ class DisasterIncident extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
-        return $this;
-    }
-
-    public function getIncidentType(): string
-    {
-        return HtmlDecode($this->incidentType);
-    }
-
-    public function setIncidentType(string $value): static
-    {
-        $this->incidentType = RemoveXss($value);
         return $this;
     }
 
@@ -173,6 +162,17 @@ class DisasterIncident extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getIncidentTypeId(): ?int
+    {
+        return $this->incidentTypeId;
+    }
+
+    public function setIncidentTypeId(?int $value): static
+    {
+        $this->incidentTypeId = $value;
         return $this;
     }
 }

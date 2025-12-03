@@ -150,9 +150,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_demographics_data_id" class="demographics_data_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->data_type->Visible) { // data_type ?>
-        <th data-name="data_type" class="<?= $Page->data_type->headerCellClass() ?>"><div id="elh_demographics_data_data_type" class="demographics_data_data_type"><?= $Page->renderFieldHeader($Page->data_type) ?></div></th>
-<?php } ?>
 <?php if ($Page->label->Visible) { // label ?>
         <th data-name="label" class="<?= $Page->label->headerCellClass() ?>"><div id="elh_demographics_data_label" class="demographics_data_label"><?= $Page->renderFieldHeader($Page->label) ?></div></th>
 <?php } ?>
@@ -170,6 +167,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_demographics_data_created_at" class="demographics_data_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->data_type_id->Visible) { // data_type_id ?>
+        <th data-name="data_type_id" class="<?= $Page->data_type_id->headerCellClass() ?>"><div id="elh_demographics_data_data_type_id" class="demographics_data_data_type_id"><?= $Page->renderFieldHeader($Page->data_type_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -203,14 +203,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_demographics_data_id" class="el_demographics_data_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->data_type->Visible) { // data_type ?>
-        <td data-name="data_type"<?= $Page->data_type->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_demographics_data_data_type" class="el_demographics_data_data_type">
-<span<?= $Page->data_type->viewAttributes() ?>>
-<?= $Page->data_type->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -259,6 +251,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_demographics_data_created_at" class="el_demographics_data_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->data_type_id->Visible) { // data_type_id ?>
+        <td data-name="data_type_id"<?= $Page->data_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_demographics_data_data_type_id" class="el_demographics_data_data_type_id">
+<span<?= $Page->data_type_id->viewAttributes() ?>>
+<?= $Page->data_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

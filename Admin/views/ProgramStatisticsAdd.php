@@ -23,11 +23,11 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["program_id", [fields.program_id.visible && fields.program_id.required ? ew.Validators.required(fields.program_id.caption) : null, ew.Validators.integer], fields.program_id.isInvalid],
-            ["program_type", [fields.program_type.visible && fields.program_type.required ? ew.Validators.required(fields.program_type.caption) : null], fields.program_type.isInvalid],
             ["stat_label", [fields.stat_label.visible && fields.stat_label.required ? ew.Validators.required(fields.stat_label.caption) : null], fields.stat_label.isInvalid],
             ["stat_value", [fields.stat_value.visible && fields.stat_value.required ? ew.Validators.required(fields.stat_value.caption) : null], fields.stat_value.isInvalid],
             ["year", [fields.year.visible && fields.year.required ? ew.Validators.required(fields.year.caption) : null, ew.Validators.integer], fields.year.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
+            ["program_type_id", [fields.program_type_id.visible && fields.program_type_id.required ? ew.Validators.required(fields.program_type_id.caption) : null], fields.program_type_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -43,6 +43,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "program_type_id": <?= $Page->program_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -84,18 +85,6 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->program_type->Visible) { // program_type ?>
-    <div id="r_program_type"<?= $Page->program_type->rowAttributes() ?>>
-        <label id="elh_program_statistics_program_type" for="x_program_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->program_type->caption() ?><?= $Page->program_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->program_type->cellAttributes() ?>>
-<span id="el_program_statistics_program_type">
-<input type="<?= $Page->program_type->getInputTextType() ?>" name="x_program_type" id="x_program_type" data-table="program_statistics" data-field="x_program_type" value="<?= $Page->program_type->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->program_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->program_type->formatPattern()) ?>"<?= $Page->program_type->editAttributes() ?> aria-describedby="x_program_type_help">
-<?= $Page->program_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->program_type->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->stat_label->Visible) { // stat_label ?>
     <div id="r_stat_label"<?= $Page->stat_label->rowAttributes() ?>>
         <label id="elh_program_statistics_stat_label" for="x_stat_label" class="<?= $Page->LeftColumnClass ?>"><?= $Page->stat_label->caption() ?><?= $Page->stat_label->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -132,40 +121,45 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_program_statistics_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_program_statistics_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="program_statistics" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
+<?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+    <div id="r_program_type_id"<?= $Page->program_type_id->rowAttributes() ?>>
+        <label id="elh_program_statistics_program_type_id" for="x_program_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->program_type_id->caption() ?><?= $Page->program_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->program_type_id->cellAttributes() ?>>
+<span id="el_program_statistics_program_type_id">
+    <select
+        id="x_program_type_id"
+        name="x_program_type_id"
+        class="form-select ew-select<?= $Page->program_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->program_type_id->IsNativeSelect) { ?>
+        data-select2-id="fprogram_statisticsadd_x_program_type_id"
+        <?php } ?>
+        data-table="program_statistics"
+        data-field="x_program_type_id"
+        data-value-separator="<?= $Page->program_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->program_type_id->getPlaceHolder()) ?>"
+        <?= $Page->program_type_id->editAttributes() ?>>
+        <?= $Page->program_type_id->selectOptionListHtml("x_program_type_id") ?>
+    </select>
+    <?= $Page->program_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->program_type_id->getErrorMessage() ?></div>
+<?= $Page->program_type_id->Lookup->getParamTag($Page, "p_x_program_type_id") ?>
+<?php if (!$Page->program_type_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fprogram_statisticsadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fprogram_statisticsadd", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fprogram_statisticsadd", function() {
+    var options = { name: "x_program_type_id", selectId: "fprogram_statisticsadd_x_program_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fprogram_statisticsadd.lists.program_type_id?.lookupOptions.length) {
+        options.data = { id: "x_program_type_id", form: "fprogram_statisticsadd" };
+    } else {
+        options.ajax = { id: "x_program_type_id", form: "fprogram_statisticsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.program_statistics.fields.program_type_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

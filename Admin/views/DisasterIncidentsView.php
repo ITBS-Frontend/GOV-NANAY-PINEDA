@@ -62,17 +62,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->incident_type->Visible) { // incident_type ?>
-    <tr id="r_incident_type"<?= $Page->incident_type->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_disaster_incidents_incident_type"><?= $Page->incident_type->caption() ?></span></td>
-        <td data-name="incident_type"<?= $Page->incident_type->cellAttributes() ?>>
-<span id="el_disaster_incidents_incident_type">
-<span<?= $Page->incident_type->viewAttributes() ?>>
-<?= $Page->incident_type->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->incident_name->Visible) { // incident_name ?>
     <tr id="r_incident_name"<?= $Page->incident_name->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_disaster_incidents_incident_name"><?= $Page->incident_name->caption() ?></span></td>
@@ -157,6 +146,17 @@ loadjs.ready("head", function () {
 <span id="el_disaster_incidents_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->incident_type_id->Visible) { // incident_type_id ?>
+    <tr id="r_incident_type_id"<?= $Page->incident_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_disaster_incidents_incident_type_id"><?= $Page->incident_type_id->caption() ?></span></td>
+        <td data-name="incident_type_id"<?= $Page->incident_type_id->cellAttributes() ?>>
+<span id="el_disaster_incidents_incident_type_id">
+<span<?= $Page->incident_type_id->viewAttributes() ?>>
+<?= $Page->incident_type_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

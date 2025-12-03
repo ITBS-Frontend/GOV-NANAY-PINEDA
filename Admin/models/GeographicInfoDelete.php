@@ -122,13 +122,13 @@ class GeographicInfoDelete extends GeographicInfo
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->info_type->setVisibility();
         $this->name->setVisibility();
         $this->description->Visible = false;
         $this->coordinates->setVisibility();
         $this->area_sqkm->setVisibility();
         $this->population->setVisibility();
         $this->created_at->setVisibility();
+        $this->info_type_id->setVisibility();
     }
 
     // Constructor
@@ -405,6 +405,9 @@ class GeographicInfoDelete extends GeographicInfo
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->info_type_id);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -588,13 +591,13 @@ class GeographicInfoDelete extends GeographicInfo
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->info_type->setDbValue($row['info_type']);
         $this->name->setDbValue($row['name']);
         $this->description->setDbValue($row['description']);
         $this->coordinates->setDbValue($row['coordinates']);
         $this->area_sqkm->setDbValue($row['area_sqkm']);
         $this->population->setDbValue($row['population']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->info_type_id->setDbValue($row['info_type_id']);
     }
 
     // Return a row with default values
@@ -602,13 +605,13 @@ class GeographicInfoDelete extends GeographicInfo
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['info_type'] = $this->info_type->DefaultValue;
         $row['name'] = $this->name->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['coordinates'] = $this->coordinates->DefaultValue;
         $row['area_sqkm'] = $this->area_sqkm->DefaultValue;
         $row['population'] = $this->population->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['info_type_id'] = $this->info_type_id->DefaultValue;
         return $row;
     }
 
@@ -626,8 +629,6 @@ class GeographicInfoDelete extends GeographicInfo
 
         // id
 
-        // info_type
-
         // name
 
         // description
@@ -640,13 +641,12 @@ class GeographicInfoDelete extends GeographicInfo
 
         // created_at
 
+        // info_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // info_type
-            $this->info_type->ViewValue = $this->info_type->CurrentValue;
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
@@ -666,13 +666,32 @@ class GeographicInfoDelete extends GeographicInfo
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // info_type_id
+            $curVal = strval($this->info_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->info_type_id->ViewValue = $this->info_type_id->lookupCacheOption($curVal);
+                if ($this->info_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->info_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->info_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->info_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->info_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->info_type_id->ViewValue = $this->info_type_id->displayValue($arwrk);
+                    } else {
+                        $this->info_type_id->ViewValue = FormatNumber($this->info_type_id->CurrentValue, $this->info_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->info_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // info_type
-            $this->info_type->HrefValue = "";
-            $this->info_type->TooltipValue = "";
 
             // name
             $this->name->HrefValue = "";
@@ -693,6 +712,10 @@ class GeographicInfoDelete extends GeographicInfo
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // info_type_id
+            $this->info_type_id->HrefValue = "";
+            $this->info_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -824,6 +847,8 @@ class GeographicInfoDelete extends GeographicInfo
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_info_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

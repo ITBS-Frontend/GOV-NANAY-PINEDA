@@ -34,9 +34,6 @@ class DemographicsDatum extends AbstractEntity
     #[SequenceGenerator(sequenceName: "demographics_data_id_seq")]
     private int $id;
 
-    #[Column(name: "data_type", type: "string")]
-    private string $dataType;
-
     #[Column(type: "string")]
     private string $label;
 
@@ -55,6 +52,9 @@ class DemographicsDatum extends AbstractEntity
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
 
+    #[Column(name: "data_type_id", type: "integer", nullable: true)]
+    private ?int $dataTypeId;
+
     public function __construct()
     {
         $this->displayOrder = 0;
@@ -68,17 +68,6 @@ class DemographicsDatum extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
-        return $this;
-    }
-
-    public function getDataType(): string
-    {
-        return HtmlDecode($this->dataType);
-    }
-
-    public function setDataType(string $value): static
-    {
-        $this->dataType = RemoveXss($value);
         return $this;
     }
 
@@ -145,6 +134,17 @@ class DemographicsDatum extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getDataTypeId(): ?int
+    {
+        return $this->dataTypeId;
+    }
+
+    public function setDataTypeId(?int $value): static
+    {
+        $this->dataTypeId = $value;
         return $this;
     }
 }

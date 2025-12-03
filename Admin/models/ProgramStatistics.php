@@ -48,11 +48,11 @@ class ProgramStatistics extends DbTable
     // Fields
     public $id;
     public $program_id;
-    public $program_type;
     public $stat_label;
     public $stat_value;
     public $year;
     public $created_at;
+    public $program_type_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -150,28 +150,6 @@ class ProgramStatistics extends DbTable
         $this->program_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['program_id'] = &$this->program_id;
 
-        // program_type
-        $this->program_type = new DbField(
-            $this, // Table
-            'x_program_type', // Variable name
-            'program_type', // Name
-            '"program_type"', // Expression
-            '"program_type"', // Basic search expression
-            200, // Type
-            50, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '"program_type"', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->program_type->InputTextType = "text";
-        $this->program_type->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
-        $this->Fields['program_type'] = &$this->program_type;
-
         // stat_label
         $this->stat_label = new DbField(
             $this, // Table
@@ -264,11 +242,40 @@ class ProgramStatistics extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->created_at->addMethod("getAutoUpdateValue", fn() => CurrentDateTime());
         $this->created_at->InputTextType = "text";
         $this->created_at->Raw = true;
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->created_at->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['created_at'] = &$this->created_at;
+
+        // program_type_id
+        $this->program_type_id = new DbField(
+            $this, // Table
+            'x_program_type_id', // Variable name
+            'program_type_id', // Name
+            '"program_type_id"', // Expression
+            'CAST("program_type_id" AS varchar(255))', // Basic search expression
+            3, // Type
+            0, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '"program_type_id"', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->program_type_id->InputTextType = "text";
+        $this->program_type_id->Raw = true;
+        $this->program_type_id->setSelectMultiple(false); // Select one
+        $this->program_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->program_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->program_type_id->Lookup = new Lookup($this->program_type_id, 'program_types', false, 'id', ["type_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"type_name\"");
+        $this->program_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->program_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['program_type_id'] = &$this->program_type_id;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -794,11 +801,11 @@ class ProgramStatistics extends DbTable
         }
         $this->id->DbValue = $row['id'];
         $this->program_id->DbValue = $row['program_id'];
-        $this->program_type->DbValue = $row['program_type'];
         $this->stat_label->DbValue = $row['stat_label'];
         $this->stat_value->DbValue = $row['stat_value'];
         $this->year->DbValue = $row['year'];
         $this->created_at->DbValue = $row['created_at'];
+        $this->program_type_id->DbValue = $row['program_type_id'];
     }
 
     // Delete uploaded files
@@ -1153,11 +1160,11 @@ class ProgramStatistics extends DbTable
         }
         $this->id->setDbValue($row['id']);
         $this->program_id->setDbValue($row['program_id']);
-        $this->program_type->setDbValue($row['program_type']);
         $this->stat_label->setDbValue($row['stat_label']);
         $this->stat_value->setDbValue($row['stat_value']);
         $this->year->setDbValue($row['year']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->program_type_id->setDbValue($row['program_type_id']);
     }
 
     // Render list content
@@ -1192,8 +1199,6 @@ class ProgramStatistics extends DbTable
 
         // program_id
 
-        // program_type
-
         // stat_label
 
         // stat_value
@@ -1202,15 +1207,14 @@ class ProgramStatistics extends DbTable
 
         // created_at
 
+        // program_type_id
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // program_id
         $this->program_id->ViewValue = $this->program_id->CurrentValue;
         $this->program_id->ViewValue = FormatNumber($this->program_id->ViewValue, $this->program_id->formatPattern());
-
-        // program_type
-        $this->program_type->ViewValue = $this->program_type->CurrentValue;
 
         // stat_label
         $this->stat_label->ViewValue = $this->stat_label->CurrentValue;
@@ -1226,6 +1230,29 @@ class ProgramStatistics extends DbTable
         $this->created_at->ViewValue = $this->created_at->CurrentValue;
         $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+        // program_type_id
+        $curVal = strval($this->program_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->program_type_id->ViewValue = $this->program_type_id->lookupCacheOption($curVal);
+            if ($this->program_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->program_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->program_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->program_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->program_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->program_type_id->ViewValue = $this->program_type_id->displayValue($arwrk);
+                } else {
+                    $this->program_type_id->ViewValue = FormatNumber($this->program_type_id->CurrentValue, $this->program_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->program_type_id->ViewValue = null;
+        }
+
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
@@ -1233,10 +1260,6 @@ class ProgramStatistics extends DbTable
         // program_id
         $this->program_id->HrefValue = "";
         $this->program_id->TooltipValue = "";
-
-        // program_type
-        $this->program_type->HrefValue = "";
-        $this->program_type->TooltipValue = "";
 
         // stat_label
         $this->stat_label->HrefValue = "";
@@ -1253,6 +1276,10 @@ class ProgramStatistics extends DbTable
         // created_at
         $this->created_at->HrefValue = "";
         $this->created_at->TooltipValue = "";
+
+        // program_type_id
+        $this->program_type_id->HrefValue = "";
+        $this->program_type_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1281,14 +1308,6 @@ class ProgramStatistics extends DbTable
             $this->program_id->EditValue = FormatNumber($this->program_id->EditValue, null);
         }
 
-        // program_type
-        $this->program_type->setupEditAttributes();
-        if (!$this->program_type->Raw) {
-            $this->program_type->CurrentValue = HtmlDecode($this->program_type->CurrentValue);
-        }
-        $this->program_type->EditValue = $this->program_type->CurrentValue;
-        $this->program_type->PlaceHolder = RemoveHtml($this->program_type->caption());
-
         // stat_label
         $this->stat_label->setupEditAttributes();
         if (!$this->stat_label->Raw) {
@@ -1314,9 +1333,10 @@ class ProgramStatistics extends DbTable
         }
 
         // created_at
-        $this->created_at->setupEditAttributes();
-        $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
+
+        // program_type_id
+        $this->program_type_id->setupEditAttributes();
+        $this->program_type_id->PlaceHolder = RemoveHtml($this->program_type_id->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1348,19 +1368,19 @@ class ProgramStatistics extends DbTable
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->program_id);
-                    $doc->exportCaption($this->program_type);
                     $doc->exportCaption($this->stat_label);
                     $doc->exportCaption($this->stat_value);
                     $doc->exportCaption($this->year);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->program_type_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->program_id);
-                    $doc->exportCaption($this->program_type);
                     $doc->exportCaption($this->stat_label);
                     $doc->exportCaption($this->stat_value);
                     $doc->exportCaption($this->year);
                     $doc->exportCaption($this->created_at);
+                    $doc->exportCaption($this->program_type_id);
                 }
                 $doc->endExportRow();
             }
@@ -1389,19 +1409,19 @@ class ProgramStatistics extends DbTable
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->program_id);
-                        $doc->exportField($this->program_type);
                         $doc->exportField($this->stat_label);
                         $doc->exportField($this->stat_value);
                         $doc->exportField($this->year);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->program_type_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->program_id);
-                        $doc->exportField($this->program_type);
                         $doc->exportField($this->stat_label);
                         $doc->exportField($this->stat_value);
                         $doc->exportField($this->year);
                         $doc->exportField($this->created_at);
+                        $doc->exportField($this->program_type_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }

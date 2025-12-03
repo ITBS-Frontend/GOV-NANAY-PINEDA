@@ -125,8 +125,8 @@ class CategoriesDelete extends Categories
         $this->name->setVisibility();
         $this->color_code->setVisibility();
         $this->created_at->setVisibility();
-        $this->category_type->setVisibility();
         $this->parent_id->setVisibility();
+        $this->category_type_id->setVisibility();
     }
 
     // Constructor
@@ -403,6 +403,9 @@ class CategoriesDelete extends Categories
             $this->InlineDelete = true;
         }
 
+        // Set up lookup cache
+        $this->setupLookupOptions($this->category_type_id);
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -589,8 +592,8 @@ class CategoriesDelete extends Categories
         $this->name->setDbValue($row['name']);
         $this->color_code->setDbValue($row['color_code']);
         $this->created_at->setDbValue($row['created_at']);
-        $this->category_type->setDbValue($row['category_type']);
         $this->parent_id->setDbValue($row['parent_id']);
+        $this->category_type_id->setDbValue($row['category_type_id']);
     }
 
     // Return a row with default values
@@ -601,8 +604,8 @@ class CategoriesDelete extends Categories
         $row['name'] = $this->name->DefaultValue;
         $row['color_code'] = $this->color_code->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
-        $row['category_type'] = $this->category_type->DefaultValue;
         $row['parent_id'] = $this->parent_id->DefaultValue;
+        $row['category_type_id'] = $this->category_type_id->DefaultValue;
         return $row;
     }
 
@@ -626,9 +629,9 @@ class CategoriesDelete extends Categories
 
         // created_at
 
-        // category_type
-
         // parent_id
+
+        // category_type_id
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -645,12 +648,32 @@ class CategoriesDelete extends Categories
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
-            // category_type
-            $this->category_type->ViewValue = $this->category_type->CurrentValue;
-
             // parent_id
             $this->parent_id->ViewValue = $this->parent_id->CurrentValue;
             $this->parent_id->ViewValue = FormatNumber($this->parent_id->ViewValue, $this->parent_id->formatPattern());
+
+            // category_type_id
+            $curVal = strval($this->category_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->category_type_id->ViewValue = $this->category_type_id->lookupCacheOption($curVal);
+                if ($this->category_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->category_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->category_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->category_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->category_type_id->ViewValue = $this->category_type_id->displayValue($arwrk);
+                    } else {
+                        $this->category_type_id->ViewValue = FormatNumber($this->category_type_id->CurrentValue, $this->category_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->category_type_id->ViewValue = null;
+            }
 
             // id
             $this->id->HrefValue = "";
@@ -668,13 +691,13 @@ class CategoriesDelete extends Categories
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
 
-            // category_type
-            $this->category_type->HrefValue = "";
-            $this->category_type->TooltipValue = "";
-
             // parent_id
             $this->parent_id->HrefValue = "";
             $this->parent_id->TooltipValue = "";
+
+            // category_type_id
+            $this->category_type_id->HrefValue = "";
+            $this->category_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -806,6 +829,8 @@ class CategoriesDelete extends Categories
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_category_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

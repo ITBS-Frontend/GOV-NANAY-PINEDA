@@ -147,11 +147,11 @@ class ProgramStatisticsList extends ProgramStatistics
     {
         $this->id->setVisibility();
         $this->program_id->setVisibility();
-        $this->program_type->setVisibility();
         $this->stat_label->setVisibility();
         $this->stat_value->setVisibility();
         $this->year->setVisibility();
         $this->created_at->setVisibility();
+        $this->program_type_id->setVisibility();
     }
 
     // Constructor
@@ -459,6 +459,9 @@ class ProgramStatisticsList extends ProgramStatistics
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
     }
 
     // Lookup data
@@ -691,6 +694,9 @@ class ProgramStatisticsList extends ProgramStatistics
 
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->program_type_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1030,11 +1036,11 @@ class ProgramStatisticsList extends ProgramStatistics
         $savedFilterList = "";
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->program_id->AdvancedSearch->toJson(), ","); // Field program_id
-        $filterList = Concat($filterList, $this->program_type->AdvancedSearch->toJson(), ","); // Field program_type
         $filterList = Concat($filterList, $this->stat_label->AdvancedSearch->toJson(), ","); // Field stat_label
         $filterList = Concat($filterList, $this->stat_value->AdvancedSearch->toJson(), ","); // Field stat_value
         $filterList = Concat($filterList, $this->year->AdvancedSearch->toJson(), ","); // Field year
         $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
+        $filterList = Concat($filterList, $this->program_type_id->AdvancedSearch->toJson(), ","); // Field program_type_id
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1090,14 +1096,6 @@ class ProgramStatisticsList extends ProgramStatistics
         $this->program_id->AdvancedSearch->SearchOperator2 = @$filter["w_program_id"];
         $this->program_id->AdvancedSearch->save();
 
-        // Field program_type
-        $this->program_type->AdvancedSearch->SearchValue = @$filter["x_program_type"];
-        $this->program_type->AdvancedSearch->SearchOperator = @$filter["z_program_type"];
-        $this->program_type->AdvancedSearch->SearchCondition = @$filter["v_program_type"];
-        $this->program_type->AdvancedSearch->SearchValue2 = @$filter["y_program_type"];
-        $this->program_type->AdvancedSearch->SearchOperator2 = @$filter["w_program_type"];
-        $this->program_type->AdvancedSearch->save();
-
         // Field stat_label
         $this->stat_label->AdvancedSearch->SearchValue = @$filter["x_stat_label"];
         $this->stat_label->AdvancedSearch->SearchOperator = @$filter["z_stat_label"];
@@ -1129,6 +1127,14 @@ class ProgramStatisticsList extends ProgramStatistics
         $this->created_at->AdvancedSearch->SearchValue2 = @$filter["y_created_at"];
         $this->created_at->AdvancedSearch->SearchOperator2 = @$filter["w_created_at"];
         $this->created_at->AdvancedSearch->save();
+
+        // Field program_type_id
+        $this->program_type_id->AdvancedSearch->SearchValue = @$filter["x_program_type_id"];
+        $this->program_type_id->AdvancedSearch->SearchOperator = @$filter["z_program_type_id"];
+        $this->program_type_id->AdvancedSearch->SearchCondition = @$filter["v_program_type_id"];
+        $this->program_type_id->AdvancedSearch->SearchValue2 = @$filter["y_program_type_id"];
+        $this->program_type_id->AdvancedSearch->SearchOperator2 = @$filter["w_program_type_id"];
+        $this->program_type_id->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1168,7 +1174,6 @@ class ProgramStatisticsList extends ProgramStatistics
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->program_type;
         $searchFlds[] = &$this->stat_label;
         $searchFlds[] = &$this->stat_value;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
@@ -1251,11 +1256,11 @@ class ProgramStatisticsList extends ProgramStatistics
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
             $this->updateSort($this->program_id); // program_id
-            $this->updateSort($this->program_type); // program_type
             $this->updateSort($this->stat_label); // stat_label
             $this->updateSort($this->stat_value); // stat_value
             $this->updateSort($this->year); // year
             $this->updateSort($this->created_at); // created_at
+            $this->updateSort($this->program_type_id); // program_type_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1282,11 +1287,11 @@ class ProgramStatisticsList extends ProgramStatistics
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
                 $this->program_id->setSort("");
-                $this->program_type->setSort("");
                 $this->stat_label->setSort("");
                 $this->stat_value->setSort("");
                 $this->year->setSort("");
                 $this->created_at->setSort("");
+                $this->program_type_id->setSort("");
             }
 
             // Reset start position
@@ -1523,11 +1528,11 @@ class ProgramStatisticsList extends ProgramStatistics
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "program_id");
-            $this->createColumnOption($option, "program_type");
             $this->createColumnOption($option, "stat_label");
             $this->createColumnOption($option, "stat_value");
             $this->createColumnOption($option, "year");
             $this->createColumnOption($option, "created_at");
+            $this->createColumnOption($option, "program_type_id");
         }
 
         // Set up custom actions
@@ -1968,11 +1973,11 @@ class ProgramStatisticsList extends ProgramStatistics
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
         $this->program_id->setDbValue($row['program_id']);
-        $this->program_type->setDbValue($row['program_type']);
         $this->stat_label->setDbValue($row['stat_label']);
         $this->stat_value->setDbValue($row['stat_value']);
         $this->year->setDbValue($row['year']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->program_type_id->setDbValue($row['program_type_id']);
     }
 
     // Return a row with default values
@@ -1981,11 +1986,11 @@ class ProgramStatisticsList extends ProgramStatistics
         $row = [];
         $row['id'] = $this->id->DefaultValue;
         $row['program_id'] = $this->program_id->DefaultValue;
-        $row['program_type'] = $this->program_type->DefaultValue;
         $row['stat_label'] = $this->stat_label->DefaultValue;
         $row['stat_value'] = $this->stat_value->DefaultValue;
         $row['year'] = $this->year->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['program_type_id'] = $this->program_type_id->DefaultValue;
         return $row;
     }
 
@@ -2030,8 +2035,6 @@ class ProgramStatisticsList extends ProgramStatistics
 
         // program_id
 
-        // program_type
-
         // stat_label
 
         // stat_value
@@ -2039,6 +2042,8 @@ class ProgramStatisticsList extends ProgramStatistics
         // year
 
         // created_at
+
+        // program_type_id
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2048,9 +2053,6 @@ class ProgramStatisticsList extends ProgramStatistics
             // program_id
             $this->program_id->ViewValue = $this->program_id->CurrentValue;
             $this->program_id->ViewValue = FormatNumber($this->program_id->ViewValue, $this->program_id->formatPattern());
-
-            // program_type
-            $this->program_type->ViewValue = $this->program_type->CurrentValue;
 
             // stat_label
             $this->stat_label->ViewValue = $this->stat_label->CurrentValue;
@@ -2066,6 +2068,29 @@ class ProgramStatisticsList extends ProgramStatistics
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // program_type_id
+            $curVal = strval($this->program_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->program_type_id->ViewValue = $this->program_type_id->lookupCacheOption($curVal);
+                if ($this->program_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->program_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->program_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->program_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->program_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->program_type_id->ViewValue = $this->program_type_id->displayValue($arwrk);
+                    } else {
+                        $this->program_type_id->ViewValue = FormatNumber($this->program_type_id->CurrentValue, $this->program_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->program_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
@@ -2073,10 +2098,6 @@ class ProgramStatisticsList extends ProgramStatistics
             // program_id
             $this->program_id->HrefValue = "";
             $this->program_id->TooltipValue = "";
-
-            // program_type
-            $this->program_type->HrefValue = "";
-            $this->program_type->TooltipValue = "";
 
             // stat_label
             $this->stat_label->HrefValue = "";
@@ -2093,6 +2114,10 @@ class ProgramStatisticsList extends ProgramStatistics
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // program_type_id
+            $this->program_type_id->HrefValue = "";
+            $this->program_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2180,6 +2205,8 @@ class ProgramStatisticsList extends ProgramStatistics
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_program_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

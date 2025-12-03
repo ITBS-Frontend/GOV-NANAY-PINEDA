@@ -37,9 +37,6 @@ class ProgramStatistic extends AbstractEntity
     #[Column(name: "program_id", type: "integer", nullable: true)]
     private ?int $programId;
 
-    #[Column(name: "program_type", type: "string", nullable: true)]
-    private ?string $programType;
-
     #[Column(name: "stat_label", type: "string")]
     private string $statLabel;
 
@@ -51,6 +48,9 @@ class ProgramStatistic extends AbstractEntity
 
     #[Column(name: "created_at", type: "datetime", nullable: true)]
     private ?DateTime $createdAt;
+
+    #[Column(name: "program_type_id", type: "integer", nullable: true)]
+    private ?int $programTypeId;
 
     public function getId(): int
     {
@@ -71,17 +71,6 @@ class ProgramStatistic extends AbstractEntity
     public function setProgramId(?int $value): static
     {
         $this->programId = $value;
-        return $this;
-    }
-
-    public function getProgramType(): ?string
-    {
-        return HtmlDecode($this->programType);
-    }
-
-    public function setProgramType(?string $value): static
-    {
-        $this->programType = RemoveXss($value);
         return $this;
     }
 
@@ -126,6 +115,17 @@ class ProgramStatistic extends AbstractEntity
     public function setCreatedAt(?DateTime $value): static
     {
         $this->createdAt = $value;
+        return $this;
+    }
+
+    public function getProgramTypeId(): ?int
+    {
+        return $this->programTypeId;
+    }
+
+    public function setProgramTypeId(?int $value): static
+    {
+        $this->programTypeId = $value;
         return $this;
     }
 }

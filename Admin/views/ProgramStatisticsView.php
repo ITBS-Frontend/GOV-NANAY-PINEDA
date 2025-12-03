@@ -73,17 +73,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->program_type->Visible) { // program_type ?>
-    <tr id="r_program_type"<?= $Page->program_type->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_program_statistics_program_type"><?= $Page->program_type->caption() ?></span></td>
-        <td data-name="program_type"<?= $Page->program_type->cellAttributes() ?>>
-<span id="el_program_statistics_program_type">
-<span<?= $Page->program_type->viewAttributes() ?>>
-<?= $Page->program_type->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->stat_label->Visible) { // stat_label ?>
     <tr id="r_stat_label"<?= $Page->stat_label->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_program_statistics_stat_label"><?= $Page->stat_label->caption() ?></span></td>
@@ -124,6 +113,17 @@ loadjs.ready("head", function () {
 <span id="el_program_statistics_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+    <tr id="r_program_type_id"<?= $Page->program_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_program_statistics_program_type_id"><?= $Page->program_type_id->caption() ?></span></td>
+        <td data-name="program_type_id"<?= $Page->program_type_id->cellAttributes() ?>>
+<span id="el_program_statistics_program_type_id">
+<span<?= $Page->program_type_id->viewAttributes() ?>>
+<?= $Page->program_type_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

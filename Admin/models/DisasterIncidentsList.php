@@ -146,7 +146,6 @@ class DisasterIncidentsList extends DisasterIncidents
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->incident_type->setVisibility();
         $this->incident_name->setVisibility();
         $this->occurrence_date->setVisibility();
         $this->affected_areas->Visible = false;
@@ -155,6 +154,7 @@ class DisasterIncidentsList extends DisasterIncidents
         $this->response_actions->Visible = false;
         $this->lessons_learned->Visible = false;
         $this->created_at->setVisibility();
+        $this->incident_type_id->setVisibility();
     }
 
     // Constructor
@@ -462,6 +462,9 @@ class DisasterIncidentsList extends DisasterIncidents
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
     }
 
     // Lookup data
@@ -694,6 +697,9 @@ class DisasterIncidentsList extends DisasterIncidents
 
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->incident_type_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1032,7 +1038,6 @@ class DisasterIncidentsList extends DisasterIncidents
         $filterList = "";
         $savedFilterList = "";
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->incident_type->AdvancedSearch->toJson(), ","); // Field incident_type
         $filterList = Concat($filterList, $this->incident_name->AdvancedSearch->toJson(), ","); // Field incident_name
         $filterList = Concat($filterList, $this->occurrence_date->AdvancedSearch->toJson(), ","); // Field occurrence_date
         $filterList = Concat($filterList, $this->affected_areas->AdvancedSearch->toJson(), ","); // Field affected_areas
@@ -1041,6 +1046,7 @@ class DisasterIncidentsList extends DisasterIncidents
         $filterList = Concat($filterList, $this->response_actions->AdvancedSearch->toJson(), ","); // Field response_actions
         $filterList = Concat($filterList, $this->lessons_learned->AdvancedSearch->toJson(), ","); // Field lessons_learned
         $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
+        $filterList = Concat($filterList, $this->incident_type_id->AdvancedSearch->toJson(), ","); // Field incident_type_id
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1087,14 +1093,6 @@ class DisasterIncidentsList extends DisasterIncidents
         $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
-
-        // Field incident_type
-        $this->incident_type->AdvancedSearch->SearchValue = @$filter["x_incident_type"];
-        $this->incident_type->AdvancedSearch->SearchOperator = @$filter["z_incident_type"];
-        $this->incident_type->AdvancedSearch->SearchCondition = @$filter["v_incident_type"];
-        $this->incident_type->AdvancedSearch->SearchValue2 = @$filter["y_incident_type"];
-        $this->incident_type->AdvancedSearch->SearchOperator2 = @$filter["w_incident_type"];
-        $this->incident_type->AdvancedSearch->save();
 
         // Field incident_name
         $this->incident_name->AdvancedSearch->SearchValue = @$filter["x_incident_name"];
@@ -1159,6 +1157,14 @@ class DisasterIncidentsList extends DisasterIncidents
         $this->created_at->AdvancedSearch->SearchValue2 = @$filter["y_created_at"];
         $this->created_at->AdvancedSearch->SearchOperator2 = @$filter["w_created_at"];
         $this->created_at->AdvancedSearch->save();
+
+        // Field incident_type_id
+        $this->incident_type_id->AdvancedSearch->SearchValue = @$filter["x_incident_type_id"];
+        $this->incident_type_id->AdvancedSearch->SearchOperator = @$filter["z_incident_type_id"];
+        $this->incident_type_id->AdvancedSearch->SearchCondition = @$filter["v_incident_type_id"];
+        $this->incident_type_id->AdvancedSearch->SearchValue2 = @$filter["y_incident_type_id"];
+        $this->incident_type_id->AdvancedSearch->SearchOperator2 = @$filter["w_incident_type_id"];
+        $this->incident_type_id->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1198,7 +1204,6 @@ class DisasterIncidentsList extends DisasterIncidents
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->incident_type;
         $searchFlds[] = &$this->incident_name;
         $searchFlds[] = &$this->affected_areas;
         $searchFlds[] = &$this->response_actions;
@@ -1282,12 +1287,12 @@ class DisasterIncidentsList extends DisasterIncidents
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->incident_type); // incident_type
             $this->updateSort($this->incident_name); // incident_name
             $this->updateSort($this->occurrence_date); // occurrence_date
             $this->updateSort($this->casualties); // casualties
             $this->updateSort($this->damages_estimated); // damages_estimated
             $this->updateSort($this->created_at); // created_at
+            $this->updateSort($this->incident_type_id); // incident_type_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1313,7 +1318,6 @@ class DisasterIncidentsList extends DisasterIncidents
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->incident_type->setSort("");
                 $this->incident_name->setSort("");
                 $this->occurrence_date->setSort("");
                 $this->affected_areas->setSort("");
@@ -1322,6 +1326,7 @@ class DisasterIncidentsList extends DisasterIncidents
                 $this->response_actions->setSort("");
                 $this->lessons_learned->setSort("");
                 $this->created_at->setSort("");
+                $this->incident_type_id->setSort("");
             }
 
             // Reset start position
@@ -1557,12 +1562,12 @@ class DisasterIncidentsList extends DisasterIncidents
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "incident_type");
             $this->createColumnOption($option, "incident_name");
             $this->createColumnOption($option, "occurrence_date");
             $this->createColumnOption($option, "casualties");
             $this->createColumnOption($option, "damages_estimated");
             $this->createColumnOption($option, "created_at");
+            $this->createColumnOption($option, "incident_type_id");
         }
 
         // Set up custom actions
@@ -2002,7 +2007,6 @@ class DisasterIncidentsList extends DisasterIncidents
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->incident_type->setDbValue($row['incident_type']);
         $this->incident_name->setDbValue($row['incident_name']);
         $this->occurrence_date->setDbValue($row['occurrence_date']);
         $this->affected_areas->setDbValue($row['affected_areas']);
@@ -2011,6 +2015,7 @@ class DisasterIncidentsList extends DisasterIncidents
         $this->response_actions->setDbValue($row['response_actions']);
         $this->lessons_learned->setDbValue($row['lessons_learned']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->incident_type_id->setDbValue($row['incident_type_id']);
     }
 
     // Return a row with default values
@@ -2018,7 +2023,6 @@ class DisasterIncidentsList extends DisasterIncidents
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['incident_type'] = $this->incident_type->DefaultValue;
         $row['incident_name'] = $this->incident_name->DefaultValue;
         $row['occurrence_date'] = $this->occurrence_date->DefaultValue;
         $row['affected_areas'] = $this->affected_areas->DefaultValue;
@@ -2027,6 +2031,7 @@ class DisasterIncidentsList extends DisasterIncidents
         $row['response_actions'] = $this->response_actions->DefaultValue;
         $row['lessons_learned'] = $this->lessons_learned->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['incident_type_id'] = $this->incident_type_id->DefaultValue;
         return $row;
     }
 
@@ -2069,8 +2074,6 @@ class DisasterIncidentsList extends DisasterIncidents
 
         // id
 
-        // incident_type
-
         // incident_name
 
         // occurrence_date
@@ -2087,13 +2090,12 @@ class DisasterIncidentsList extends DisasterIncidents
 
         // created_at
 
+        // incident_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // incident_type
-            $this->incident_type->ViewValue = $this->incident_type->CurrentValue;
 
             // incident_name
             $this->incident_name->ViewValue = $this->incident_name->CurrentValue;
@@ -2114,13 +2116,32 @@ class DisasterIncidentsList extends DisasterIncidents
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // incident_type_id
+            $curVal = strval($this->incident_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->incident_type_id->ViewValue = $this->incident_type_id->lookupCacheOption($curVal);
+                if ($this->incident_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->incident_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->incident_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->incident_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->incident_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->incident_type_id->ViewValue = $this->incident_type_id->displayValue($arwrk);
+                    } else {
+                        $this->incident_type_id->ViewValue = FormatNumber($this->incident_type_id->CurrentValue, $this->incident_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->incident_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // incident_type
-            $this->incident_type->HrefValue = "";
-            $this->incident_type->TooltipValue = "";
 
             // incident_name
             $this->incident_name->HrefValue = "";
@@ -2141,6 +2162,10 @@ class DisasterIncidentsList extends DisasterIncidents
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // incident_type_id
+            $this->incident_type_id->HrefValue = "";
+            $this->incident_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2228,6 +2253,8 @@ class DisasterIncidentsList extends DisasterIncidents
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_incident_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

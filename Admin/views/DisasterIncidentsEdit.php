@@ -29,7 +29,6 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["incident_type", [fields.incident_type.visible && fields.incident_type.required ? ew.Validators.required(fields.incident_type.caption) : null], fields.incident_type.isInvalid],
             ["incident_name", [fields.incident_name.visible && fields.incident_name.required ? ew.Validators.required(fields.incident_name.caption) : null], fields.incident_name.isInvalid],
             ["occurrence_date", [fields.occurrence_date.visible && fields.occurrence_date.required ? ew.Validators.required(fields.occurrence_date.caption) : null, ew.Validators.datetime(fields.occurrence_date.clientFormatPattern)], fields.occurrence_date.isInvalid],
             ["affected_areas", [fields.affected_areas.visible && fields.affected_areas.required ? ew.Validators.required(fields.affected_areas.caption) : null], fields.affected_areas.isInvalid],
@@ -37,7 +36,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["damages_estimated", [fields.damages_estimated.visible && fields.damages_estimated.required ? ew.Validators.required(fields.damages_estimated.caption) : null, ew.Validators.float], fields.damages_estimated.isInvalid],
             ["response_actions", [fields.response_actions.visible && fields.response_actions.required ? ew.Validators.required(fields.response_actions.caption) : null], fields.response_actions.isInvalid],
             ["lessons_learned", [fields.lessons_learned.visible && fields.lessons_learned.required ? ew.Validators.required(fields.lessons_learned.caption) : null], fields.lessons_learned.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
+            ["incident_type_id", [fields.incident_type_id.visible && fields.incident_type_id.required ? ew.Validators.required(fields.incident_type_id.caption) : null], fields.incident_type_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -53,6 +53,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "incident_type_id": <?= $Page->incident_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -85,18 +86,6 @@ loadjs.ready("head", function () {
 <span<?= $Page->id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
 <input type="hidden" data-table="disaster_incidents" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->incident_type->Visible) { // incident_type ?>
-    <div id="r_incident_type"<?= $Page->incident_type->rowAttributes() ?>>
-        <label id="elh_disaster_incidents_incident_type" for="x_incident_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->incident_type->caption() ?><?= $Page->incident_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->incident_type->cellAttributes() ?>>
-<span id="el_disaster_incidents_incident_type">
-<input type="<?= $Page->incident_type->getInputTextType() ?>" name="x_incident_type" id="x_incident_type" data-table="disaster_incidents" data-field="x_incident_type" value="<?= $Page->incident_type->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->incident_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->incident_type->formatPattern()) ?>"<?= $Page->incident_type->editAttributes() ?> aria-describedby="x_incident_type_help">
-<?= $Page->incident_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->incident_type->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>
@@ -214,40 +203,45 @@ loadjs.ready(["fdisaster_incidentsedit", "datetimepicker"], function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_disaster_incidents_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_disaster_incidents_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="disaster_incidents" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
+<?php if ($Page->incident_type_id->Visible) { // incident_type_id ?>
+    <div id="r_incident_type_id"<?= $Page->incident_type_id->rowAttributes() ?>>
+        <label id="elh_disaster_incidents_incident_type_id" for="x_incident_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->incident_type_id->caption() ?><?= $Page->incident_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->incident_type_id->cellAttributes() ?>>
+<span id="el_disaster_incidents_incident_type_id">
+    <select
+        id="x_incident_type_id"
+        name="x_incident_type_id"
+        class="form-select ew-select<?= $Page->incident_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->incident_type_id->IsNativeSelect) { ?>
+        data-select2-id="fdisaster_incidentsedit_x_incident_type_id"
+        <?php } ?>
+        data-table="disaster_incidents"
+        data-field="x_incident_type_id"
+        data-value-separator="<?= $Page->incident_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->incident_type_id->getPlaceHolder()) ?>"
+        <?= $Page->incident_type_id->editAttributes() ?>>
+        <?= $Page->incident_type_id->selectOptionListHtml("x_incident_type_id") ?>
+    </select>
+    <?= $Page->incident_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->incident_type_id->getErrorMessage() ?></div>
+<?= $Page->incident_type_id->Lookup->getParamTag($Page, "p_x_incident_type_id") ?>
+<?php if (!$Page->incident_type_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fdisaster_incidentsedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fdisaster_incidentsedit", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fdisaster_incidentsedit", function() {
+    var options = { name: "x_incident_type_id", selectId: "fdisaster_incidentsedit_x_incident_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fdisaster_incidentsedit.lists.incident_type_id?.lookupOptions.length) {
+        options.data = { id: "x_incident_type_id", form: "fdisaster_incidentsedit" };
+    } else {
+        options.ajax = { id: "x_incident_type_id", form: "fdisaster_incidentsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.disaster_incidents.fields.incident_type_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

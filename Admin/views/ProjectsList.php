@@ -183,14 +183,14 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->status->Visible) { // status ?>
         <th data-name="status" class="<?= $Page->status->headerCellClass() ?>"><div id="elh_projects_status" class="projects_status"><?= $Page->renderFieldHeader($Page->status) ?></div></th>
 <?php } ?>
-<?php if ($Page->project_type->Visible) { // project_type ?>
-        <th data-name="project_type" class="<?= $Page->project_type->headerCellClass() ?>"><div id="elh_projects_project_type" class="projects_project_type"><?= $Page->renderFieldHeader($Page->project_type) ?></div></th>
-<?php } ?>
 <?php if ($Page->municipality->Visible) { // municipality ?>
         <th data-name="municipality" class="<?= $Page->municipality->headerCellClass() ?>"><div id="elh_projects_municipality" class="projects_municipality"><?= $Page->renderFieldHeader($Page->municipality) ?></div></th>
 <?php } ?>
 <?php if ($Page->coordinates->Visible) { // coordinates ?>
         <th data-name="coordinates" class="<?= $Page->coordinates->headerCellClass() ?>"><div id="elh_projects_coordinates" class="projects_coordinates"><?= $Page->renderFieldHeader($Page->coordinates) ?></div></th>
+<?php } ?>
+<?php if ($Page->project_type_id->Visible) { // project_type_id ?>
+        <th data-name="project_type_id" class="<?= $Page->project_type_id->headerCellClass() ?>"><div id="elh_projects_project_type_id" class="projects_project_type_id"><?= $Page->renderFieldHeader($Page->project_type_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -317,14 +317,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->project_type->Visible) { // project_type ?>
-        <td data-name="project_type"<?= $Page->project_type->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_project_type" class="el_projects_project_type">
-<span<?= $Page->project_type->viewAttributes() ?>>
-<?= $Page->project_type->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->municipality->Visible) { // municipality ?>
         <td data-name="municipality"<?= $Page->municipality->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_municipality" class="el_projects_municipality">
@@ -338,6 +330,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_coordinates" class="el_projects_coordinates">
 <span<?= $Page->coordinates->viewAttributes() ?>>
 <?= $Page->coordinates->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->project_type_id->Visible) { // project_type_id ?>
+        <td data-name="project_type_id"<?= $Page->project_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_projects_project_type_id" class="el_projects_project_type_id">
+<span<?= $Page->project_type_id->viewAttributes() ?>>
+<?= $Page->project_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

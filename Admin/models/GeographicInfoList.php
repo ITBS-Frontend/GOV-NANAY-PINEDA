@@ -146,13 +146,13 @@ class GeographicInfoList extends GeographicInfo
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->info_type->setVisibility();
         $this->name->setVisibility();
         $this->description->Visible = false;
         $this->coordinates->setVisibility();
         $this->area_sqkm->setVisibility();
         $this->population->setVisibility();
         $this->created_at->setVisibility();
+        $this->info_type_id->setVisibility();
     }
 
     // Constructor
@@ -460,6 +460,9 @@ class GeographicInfoList extends GeographicInfo
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
         }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
+        }
     }
 
     // Lookup data
@@ -692,6 +695,9 @@ class GeographicInfoList extends GeographicInfo
 
         // Setup other options
         $this->setupOtherOptions();
+
+        // Set up lookup cache
+        $this->setupLookupOptions($this->info_type_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1030,13 +1036,13 @@ class GeographicInfoList extends GeographicInfo
         $filterList = "";
         $savedFilterList = "";
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->info_type->AdvancedSearch->toJson(), ","); // Field info_type
         $filterList = Concat($filterList, $this->name->AdvancedSearch->toJson(), ","); // Field name
         $filterList = Concat($filterList, $this->description->AdvancedSearch->toJson(), ","); // Field description
         $filterList = Concat($filterList, $this->coordinates->AdvancedSearch->toJson(), ","); // Field coordinates
         $filterList = Concat($filterList, $this->area_sqkm->AdvancedSearch->toJson(), ","); // Field area_sqkm
         $filterList = Concat($filterList, $this->population->AdvancedSearch->toJson(), ","); // Field population
         $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
+        $filterList = Concat($filterList, $this->info_type_id->AdvancedSearch->toJson(), ","); // Field info_type_id
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1083,14 +1089,6 @@ class GeographicInfoList extends GeographicInfo
         $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
-
-        // Field info_type
-        $this->info_type->AdvancedSearch->SearchValue = @$filter["x_info_type"];
-        $this->info_type->AdvancedSearch->SearchOperator = @$filter["z_info_type"];
-        $this->info_type->AdvancedSearch->SearchCondition = @$filter["v_info_type"];
-        $this->info_type->AdvancedSearch->SearchValue2 = @$filter["y_info_type"];
-        $this->info_type->AdvancedSearch->SearchOperator2 = @$filter["w_info_type"];
-        $this->info_type->AdvancedSearch->save();
 
         // Field name
         $this->name->AdvancedSearch->SearchValue = @$filter["x_name"];
@@ -1139,6 +1137,14 @@ class GeographicInfoList extends GeographicInfo
         $this->created_at->AdvancedSearch->SearchValue2 = @$filter["y_created_at"];
         $this->created_at->AdvancedSearch->SearchOperator2 = @$filter["w_created_at"];
         $this->created_at->AdvancedSearch->save();
+
+        // Field info_type_id
+        $this->info_type_id->AdvancedSearch->SearchValue = @$filter["x_info_type_id"];
+        $this->info_type_id->AdvancedSearch->SearchOperator = @$filter["z_info_type_id"];
+        $this->info_type_id->AdvancedSearch->SearchCondition = @$filter["v_info_type_id"];
+        $this->info_type_id->AdvancedSearch->SearchValue2 = @$filter["y_info_type_id"];
+        $this->info_type_id->AdvancedSearch->SearchOperator2 = @$filter["w_info_type_id"];
+        $this->info_type_id->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1178,7 +1184,6 @@ class GeographicInfoList extends GeographicInfo
 
         // Fields to search
         $searchFlds = [];
-        $searchFlds[] = &$this->info_type;
         $searchFlds[] = &$this->name;
         $searchFlds[] = &$this->description;
         $searchFlds[] = &$this->coordinates;
@@ -1261,12 +1266,12 @@ class GeographicInfoList extends GeographicInfo
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
-            $this->updateSort($this->info_type); // info_type
             $this->updateSort($this->name); // name
             $this->updateSort($this->coordinates); // coordinates
             $this->updateSort($this->area_sqkm); // area_sqkm
             $this->updateSort($this->population); // population
             $this->updateSort($this->created_at); // created_at
+            $this->updateSort($this->info_type_id); // info_type_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1292,13 +1297,13 @@ class GeographicInfoList extends GeographicInfo
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
-                $this->info_type->setSort("");
                 $this->name->setSort("");
                 $this->description->setSort("");
                 $this->coordinates->setSort("");
                 $this->area_sqkm->setSort("");
                 $this->population->setSort("");
                 $this->created_at->setSort("");
+                $this->info_type_id->setSort("");
             }
 
             // Reset start position
@@ -1534,12 +1539,12 @@ class GeographicInfoList extends GeographicInfo
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "info_type");
             $this->createColumnOption($option, "name");
             $this->createColumnOption($option, "coordinates");
             $this->createColumnOption($option, "area_sqkm");
             $this->createColumnOption($option, "population");
             $this->createColumnOption($option, "created_at");
+            $this->createColumnOption($option, "info_type_id");
         }
 
         // Set up custom actions
@@ -1979,13 +1984,13 @@ class GeographicInfoList extends GeographicInfo
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->info_type->setDbValue($row['info_type']);
         $this->name->setDbValue($row['name']);
         $this->description->setDbValue($row['description']);
         $this->coordinates->setDbValue($row['coordinates']);
         $this->area_sqkm->setDbValue($row['area_sqkm']);
         $this->population->setDbValue($row['population']);
         $this->created_at->setDbValue($row['created_at']);
+        $this->info_type_id->setDbValue($row['info_type_id']);
     }
 
     // Return a row with default values
@@ -1993,13 +1998,13 @@ class GeographicInfoList extends GeographicInfo
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['info_type'] = $this->info_type->DefaultValue;
         $row['name'] = $this->name->DefaultValue;
         $row['description'] = $this->description->DefaultValue;
         $row['coordinates'] = $this->coordinates->DefaultValue;
         $row['area_sqkm'] = $this->area_sqkm->DefaultValue;
         $row['population'] = $this->population->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['info_type_id'] = $this->info_type_id->DefaultValue;
         return $row;
     }
 
@@ -2042,8 +2047,6 @@ class GeographicInfoList extends GeographicInfo
 
         // id
 
-        // info_type
-
         // name
 
         // description
@@ -2056,13 +2059,12 @@ class GeographicInfoList extends GeographicInfo
 
         // created_at
 
+        // info_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // info_type
-            $this->info_type->ViewValue = $this->info_type->CurrentValue;
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
@@ -2082,13 +2084,32 @@ class GeographicInfoList extends GeographicInfo
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // info_type_id
+            $curVal = strval($this->info_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->info_type_id->ViewValue = $this->info_type_id->lookupCacheOption($curVal);
+                if ($this->info_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->info_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->info_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->info_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->info_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->info_type_id->ViewValue = $this->info_type_id->displayValue($arwrk);
+                    } else {
+                        $this->info_type_id->ViewValue = FormatNumber($this->info_type_id->CurrentValue, $this->info_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->info_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // info_type
-            $this->info_type->HrefValue = "";
-            $this->info_type->TooltipValue = "";
 
             // name
             $this->name->HrefValue = "";
@@ -2109,6 +2130,10 @@ class GeographicInfoList extends GeographicInfo
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // info_type_id
+            $this->info_type_id->HrefValue = "";
+            $this->info_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2196,6 +2221,8 @@ class GeographicInfoList extends GeographicInfo
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_info_type_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

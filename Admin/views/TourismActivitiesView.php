@@ -106,17 +106,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->difficulty_level->Visible) { // difficulty_level ?>
-    <tr id="r_difficulty_level"<?= $Page->difficulty_level->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_tourism_activities_difficulty_level"><?= $Page->difficulty_level->caption() ?></span></td>
-        <td data-name="difficulty_level"<?= $Page->difficulty_level->cellAttributes() ?>>
-<span id="el_tourism_activities_difficulty_level">
-<span<?= $Page->difficulty_level->viewAttributes() ?>>
-<?= $Page->difficulty_level->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->display_order->Visible) { // display_order ?>
     <tr id="r_display_order"<?= $Page->display_order->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_tourism_activities_display_order"><?= $Page->display_order->caption() ?></span></td>
@@ -135,6 +124,17 @@ loadjs.ready("head", function () {
 <span id="el_tourism_activities_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->difficulty_level_id->Visible) { // difficulty_level_id ?>
+    <tr id="r_difficulty_level_id"<?= $Page->difficulty_level_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_tourism_activities_difficulty_level_id"><?= $Page->difficulty_level_id->caption() ?></span></td>
+        <td data-name="difficulty_level_id"<?= $Page->difficulty_level_id->cellAttributes() ?>>
+<span id="el_tourism_activities_difficulty_level_id">
+<span<?= $Page->difficulty_level_id->viewAttributes() ?>>
+<?= $Page->difficulty_level_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

@@ -32,8 +32,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
             ["color_code", [fields.color_code.visible && fields.color_code.required ? ew.Validators.required(fields.color_code.caption) : null], fields.color_code.isInvalid],
             ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid],
-            ["category_type", [fields.category_type.visible && fields.category_type.required ? ew.Validators.required(fields.category_type.caption) : null], fields.category_type.isInvalid],
-            ["parent_id", [fields.parent_id.visible && fields.parent_id.required ? ew.Validators.required(fields.parent_id.caption) : null, ew.Validators.integer], fields.parent_id.isInvalid]
+            ["parent_id", [fields.parent_id.visible && fields.parent_id.required ? ew.Validators.required(fields.parent_id.caption) : null, ew.Validators.integer], fields.parent_id.isInvalid],
+            ["category_type_id", [fields.category_type_id.visible && fields.category_type_id.required ? ew.Validators.required(fields.category_type_id.caption) : null], fields.category_type_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -49,6 +49,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "category_type_id": <?= $Page->category_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -150,18 +151,6 @@ loadjs.ready(["fcategoriesedit", "datetimepicker"], function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->category_type->Visible) { // category_type ?>
-    <div id="r_category_type"<?= $Page->category_type->rowAttributes() ?>>
-        <label id="elh_categories_category_type" for="x_category_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->category_type->caption() ?><?= $Page->category_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->category_type->cellAttributes() ?>>
-<span id="el_categories_category_type">
-<input type="<?= $Page->category_type->getInputTextType() ?>" name="x_category_type" id="x_category_type" data-table="categories" data-field="x_category_type" value="<?= $Page->category_type->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->category_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->category_type->formatPattern()) ?>"<?= $Page->category_type->editAttributes() ?> aria-describedby="x_category_type_help">
-<?= $Page->category_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->category_type->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->parent_id->Visible) { // parent_id ?>
     <div id="r_parent_id"<?= $Page->parent_id->rowAttributes() ?>>
         <label id="elh_categories_parent_id" for="x_parent_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->parent_id->caption() ?><?= $Page->parent_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -170,6 +159,52 @@ loadjs.ready(["fcategoriesedit", "datetimepicker"], function () {
 <input type="<?= $Page->parent_id->getInputTextType() ?>" name="x_parent_id" id="x_parent_id" data-table="categories" data-field="x_parent_id" value="<?= $Page->parent_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->parent_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->parent_id->formatPattern()) ?>"<?= $Page->parent_id->editAttributes() ?> aria-describedby="x_parent_id_help">
 <?= $Page->parent_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->parent_id->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->category_type_id->Visible) { // category_type_id ?>
+    <div id="r_category_type_id"<?= $Page->category_type_id->rowAttributes() ?>>
+        <label id="elh_categories_category_type_id" for="x_category_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->category_type_id->caption() ?><?= $Page->category_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->category_type_id->cellAttributes() ?>>
+<span id="el_categories_category_type_id">
+    <select
+        id="x_category_type_id"
+        name="x_category_type_id"
+        class="form-select ew-select<?= $Page->category_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->category_type_id->IsNativeSelect) { ?>
+        data-select2-id="fcategoriesedit_x_category_type_id"
+        <?php } ?>
+        data-table="categories"
+        data-field="x_category_type_id"
+        data-value-separator="<?= $Page->category_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->category_type_id->getPlaceHolder()) ?>"
+        <?= $Page->category_type_id->editAttributes() ?>>
+        <?= $Page->category_type_id->selectOptionListHtml("x_category_type_id") ?>
+    </select>
+    <?= $Page->category_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->category_type_id->getErrorMessage() ?></div>
+<?= $Page->category_type_id->Lookup->getParamTag($Page, "p_x_category_type_id") ?>
+<?php if (!$Page->category_type_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fcategoriesedit", function() {
+    var options = { name: "x_category_type_id", selectId: "fcategoriesedit_x_category_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fcategoriesedit.lists.category_type_id?.lookupOptions.length) {
+        options.data = { id: "x_category_type_id", form: "fcategoriesedit" };
+    } else {
+        options.ajax = { id: "x_category_type_id", form: "fcategoriesedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.categories.fields.category_type_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

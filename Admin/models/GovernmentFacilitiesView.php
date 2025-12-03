@@ -140,7 +140,6 @@ class GovernmentFacilitiesView extends GovernmentFacilities
     public function setVisibility()
     {
         $this->id->setVisibility();
-        $this->facility_type->setVisibility();
         $this->name->setVisibility();
         $this->address->setVisibility();
         $this->municipality->setVisibility();
@@ -152,6 +151,7 @@ class GovernmentFacilitiesView extends GovernmentFacilities
         $this->featured_image->setVisibility();
         $this->is_active->setVisibility();
         $this->created_at->setVisibility();
+        $this->facility_type_id->setVisibility();
     }
 
     // Constructor
@@ -542,6 +542,7 @@ class GovernmentFacilitiesView extends GovernmentFacilities
 
         // Set up lookup cache
         $this->setupLookupOptions($this->is_active);
+        $this->setupLookupOptions($this->facility_type_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -742,7 +743,6 @@ class GovernmentFacilitiesView extends GovernmentFacilities
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->facility_type->setDbValue($row['facility_type']);
         $this->name->setDbValue($row['name']);
         $this->address->setDbValue($row['address']);
         $this->municipality->setDbValue($row['municipality']);
@@ -754,6 +754,7 @@ class GovernmentFacilitiesView extends GovernmentFacilities
         $this->featured_image->setDbValue($row['featured_image']);
         $this->is_active->setDbValue((ConvertToBool($row['is_active']) ? "1" : "0"));
         $this->created_at->setDbValue($row['created_at']);
+        $this->facility_type_id->setDbValue($row['facility_type_id']);
     }
 
     // Return a row with default values
@@ -761,7 +762,6 @@ class GovernmentFacilitiesView extends GovernmentFacilities
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['facility_type'] = $this->facility_type->DefaultValue;
         $row['name'] = $this->name->DefaultValue;
         $row['address'] = $this->address->DefaultValue;
         $row['municipality'] = $this->municipality->DefaultValue;
@@ -773,6 +773,7 @@ class GovernmentFacilitiesView extends GovernmentFacilities
         $row['featured_image'] = $this->featured_image->DefaultValue;
         $row['is_active'] = $this->is_active->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
+        $row['facility_type_id'] = $this->facility_type_id->DefaultValue;
         return $row;
     }
 
@@ -796,8 +797,6 @@ class GovernmentFacilitiesView extends GovernmentFacilities
 
         // id
 
-        // facility_type
-
         // name
 
         // address
@@ -820,13 +819,12 @@ class GovernmentFacilitiesView extends GovernmentFacilities
 
         // created_at
 
+        // facility_type_id
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-
-            // facility_type
-            $this->facility_type->ViewValue = $this->facility_type->CurrentValue;
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
@@ -866,13 +864,32 @@ class GovernmentFacilitiesView extends GovernmentFacilities
             $this->created_at->ViewValue = $this->created_at->CurrentValue;
             $this->created_at->ViewValue = FormatDateTime($this->created_at->ViewValue, $this->created_at->formatPattern());
 
+            // facility_type_id
+            $curVal = strval($this->facility_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->facility_type_id->ViewValue = $this->facility_type_id->lookupCacheOption($curVal);
+                if ($this->facility_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->facility_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->facility_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->facility_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->facility_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->facility_type_id->ViewValue = $this->facility_type_id->displayValue($arwrk);
+                    } else {
+                        $this->facility_type_id->ViewValue = FormatNumber($this->facility_type_id->CurrentValue, $this->facility_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->facility_type_id->ViewValue = null;
+            }
+
             // id
             $this->id->HrefValue = "";
             $this->id->TooltipValue = "";
-
-            // facility_type
-            $this->facility_type->HrefValue = "";
-            $this->facility_type->TooltipValue = "";
 
             // name
             $this->name->HrefValue = "";
@@ -917,6 +934,10 @@ class GovernmentFacilitiesView extends GovernmentFacilities
             // created_at
             $this->created_at->HrefValue = "";
             $this->created_at->TooltipValue = "";
+
+            // facility_type_id
+            $this->facility_type_id->HrefValue = "";
+            $this->facility_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -950,6 +971,8 @@ class GovernmentFacilitiesView extends GovernmentFacilities
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_is_active":
+                    break;
+                case "x_facility_type_id":
                     break;
                 default:
                     $lookupFilter = "";

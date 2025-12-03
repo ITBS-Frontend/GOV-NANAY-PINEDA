@@ -26,9 +26,9 @@ loadjs.ready(["wrapper", "head"], function () {
             ["activity_name", [fields.activity_name.visible && fields.activity_name.required ? ew.Validators.required(fields.activity_name.caption) : null], fields.activity_name.isInvalid],
             ["description", [fields.description.visible && fields.description.required ? ew.Validators.required(fields.description.caption) : null], fields.description.isInvalid],
             ["duration", [fields.duration.visible && fields.duration.required ? ew.Validators.required(fields.duration.caption) : null], fields.duration.isInvalid],
-            ["difficulty_level", [fields.difficulty_level.visible && fields.difficulty_level.required ? ew.Validators.required(fields.difficulty_level.caption) : null], fields.difficulty_level.isInvalid],
             ["display_order", [fields.display_order.visible && fields.display_order.required ? ew.Validators.required(fields.display_order.caption) : null, ew.Validators.integer], fields.display_order.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
+            ["difficulty_level_id", [fields.difficulty_level_id.visible && fields.difficulty_level_id.required ? ew.Validators.required(fields.difficulty_level_id.caption) : null], fields.difficulty_level_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -44,6 +44,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "difficulty_level_id": <?= $Page->difficulty_level_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -121,18 +122,6 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->difficulty_level->Visible) { // difficulty_level ?>
-    <div id="r_difficulty_level"<?= $Page->difficulty_level->rowAttributes() ?>>
-        <label id="elh_tourism_activities_difficulty_level" for="x_difficulty_level" class="<?= $Page->LeftColumnClass ?>"><?= $Page->difficulty_level->caption() ?><?= $Page->difficulty_level->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->difficulty_level->cellAttributes() ?>>
-<span id="el_tourism_activities_difficulty_level">
-<input type="<?= $Page->difficulty_level->getInputTextType() ?>" name="x_difficulty_level" id="x_difficulty_level" data-table="tourism_activities" data-field="x_difficulty_level" value="<?= $Page->difficulty_level->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->difficulty_level->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->difficulty_level->formatPattern()) ?>"<?= $Page->difficulty_level->editAttributes() ?> aria-describedby="x_difficulty_level_help">
-<?= $Page->difficulty_level->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->difficulty_level->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->display_order->Visible) { // display_order ?>
     <div id="r_display_order"<?= $Page->display_order->rowAttributes() ?>>
         <label id="elh_tourism_activities_display_order" for="x_display_order" class="<?= $Page->LeftColumnClass ?>"><?= $Page->display_order->caption() ?><?= $Page->display_order->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -145,40 +134,45 @@ $Page->showMessage();
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_tourism_activities_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_tourism_activities_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="tourism_activities" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
+<?php if ($Page->difficulty_level_id->Visible) { // difficulty_level_id ?>
+    <div id="r_difficulty_level_id"<?= $Page->difficulty_level_id->rowAttributes() ?>>
+        <label id="elh_tourism_activities_difficulty_level_id" for="x_difficulty_level_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->difficulty_level_id->caption() ?><?= $Page->difficulty_level_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->difficulty_level_id->cellAttributes() ?>>
+<span id="el_tourism_activities_difficulty_level_id">
+    <select
+        id="x_difficulty_level_id"
+        name="x_difficulty_level_id"
+        class="form-select ew-select<?= $Page->difficulty_level_id->isInvalidClass() ?>"
+        <?php if (!$Page->difficulty_level_id->IsNativeSelect) { ?>
+        data-select2-id="ftourism_activitiesadd_x_difficulty_level_id"
+        <?php } ?>
+        data-table="tourism_activities"
+        data-field="x_difficulty_level_id"
+        data-value-separator="<?= $Page->difficulty_level_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->difficulty_level_id->getPlaceHolder()) ?>"
+        <?= $Page->difficulty_level_id->editAttributes() ?>>
+        <?= $Page->difficulty_level_id->selectOptionListHtml("x_difficulty_level_id") ?>
+    </select>
+    <?= $Page->difficulty_level_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->difficulty_level_id->getErrorMessage() ?></div>
+<?= $Page->difficulty_level_id->Lookup->getParamTag($Page, "p_x_difficulty_level_id") ?>
+<?php if (!$Page->difficulty_level_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["ftourism_activitiesadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("ftourism_activitiesadd", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("ftourism_activitiesadd", function() {
+    var options = { name: "x_difficulty_level_id", selectId: "ftourism_activitiesadd_x_difficulty_level_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (ftourism_activitiesadd.lists.difficulty_level_id?.lookupOptions.length) {
+        options.data = { id: "x_difficulty_level_id", form: "ftourism_activitiesadd" };
+    } else {
+        options.ajax = { id: "x_difficulty_level_id", form: "ftourism_activitiesadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.tourism_activities.fields.difficulty_level_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

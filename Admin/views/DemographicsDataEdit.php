@@ -29,13 +29,13 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["data_type", [fields.data_type.visible && fields.data_type.required ? ew.Validators.required(fields.data_type.caption) : null], fields.data_type.isInvalid],
             ["label", [fields.label.visible && fields.label.required ? ew.Validators.required(fields.label.caption) : null], fields.label.isInvalid],
             ["value", [fields.value.visible && fields.value.required ? ew.Validators.required(fields.value.caption) : null], fields.value.isInvalid],
             ["year", [fields.year.visible && fields.year.required ? ew.Validators.required(fields.year.caption) : null, ew.Validators.integer], fields.year.isInvalid],
             ["source", [fields.source.visible && fields.source.required ? ew.Validators.required(fields.source.caption) : null], fields.source.isInvalid],
             ["display_order", [fields.display_order.visible && fields.display_order.required ? ew.Validators.required(fields.display_order.caption) : null, ew.Validators.integer], fields.display_order.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
+            ["data_type_id", [fields.data_type_id.visible && fields.data_type_id.required ? ew.Validators.required(fields.data_type_id.caption) : null], fields.data_type_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -51,6 +51,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "data_type_id": <?= $Page->data_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -83,18 +84,6 @@ loadjs.ready("head", function () {
 <span<?= $Page->id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
 <input type="hidden" data-table="demographics_data" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->data_type->Visible) { // data_type ?>
-    <div id="r_data_type"<?= $Page->data_type->rowAttributes() ?>>
-        <label id="elh_demographics_data_data_type" for="x_data_type" class="<?= $Page->LeftColumnClass ?>"><?= $Page->data_type->caption() ?><?= $Page->data_type->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->data_type->cellAttributes() ?>>
-<span id="el_demographics_data_data_type">
-<input type="<?= $Page->data_type->getInputTextType() ?>" name="x_data_type" id="x_data_type" data-table="demographics_data" data-field="x_data_type" value="<?= $Page->data_type->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->data_type->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->data_type->formatPattern()) ?>"<?= $Page->data_type->editAttributes() ?> aria-describedby="x_data_type_help">
-<?= $Page->data_type->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->data_type->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>
@@ -159,40 +148,45 @@ loadjs.ready("head", function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_demographics_data_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_demographics_data_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="demographics_data" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
+<?php if ($Page->data_type_id->Visible) { // data_type_id ?>
+    <div id="r_data_type_id"<?= $Page->data_type_id->rowAttributes() ?>>
+        <label id="elh_demographics_data_data_type_id" for="x_data_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->data_type_id->caption() ?><?= $Page->data_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->data_type_id->cellAttributes() ?>>
+<span id="el_demographics_data_data_type_id">
+    <select
+        id="x_data_type_id"
+        name="x_data_type_id"
+        class="form-select ew-select<?= $Page->data_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->data_type_id->IsNativeSelect) { ?>
+        data-select2-id="fdemographics_dataedit_x_data_type_id"
+        <?php } ?>
+        data-table="demographics_data"
+        data-field="x_data_type_id"
+        data-value-separator="<?= $Page->data_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->data_type_id->getPlaceHolder()) ?>"
+        <?= $Page->data_type_id->editAttributes() ?>>
+        <?= $Page->data_type_id->selectOptionListHtml("x_data_type_id") ?>
+    </select>
+    <?= $Page->data_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->data_type_id->getErrorMessage() ?></div>
+<?= $Page->data_type_id->Lookup->getParamTag($Page, "p_x_data_type_id") ?>
+<?php if (!$Page->data_type_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fdemographics_dataedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fdemographics_dataedit", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fdemographics_dataedit", function() {
+    var options = { name: "x_data_type_id", selectId: "fdemographics_dataedit_x_data_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fdemographics_dataedit.lists.data_type_id?.lookupOptions.length) {
+        options.data = { id: "x_data_type_id", form: "fdemographics_dataedit" };
+    } else {
+        options.ajax = { id: "x_data_type_id", form: "fdemographics_dataedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.demographics_data.fields.data_type_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

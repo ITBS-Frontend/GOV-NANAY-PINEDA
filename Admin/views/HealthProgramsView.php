@@ -128,17 +128,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-    <tr id="r_status"<?= $Page->status->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_health_programs_status"><?= $Page->status->caption() ?></span></td>
-        <td data-name="status"<?= $Page->status->cellAttributes() ?>>
-<span id="el_health_programs_status">
-<span<?= $Page->status->viewAttributes() ?>>
-<?= $Page->status->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->contact_info->Visible) { // contact_info ?>
     <tr id="r_contact_info"<?= $Page->contact_info->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_health_programs_contact_info"><?= $Page->contact_info->caption() ?></span></td>
@@ -155,8 +144,9 @@ loadjs.ready("head", function () {
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_health_programs_featured_image"><?= $Page->featured_image->caption() ?></span></td>
         <td data-name="featured_image"<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el_health_programs_featured_image">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     </tr>
@@ -180,6 +170,17 @@ loadjs.ready("head", function () {
 <span id="el_health_programs_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+    <tr id="r_status_id"<?= $Page->status_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_health_programs_status_id"><?= $Page->status_id->caption() ?></span></td>
+        <td data-name="status_id"<?= $Page->status_id->cellAttributes() ?>>
+<span id="el_health_programs_status_id">
+<span<?= $Page->status_id->viewAttributes() ?>>
+<?= $Page->status_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>

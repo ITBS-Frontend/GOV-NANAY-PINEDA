@@ -35,11 +35,11 @@ loadjs.ready(["wrapper", "head"], function () {
             ["target_beneficiaries", [fields.target_beneficiaries.visible && fields.target_beneficiaries.required ? ew.Validators.required(fields.target_beneficiaries.caption) : null], fields.target_beneficiaries.isInvalid],
             ["coverage_area", [fields.coverage_area.visible && fields.coverage_area.required ? ew.Validators.required(fields.coverage_area.caption) : null], fields.coverage_area.isInvalid],
             ["implementation_date", [fields.implementation_date.visible && fields.implementation_date.required ? ew.Validators.required(fields.implementation_date.caption) : null, ew.Validators.datetime(fields.implementation_date.clientFormatPattern)], fields.implementation_date.isInvalid],
-            ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
             ["contact_info", [fields.contact_info.visible && fields.contact_info.required ? ew.Validators.required(fields.contact_info.caption) : null], fields.contact_info.isInvalid],
-            ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.required(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
+            ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.fileRequired(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
             ["is_active", [fields.is_active.visible && fields.is_active.required ? ew.Validators.required(fields.is_active.caption) : null], fields.is_active.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid]
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
+            ["status_id", [fields.status_id.visible && fields.status_id.required ? ew.Validators.required(fields.status_id.caption) : null], fields.status_id.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -56,6 +56,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "is_active": <?= $Page->is_active->toClientList($Page) ?>,
+            "status_id": <?= $Page->status_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -193,18 +194,6 @@ loadjs.ready(["fhealth_programsedit", "datetimepicker"], function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-    <div id="r_status"<?= $Page->status->rowAttributes() ?>>
-        <label id="elh_health_programs_status" for="x_status" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status->caption() ?><?= $Page->status->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status->cellAttributes() ?>>
-<span id="el_health_programs_status">
-<input type="<?= $Page->status->getInputTextType() ?>" name="x_status" id="x_status" data-table="health_programs" data-field="x_status" value="<?= $Page->status->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->status->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->status->formatPattern()) ?>"<?= $Page->status->editAttributes() ?> aria-describedby="x_status_help">
-<?= $Page->status->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->status->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->contact_info->Visible) { // contact_info ?>
     <div id="r_contact_info"<?= $Page->contact_info->rowAttributes() ?>>
         <label id="elh_health_programs_contact_info" for="x_contact_info" class="<?= $Page->LeftColumnClass ?>"><?= $Page->contact_info->caption() ?><?= $Page->contact_info->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -219,12 +208,35 @@ loadjs.ready(["fhealth_programsedit", "datetimepicker"], function () {
 <?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
     <div id="r_featured_image"<?= $Page->featured_image->rowAttributes() ?>>
-        <label id="elh_health_programs_featured_image" for="x_featured_image" class="<?= $Page->LeftColumnClass ?>"><?= $Page->featured_image->caption() ?><?= $Page->featured_image->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_health_programs_featured_image" class="<?= $Page->LeftColumnClass ?>"><?= $Page->featured_image->caption() ?><?= $Page->featured_image->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el_health_programs_featured_image">
-<input type="<?= $Page->featured_image->getInputTextType() ?>" name="x_featured_image" id="x_featured_image" data-table="health_programs" data-field="x_featured_image" value="<?= $Page->featured_image->EditValue ?>" size="30" maxlength="500" placeholder="<?= HtmlEncode($Page->featured_image->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->featured_image->formatPattern()) ?>"<?= $Page->featured_image->editAttributes() ?> aria-describedby="x_featured_image_help">
-<?= $Page->featured_image->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->featured_image->getErrorMessage() ?></div>
+<div id="fd_x_featured_image" class="fileinput-button ew-file-drop-zone">
+    <input
+        type="file"
+        id="x_featured_image"
+        name="x_featured_image"
+        class="form-control ew-file-input"
+        title="<?= $Page->featured_image->title() ?>"
+        lang="<?= CurrentLanguageID() ?>"
+        data-table="health_programs"
+        data-field="x_featured_image"
+        data-size="500"
+        data-accept-file-types="<?= $Page->featured_image->acceptFileTypes() ?>"
+        data-max-file-size="<?= $Page->featured_image->UploadMaxFileSize ?>"
+        data-max-number-of-files="null"
+        data-disable-image-crop="<?= $Page->featured_image->ImageCropper ? 0 : 1 ?>"
+        aria-describedby="x_featured_image_help"
+        <?= ($Page->featured_image->ReadOnly || $Page->featured_image->Disabled) ? " disabled" : "" ?>
+        <?= $Page->featured_image->editAttributes() ?>
+    >
+    <div class="text-body-secondary ew-file-text"><?= $Language->phrase("ChooseFile") ?></div>
+    <?= $Page->featured_image->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->featured_image->getErrorMessage() ?></div>
+</div>
+<input type="hidden" name="fn_x_featured_image" id= "fn_x_featured_image" value="<?= $Page->featured_image->Upload->FileName ?>">
+<input type="hidden" name="fa_x_featured_image" id= "fa_x_featured_image" value="<?= (Post("fa_x_featured_image") == "0") ? "0" : "1" ?>">
+<table id="ft_x_featured_image" class="table table-sm float-start ew-upload-table"><tbody class="files"></tbody></table>
 </span>
 </div></div>
     </div>
@@ -243,40 +255,45 @@ loadjs.ready(["fhealth_programsedit", "datetimepicker"], function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_health_programs_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_health_programs_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="health_programs" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+    <div id="r_status_id"<?= $Page->status_id->rowAttributes() ?>>
+        <label id="elh_health_programs_status_id" for="x_status_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status_id->caption() ?><?= $Page->status_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->status_id->cellAttributes() ?>>
+<span id="el_health_programs_status_id">
+    <select
+        id="x_status_id"
+        name="x_status_id"
+        class="form-select ew-select<?= $Page->status_id->isInvalidClass() ?>"
+        <?php if (!$Page->status_id->IsNativeSelect) { ?>
+        data-select2-id="fhealth_programsedit_x_status_id"
+        <?php } ?>
+        data-table="health_programs"
+        data-field="x_status_id"
+        data-value-separator="<?= $Page->status_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->status_id->getPlaceHolder()) ?>"
+        <?= $Page->status_id->editAttributes() ?>>
+        <?= $Page->status_id->selectOptionListHtml("x_status_id") ?>
+    </select>
+    <?= $Page->status_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->status_id->getErrorMessage() ?></div>
+<?= $Page->status_id->Lookup->getParamTag($Page, "p_x_status_id") ?>
+<?php if (!$Page->status_id->IsNativeSelect) { ?>
 <script>
-loadjs.ready(["fhealth_programsedit", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fhealth_programsedit", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
+loadjs.ready("fhealth_programsedit", function() {
+    var options = { name: "x_status_id", selectId: "fhealth_programsedit_x_status_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fhealth_programsedit.lists.status_id?.lookupOptions.length) {
+        options.data = { id: "x_status_id", form: "fhealth_programsedit" };
+    } else {
+        options.ajax = { id: "x_status_id", form: "fhealth_programsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.health_programs.fields.status_id.selectOptions);
+    ew.createSelect(options);
 });
 </script>
 <?php } ?>

@@ -82,9 +82,6 @@ class Project extends AbstractEntity
     #[Column(type: "string", nullable: true)]
     private ?string $status;
 
-    #[Column(name: "project_type", type: "string", nullable: true)]
-    private ?string $projectType;
-
     #[Column(type: "string", nullable: true)]
     private ?string $municipality;
 
@@ -94,10 +91,12 @@ class Project extends AbstractEntity
     #[Column(name: "economic_impact", type: "text", nullable: true)]
     private ?string $economicImpact;
 
+    #[Column(name: "project_type_id", type: "integer", nullable: true)]
+    private ?int $projectTypeId;
+
     public function __construct()
     {
         $this->status = "completed";
-        $this->projectType = "governance";
     }
 
     public function getId(): int
@@ -287,17 +286,6 @@ class Project extends AbstractEntity
         return $this;
     }
 
-    public function getProjectType(): ?string
-    {
-        return HtmlDecode($this->projectType);
-    }
-
-    public function setProjectType(?string $value): static
-    {
-        $this->projectType = RemoveXss($value);
-        return $this;
-    }
-
     public function getMunicipality(): ?string
     {
         return HtmlDecode($this->municipality);
@@ -328,6 +316,17 @@ class Project extends AbstractEntity
     public function setEconomicImpact(?string $value): static
     {
         $this->economicImpact = RemoveXss($value);
+        return $this;
+    }
+
+    public function getProjectTypeId(): ?int
+    {
+        return $this->projectTypeId;
+    }
+
+    public function setProjectTypeId(?int $value): static
+    {
+        $this->projectTypeId = $value;
         return $this;
     }
 }

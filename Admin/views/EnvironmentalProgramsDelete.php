@@ -56,23 +56,23 @@ $Page->showMessage();
 <?php if ($Page->program_name->Visible) { // program_name ?>
         <th class="<?= $Page->program_name->headerCellClass() ?>"><span id="elh_environmental_programs_program_name" class="environmental_programs_program_name"><?= $Page->program_name->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->program_type->Visible) { // program_type ?>
-        <th class="<?= $Page->program_type->headerCellClass() ?>"><span id="elh_environmental_programs_program_type" class="environmental_programs_program_type"><?= $Page->program_type->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->coverage_area->Visible) { // coverage_area ?>
         <th class="<?= $Page->coverage_area->headerCellClass() ?>"><span id="elh_environmental_programs_coverage_area" class="environmental_programs_coverage_area"><?= $Page->coverage_area->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->implementation_date->Visible) { // implementation_date ?>
         <th class="<?= $Page->implementation_date->headerCellClass() ?>"><span id="elh_environmental_programs_implementation_date" class="environmental_programs_implementation_date"><?= $Page->implementation_date->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-        <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_environmental_programs_status" class="environmental_programs_status"><?= $Page->status->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <th class="<?= $Page->featured_image->headerCellClass() ?>"><span id="elh_environmental_programs_featured_image" class="environmental_programs_featured_image"><?= $Page->featured_image->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_environmental_programs_created_at" class="environmental_programs_created_at"><?= $Page->created_at->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+        <th class="<?= $Page->program_type_id->headerCellClass() ?>"><span id="elh_environmental_programs_program_type_id" class="environmental_programs_program_type_id"><?= $Page->program_type_id->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+        <th class="<?= $Page->status_id->headerCellClass() ?>"><span id="elh_environmental_programs_status_id" class="environmental_programs_status_id"><?= $Page->status_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -111,14 +111,6 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->program_type->Visible) { // program_type ?>
-        <td<?= $Page->program_type->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->program_type->viewAttributes() ?>>
-<?= $Page->program_type->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->coverage_area->Visible) { // coverage_area ?>
         <td<?= $Page->coverage_area->cellAttributes() ?>>
 <span id="">
@@ -135,19 +127,12 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->status->Visible) { // status ?>
-        <td<?= $Page->status->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->status->viewAttributes() ?>>
-<?= $Page->status->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <td<?= $Page->featured_image->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -156,6 +141,22 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->program_type_id->Visible) { // program_type_id ?>
+        <td<?= $Page->program_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->program_type_id->viewAttributes() ?>>
+<?= $Page->program_type_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+        <td<?= $Page->status_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->status_id->viewAttributes() ?>>
+<?= $Page->status_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

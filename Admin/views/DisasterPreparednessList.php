@@ -150,9 +150,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->id->Visible) { // id ?>
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_disaster_preparedness_id" class="disaster_preparedness_id"><?= $Page->renderFieldHeader($Page->id) ?></div></th>
 <?php } ?>
-<?php if ($Page->disaster_type->Visible) { // disaster_type ?>
-        <th data-name="disaster_type" class="<?= $Page->disaster_type->headerCellClass() ?>"><div id="elh_disaster_preparedness_disaster_type" class="disaster_preparedness_disaster_type"><?= $Page->renderFieldHeader($Page->disaster_type) ?></div></th>
-<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <th data-name="featured_image" class="<?= $Page->featured_image->headerCellClass() ?>"><div id="elh_disaster_preparedness_featured_image" class="disaster_preparedness_featured_image"><?= $Page->renderFieldHeader($Page->featured_image) ?></div></th>
 <?php } ?>
@@ -161,6 +158,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->created_at->Visible) { // created_at ?>
         <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_disaster_preparedness_created_at" class="disaster_preparedness_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->disaster_type_id->Visible) { // disaster_type_id ?>
+        <th data-name="disaster_type_id" class="<?= $Page->disaster_type_id->headerCellClass() ?>"><div id="elh_disaster_preparedness_disaster_type_id" class="disaster_preparedness_disaster_type_id"><?= $Page->renderFieldHeader($Page->disaster_type_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -197,19 +197,12 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->disaster_type->Visible) { // disaster_type ?>
-        <td data-name="disaster_type"<?= $Page->disaster_type->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_disaster_preparedness_disaster_type" class="el_disaster_preparedness_disaster_type">
-<span<?= $Page->disaster_type->viewAttributes() ?>>
-<?= $Page->disaster_type->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <td data-name="featured_image"<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_disaster_preparedness_featured_image" class="el_disaster_preparedness_featured_image">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     <?php } ?>
@@ -226,6 +219,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_disaster_preparedness_created_at" class="el_disaster_preparedness_created_at">
 <span<?= $Page->created_at->viewAttributes() ?>>
 <?= $Page->created_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->disaster_type_id->Visible) { // disaster_type_id ?>
+        <td data-name="disaster_type_id"<?= $Page->disaster_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_disaster_preparedness_disaster_type_id" class="el_disaster_preparedness_disaster_type_id">
+<span<?= $Page->disaster_type_id->viewAttributes() ?>>
+<?= $Page->disaster_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
