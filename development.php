@@ -54,20 +54,52 @@ $additionalCSS = ['css/development.css'];
         </div>
     </section>
 
+            <!-- Projects Section -->
+        <section id="projects" class="projects-section">
+            <div class="section-header">
+                <h2 class="section-title">Governance Portfolio</h2>
+                <p class="section-subtitle">
+                    Transformative initiatives that have positioned Pampanga as a model 
+                    province through innovative governance and inclusive development.
+                </p>
+            </div>
+
+            <!-- Enhanced Category Filter with Scroll -->
+            <div class="category-tabs-container">
+                <button class="category-scroll-btn scroll-left" id="projectScrollLeft">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="category-tabs-wrapper" id="projectTabsWrapper">
+                    <div class="category-tabs" id="categoryTabs">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                
+                <button class="category-scroll-btn scroll-right" id="projectScrollRight">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="projects-grid" id="projectsGrid">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </section>
+
     <!-- Infrastructure Projects Section -->
-    <section class="infrastructure-projects">
+    <!-- <section class="infrastructure-projects">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Infrastructure Projects</h2>
                 <p class="section-subtitle">Major development projects transforming Pampanga</p>
             </div>
 
-            <!-- Municipality Filter -->
             <div class="filter-tabs" id="municipalityTabs">
                 <button class="filter-tab active" data-municipality="">All Projects</button>
             </div>
 
-            <!-- Projects Grid -->
             <div class="projects-grid" id="projectsGrid">
                 <div class="loading-state">
                     <i class="fas fa-spinner fa-spin"></i>
@@ -75,10 +107,10 @@ $additionalCSS = ['css/development.css'];
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Investment Opportunities Section -->
-    <section class="investment-section">
+    <!-- <section class="investment-section">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Investment Opportunities</h2>
@@ -92,7 +124,7 @@ $additionalCSS = ['css/development.css'];
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Project Detail Modal -->
     <div class="modal" id="projectModal">
@@ -115,26 +147,82 @@ $additionalCSS = ['css/development.css'];
             const API_BASE = window.location.origin;
             let allProjects = [];
             let municipalities = [];
+            let categories = [];
 
             // Load all data
             loadEconomicIndicators();
             loadBusinessSectors();
-            loadInfrastructureProjects();
+            loadProjects();
             loadInvestmentOpportunities();
+            loadCategories();
 
             // Municipality filter click
-            $(document).on('click', '.filter-tab', function() {
-                $('.filter-tab').removeClass('active');
-                $(this).addClass('active');
-                const municipality = $(this).data('municipality');
-                loadInfrastructureProjects(municipality);
+            // $(document).on('click', '.filter-tab', function() {
+            //     $('.filter-tab').removeClass('active');
+            //     $(this).addClass('active');
+            //     const municipality = $(this).data('municipality');
+            //     loadProjects(municipality);
+            // });
+
+            function updateProjectScrollButtons() {
+                const container = $('#categoryTabs')[0];
+                const wrapper = $('#projectTabsWrapper');
+                
+                if (!container) return;
+                
+                const isScrollable = container.scrollWidth > container.clientWidth;
+                const isAtStart = container.scrollLeft <= 10;
+                const isAtEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth - 10;
+                
+                // Show/hide scroll buttons
+                if (isScrollable) {
+                    $('#projectScrollLeft').toggleClass('show', !isAtStart);
+                    $('#projectScrollRight').toggleClass('show', !isAtEnd);
+                    
+                    // Add gradient overlays
+                    wrapper.toggleClass('show-left-gradient', !isAtStart);
+                    wrapper.toggleClass('show-right-gradient', !isAtEnd);
+                } else {
+                    $('#projectScrollLeft, #projectScrollRight').removeClass('show');
+                    wrapper.removeClass('show-left-gradient show-right-gradient');
+                }
+            }
+            
+            $('#projectScrollLeft').click(function() {
+                const container = $('#categoryTabs')[0];
+                container.scrollBy({ left: -200, behavior: 'smooth' });
+                setTimeout(updateProjectScrollButtons, 300);
+            });
+            
+            $('#projectScrollRight').click(function() {
+                const container = $('#categoryTabs')[0];
+                container.scrollBy({ left: 200, behavior: 'smooth' });
+                setTimeout(updateProjectScrollButtons, 300);
+            });
+            
+            $('#categoryTabs').on('scroll', function() {
+                updateProjectScrollButtons();
             });
 
-            // Project card click
-            $(document).on('click', '.project-card', function() {
-                const projectData = $(this).data('project');
-                showProjectModal(projectData);
+            
+            $(document).on('click', '.category-tab', function() {
+                $('.category-tab').removeClass('active');
+                $(this).addClass('active');
+                
+                const category = $(this).data('category');
+                loadProjects(category === 'all' ? null : category);
             });
+            
+            $(window).on('resize', function() {
+                updateProjectScrollButtons();
+            });
+
+
+            // Project card click
+            // $(document).on('click', '.project-card', function() {
+            //     const projectData = $(this).data('project');
+            //     showProjectModal(projectData);
+            // });
 
             // Modal close
             $('.modal-close, .modal-overlay').on('click', function() {
@@ -177,29 +265,68 @@ $additionalCSS = ['css/development.css'];
                 });
             }
 
-            function loadInfrastructureProjects(municipality = '') {
-                const url = municipality 
-                    ? `${API_BASE}/Admin/api/development/infrastructure?municipality=${municipality}`
-                    : `${API_BASE}/Admin/api/development/infrastructure`;
+            function loadCategories() {
+                $.ajax({
+                    url: `${API_BASE}/Admin/api/categories`,
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            categories = response.data;
+                            renderCategoryTabs();
+                            setTimeout(updateProjectScrollButtons, 100);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading categories:', error);
+                    }
+                });
+            }
 
+
+            // function loadInfrastructureProjects(municipality = '') {
+            //     const url = municipality 
+            //         ? `${API_BASE}/Admin/api/projects?municipality=${municipality}`
+            //         : `${API_BASE}/Admin/api/projects`;
+
+            //     $.ajax({
+            //         url: url,
+            //         method: 'GET',
+            //         success: function(response) {
+            //             if (response.success && response.data) {  // Add response.data check
+            //                 allProjects = response.data;
+            //                 renderProjects(allProjects);
+            //                 extractMunicipalities(allProjects);
+            //             }
+            //         },
+            //         error: function(xhr, status, error) {
+            //             console.error('Failed to load projects:', error);
+            //             $('#projectsGrid').html(`
+            //                 <div class="error-state">
+            //                     <i class="fas fa-exclamation-circle"></i>
+            //                     <p>Failed to load projects.</p>
+            //                 </div>
+            //             `);
+            //         }
+            //     });
+            // }
+
+                        function loadProjects(categoryId = null) {
+                const url = categoryId ? `${API_BASE}/Admin/api/projects?category=${categoryId}` : `${API_BASE}/Admin/api/projects`;
+                
+                $('#projectsGrid').html('<div class="loading-container"><div class="loading-spinner"></div></div>');
+                
                 $.ajax({
                     url: url,
                     method: 'GET',
                     success: function(response) {
-                        if (response.success) {
+                        if (response.success && response.data) {
                             allProjects = response.data;
-                            renderProjects(allProjects);
-                            extractMunicipalities(allProjects);
+                            renderProjects();
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Failed to load projects:', error);
-                        $('#projectsGrid').html(`
-                            <div class="error-state">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <p>Failed to load projects.</p>
-                            </div>
-                        `);
+                        console.error('Error loading projects:', error);
+                        $('#projectsGrid').html('<p class="text-center">Error loading projects</p>');
                     }
                 });
             }
@@ -311,67 +438,120 @@ $additionalCSS = ['css/development.css'];
                 $('#municipalityTabs').html(html);
             }
 
-            function renderProjects(projects) {
-                if (!projects || projects.length === 0) {
-                    $('#projectsGrid').html(`
-                        <div class="empty-state">
-                            <i class="fas fa-folder-open"></i>
-                            <p>No projects found.</p>
-                        </div>
-                    `);
+            // function renderProjects(projects) {
+            //     if (!projects || projects.length === 0) {
+            //         $('#projectsGrid').html(`
+            //             <div class="empty-state">
+            //                 <i class="fas fa-folder-open"></i>
+            //                 <p>No projects found.</p>
+            //             </div>
+            //         `);
+            //         return;
+            //     }
+
+            //     let html = '';
+            //     projects.forEach(function(project) {
+            //         // Add safety checks for undefined fields
+            //         const status = project.status || project.project_status || 'Ongoing';
+            //         const municipality = project.municipality || project.location || '';
+            //         const categoryName = project.category_name || project.category || 'Infrastructure';
+                    
+            //         html += `
+            //             <div class="project-card" data-project='${JSON.stringify(project)}'>
+            //                 ${project.image_url ? `
+            //                     <div class="project-image">
+            //                         <img src="${project.image_url}" alt="${project.title}">
+            //                         <div class="project-status ${status.toLowerCase()}">${status}</div>
+            //                     </div>
+            //                 ` : `
+            //                     <div class="project-image placeholder" style="background: ${project.color_code || '#3B82F6'}">
+            //                         <div class="project-status ${status.toLowerCase()}">${status}</div>
+            //                     </div>
+            //                 `}
+                            
+            //                 <div class="project-content">
+            //                     <div class="project-header">
+            //                         <span class="project-category" style="color: ${project.color_code || '#3B82F6'}">
+            //                             ${categoryName}
+            //                         </span>
+            //                         ${municipality ? `
+            //                             <span class="project-location">
+            //                                 <i class="fas fa-map-marker-alt"></i>
+            //                                 ${municipality}
+            //                             </span>
+            //                         ` : ''}
+            //                     </div>
+                                
+            //                     <h3 class="project-title">${project.title}</h3>
+            //                     <p class="project-description">${truncateText(project.description, 100)}</p>
+                                
+            //                     <div class="project-footer">
+            //                         ${project.budget_display || project.budget ? `
+            //                             <div class="project-budget">
+            //                                 <i class="fas fa-coins"></i>
+            //                                 ${project.budget_display || project.budget}
+            //                             </div>
+            //                         ` : ''}
+                                    
+            //                        <a href="project-detail.php?id=${project.id}" class="project-read-more">
+            //                         Read More
+            //                         <i class="fas fa-arrow-right"></i>
+            //                     </a>
+            //                     </div>
+            //                 </div>
+            //             </div>
+            //         `;
+            //     });
+
+            //     $('#projectsGrid').html(html);
+            // }
+
+                        function renderProjects() {
+                if (allProjects.length === 0) {
+                    $('#projectsGrid').html('<p class="text-center">No projects found</p>');
                     return;
                 }
-
-                let html = '';
-                projects.forEach(function(project) {
-                    html += `
-                        <div class="project-card" data-project='${JSON.stringify(project)}'>
-                            ${project.image_url ? `
-                                <div class="project-image">
-                                    <img src="${project.image_url}" alt="${project.title}">
-                                    <div class="project-status ${project.status.toLowerCase()}">${project.status}</div>
-                                </div>
-                            ` : `
-                                <div class="project-image placeholder" style="background: ${project.color_code || '#3B82F6'}">
-                                    <div class="project-status ${project.status.toLowerCase()}">${project.status}</div>
-                                </div>
-                            `}
-                            
+                
+                let projectsHtml = '';
+                
+                allProjects.forEach(project => {
+                    const projectNumber = project.display_number || String(project.project_number || '').padStart(2, '0');
+                    
+                    projectsHtml += `
+                        <div class="project-card">
+                            <div class="project-image" style="background: linear-gradient(135deg, ${project.color_code || '#3B82F6'}, ${project.color_code || '#3B82F6'}99);">
+                                ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}">` : ''}
+                                <div class="project-number">${projectNumber}</div>
+                            </div>
                             <div class="project-content">
-                                <div class="project-header">
-                                    <span class="project-category" style="color: ${project.color_code || '#3B82F6'}">
-                                        ${project.category_name || 'Infrastructure'}
-                                    </span>
-                                    ${project.municipality ? `
-                                        <span class="project-location">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            ${project.municipality}
-                                        </span>
-                                    ` : ''}
-                                </div>
-                                
+                                <span class="project-category">${project.category_name || 'Project'}</span>
                                 <h3 class="project-title">${project.title}</h3>
-                                <p class="project-description">${truncateText(project.description, 100)}</p>
-                                
-                                <div class="project-footer">
-                                    ${project.budget_display ? `
-                                        <div class="project-budget">
-                                            <i class="fas fa-coins"></i>
-                                            ${project.budget_display}
-                                        </div>
-                                    ` : ''}
-                                    
-                                    <button class="btn-view-details">
-                                        View Details
-                                        <i class="fas fa-arrow-right"></i>
-                                    </button>
-                                </div>
+                                <p class="project-description">${project.description}</p>
+                                <a href="project-detail.php?id=${project.id}" class="project-read-more">
+                                    Read More
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     `;
                 });
+                
+                $('#projectsGrid').html(projectsHtml);
+            }
 
-                $('#projectsGrid').html(html);
+             function renderCategoryTabs() {
+                let tabsHtml = '<div class="category-tab active" data-category="all">All Projects</div>';
+                
+                categories.forEach(category => {
+                    const count = category.project_count > 0 ? `<span class="category-count">${category.project_count}</span>` : '';
+                    tabsHtml += `
+                        <div class="category-tab" data-category="${category.id}">
+                            ${category.name}${count}
+                        </div>
+                    `;
+                });
+                
+                $('#categoryTabs').html(tabsHtml);
             }
 
             function renderOpportunities(opportunities) {
@@ -416,70 +596,70 @@ $additionalCSS = ['css/development.css'];
                 $('#opportunitiesGrid').html(html);
             }
 
-            function showProjectModal(project) {
-                const modalBody = `
-                    <div class="project-detail">
-                        ${project.image_url ? `
-                            <div class="project-detail-image">
-                                <img src="${project.image_url}" alt="${project.title}">
-                            </div>
-                        ` : ''}
+            // function showProjectModal(project) {
+            //     const modalBody = `
+            //         <div class="project-detail">
+            //             ${project.image_url ? `
+            //                 <div class="project-detail-image">
+            //                     <img src="${project.image_url}" alt="${project.title}">
+            //                 </div>
+            //             ` : ''}
                         
-                        <div class="project-detail-header">
-                            <div class="project-detail-meta">
-                                <span class="project-category" style="color: ${project.color_code || '#3B82F6'}">
-                                    ${project.category_name || 'Infrastructure'}
-                                </span>
-                                <span class="project-status ${project.status.toLowerCase()}">${project.status}</span>
-                            </div>
-                            <h2 class="project-detail-title">${project.title}</h2>
-                            ${project.location ? `<p class="project-location"><i class="fas fa-map-marker-alt"></i> ${project.location}</p>` : ''}
-                        </div>
+            //             <div class="project-detail-header">
+            //                 <div class="project-detail-meta">
+            //                     <span class="project-category" style="color: ${project.color_code || '#3B82F6'}">
+            //                         ${project.category_name || 'Infrastructure'}
+            //                     </span>
+            //                     <span class="project-status ${project.status.toLowerCase()}">${project.status}</span>
+            //                 </div>
+            //                 <h2 class="project-detail-title">${project.title}</h2>
+            //                 ${project.location ? `<p class="project-location"><i class="fas fa-map-marker-alt"></i> ${project.location}</p>` : ''}
+            //             </div>
 
-                        <div class="project-detail-body">
-                            <div class="detail-section">
-                                <h4><i class="fas fa-info-circle"></i> Description</h4>
-                                <p>${project.full_description || project.description}</p>
-                            </div>
+            //             <div class="project-detail-body">
+            //                 <div class="detail-section">
+            //                     <h4><i class="fas fa-info-circle"></i> Description</h4>
+            //                     <p>${project.full_description || project.description}</p>
+            //                 </div>
 
-                            <div class="project-info-grid">
-                                ${project.budget_display ? `
-                                    <div class="info-item">
-                                        <i class="fas fa-coins"></i>
-                                        <div>
-                                            <span class="info-label">Budget</span>
-                                            <span class="info-value">${project.budget_display}</span>
-                                        </div>
-                                    </div>
-                                ` : ''}
+            //                 <div class="project-info-grid">
+            //                     ${project.budget_display ? `
+            //                         <div class="info-item">
+            //                             <i class="fas fa-coins"></i>
+            //                             <div>
+            //                                 <span class="info-label">Budget</span>
+            //                                 <span class="info-value">${project.budget_display}</span>
+            //                             </div>
+            //                         </div>
+            //                     ` : ''}
                                 
-                                ${project.start_date ? `
-                                    <div class="info-item">
-                                        <i class="fas fa-calendar-alt"></i>
-                                        <div>
-                                            <span class="info-label">Start Date</span>
-                                            <span class="info-value">${formatDate(project.start_date)}</span>
-                                        </div>
-                                    </div>
-                                ` : ''}
+            //                     ${project.start_date ? `
+            //                         <div class="info-item">
+            //                             <i class="fas fa-calendar-alt"></i>
+            //                             <div>
+            //                                 <span class="info-label">Start Date</span>
+            //                                 <span class="info-value">${formatDate(project.start_date)}</span>
+            //                             </div>
+            //                         </div>
+            //                     ` : ''}
                                 
-                                ${project.end_date ? `
-                                    <div class="info-item">
-                                        <i class="fas fa-calendar-check"></i>
-                                        <div>
-                                            <span class="info-label">Target Completion</span>
-                                            <span class="info-value">${formatDate(project.end_date)}</span>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
+            //                     ${project.end_date ? `
+            //                         <div class="info-item">
+            //                             <i class="fas fa-calendar-check"></i>
+            //                             <div>
+            //                                 <span class="info-label">Target Completion</span>
+            //                                 <span class="info-value">${formatDate(project.end_date)}</span>
+            //                             </div>
+            //                         </div>
+            //                     ` : ''}
+            //                 </div>
+            //             </div>
+            //         </div>
+            //     `;
 
-                $('#projectModalBody').html(modalBody);
-                $('#projectModal').addClass('active');
-            }
+            //     $('#projectModalBody').html(modalBody);
+            //     $('#projectModal').addClass('active');
+            // }
 
             function truncateText(text, maxLength) {
                 if (!text) return '';

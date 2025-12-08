@@ -85,61 +85,69 @@ class ProjectService
     /**
      * Get all projects with optional category filter
      */
-    public function getProjects($categoryId = null) 
-    {
-        try {
-            $conn = Conn();
-            
-            $sql = "
-                SELECT 
-                    p.id,
-                    p.title,
-                    p.description,
-                    p.project_number,
-                    p.featured_image,
-                    p.budget_amount,
-                    p.project_date,
-                    c.name as category_name,
-                    c.color_code
-                FROM projects p
-                LEFT JOIN categories c ON p.category_id = c.id
-                WHERE 1=1
-            ";
-            
-            $params = [];
-            
-            if ($categoryId && $categoryId !== 'all') {
-                $sql .= " AND p.category_id = ?";
-                $params[] = $categoryId;
-            }
-            
-            $sql .= " ORDER BY p.project_number ASC";
-            
-            $projects = $conn->executeQuery($sql, $params)->fetchAllAssociative();
-            
-            foreach ($projects as &$project) {
-                $project['stats'] = $this->getProjectStats($project['id']);
-                
-                if (!empty($project['featured_image'])) {
-                    $project['image_url'] = getPresignedUrl('gov-pineda-images/' . $project['featured_image']);
-                } else {
-                    $project['image_url'] = null;
-                }
-                
-                // Format project number
-                $project['display_number'] = str_pad($project['project_number'], 2, '0', STR_PAD_LEFT);
-            }
-            
-            return [
-                'success' => true,
-                'data' => $projects
-            ];
-            
-        } catch (\Exception $e) {
-            error_log('Get projects error: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'Failed to fetch projects'];
+   public function getProjects($categoryId = null) 
+{
+    try {
+        $conn = Conn();
+        
+        $sql = "
+            SELECT 
+                p.id,
+                p.title,
+                p.description,
+                p.project_number,
+                p.featured_image,
+                p.budget_amount,
+                p.project_date,
+                p.status,                 
+                p.municipality,            
+                p.location,                 
+                c.name as category_name,
+                c.color_code
+            FROM projects p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE 1=1
+        ";
+        
+        $params = [];
+        
+        if ($categoryId && $categoryId !== 'all') {
+            $sql .= " AND p.category_id = ?";
+            $params[] = $categoryId;
         }
+        
+        $sql .= " ORDER BY p.project_number ASC";
+        
+        $projects = $conn->executeQuery($sql, $params)->fetchAllAssociative();
+        
+        foreach ($projects as &$project) {
+            $project['stats'] = $this->getProjectStats($project['id']);
+            
+            if (!empty($project['featured_image'])) {
+                $project['image_url'] = getPresignedUrl('gov-pineda-images/' . $project['featured_image']);
+            } else {
+                $project['image_url'] = null;
+            }
+            
+            // Format budget
+            if (!empty($project['budget_amount'])) {
+                $project['budget_display'] = '₱' . number_format($project['budget_amount'], 2);
+            }
+            
+            // Format project number
+            $project['display_number'] = str_pad($project['project_number'], 2, '0', STR_PAD_LEFT);
+        }
+        
+        return [
+            'success' => true,
+            'data' => $projects
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get projects error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch projects'];
     }
+}
     
     /**
      * Get project statistics

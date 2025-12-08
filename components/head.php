@@ -12,7 +12,7 @@ $additionalCSS = isset($additionalCSS) ? $additionalCSS : [];
 <title><?php echo $pageTitle; ?></title>
 
 <!-- Favicon -->
-<link rel="icon" type="image/png" href="assets/profile.jpg">
+<link rel="icon" type="image/png" href="assets/Ph_seal_pampanga.png">
 
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">

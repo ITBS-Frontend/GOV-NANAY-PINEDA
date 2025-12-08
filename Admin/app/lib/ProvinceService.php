@@ -176,7 +176,7 @@ class ProvinceService
         }
     }
 
-    /**
+/**
  * Get Pampanga preview for homepage
  */
 public function getPreview() 
@@ -184,55 +184,39 @@ public function getPreview()
     try {
         $conn = Conn();
         
-        // Get province preview content
         $sql = "
             SELECT 
-                id,
-                title,
-                content,
-                featured_image
-            FROM province_history
-            WHERE is_active = true
-            AND title = 'Province Overview'
+                preview_text,
+                main_image,
+                showcase_image_1,
+                showcase_image_2
+            FROM pampanga_about
+            ORDER BY updated_at DESC
             LIMIT 1
         ";
         
-        $preview = $conn->executeQuery($sql)->fetchAssociative();
+        $about = $conn->executeQuery($sql)->fetchAssociative();
         
-        if ($preview) {
-            // Truncate content for homepage
-            $preview['content'] = substr(strip_tags($preview['content']), 0, 300) . '...';
-            
-            if (!empty($preview['featured_image'])) {
-                $preview['image_url'] = getPresignedUrl('gov-pineda-images/' . $preview['featured_image']);
-            }
-            
-            // Get 2 additional showcase images from province_history
-            $showcaseSql = "
-                SELECT featured_image
-                FROM province_history
-                WHERE is_active = true
-                AND featured_image IS NOT NULL
-                AND id != ?
-                ORDER BY display_order ASC
-                LIMIT 2
-            ";
-            
-            $showcaseImages = $conn->executeQuery($showcaseSql, [$preview['id']])->fetchAllAssociative();
-            
-            $preview['showcase_images'] = array_map(function($img) {
-                return getPresignedUrl('gov-pineda-images/' . $img['featured_image']);
-            }, $showcaseImages);
+        if ($about) {
+            $data = [
+                'content' => $about['preview_text'],
+                'main_image' => !empty($about['main_image']) ? 
+                    getPresignedUrl('gov-pineda-images/' . $about['main_image']) : null,
+                'showcase_image_1' => !empty($about['showcase_image_1']) ? 
+                    getPresignedUrl('gov-pineda-images/' . $about['showcase_image_1']) : null,
+                'showcase_image_2' => !empty($about['showcase_image_2']) ? 
+                    getPresignedUrl('gov-pineda-images/' . $about['showcase_image_2']) : null
+            ];
+        } else {
+            $data = [
+                'content' => 'Pampanga, the Culinary Capital of the Philippines...',
+                'main_image' => null,
+                'showcase_image_1' => null,
+                'showcase_image_2' => null
+            ];
         }
         
-        return [
-            'success' => true,
-            'data' => $preview ?: [
-                'content' => 'Pampanga, the Culinary Capital of the Philippines...',
-                'image_url' => null,
-                'showcase_images' => []
-            ]
-        ];
+        return ['success' => true, 'data' => $data];
         
     } catch (\Exception $e) {
         error_log('Get preview error: ' . $e->getMessage());
@@ -248,39 +232,27 @@ public function getQuickFacts()
     try {
         $conn = Conn();
         
-        // Get key statistics
-        $facts = [];
+        $sql = "
+            SELECT 
+                icon,
+                title,
+                description
+            FROM quick_facts
+            WHERE is_active = true
+            ORDER BY display_order ASC
+        ";
         
-        // Municipalities count
-        $munSql = "SELECT COUNT(*) as count FROM geographic_info WHERE info_type = 'municipality'";
-        $munCount = $conn->executeQuery($munSql)->fetchOne();
-        $facts[] = [
-            'label' => 'Municipalities',
-            'value' => $munCount,
-            'icon' => 'fas fa-map'
-        ];
-        
-        // Population
-        $popSql = "SELECT value FROM demographics_data WHERE label = 'Total Population' LIMIT 1";
-        $population = $conn->executeQuery($popSql)->fetchOne();
-        $facts[] = [
-            'label' => 'Population',
-            'value' => $population ?: '2.6M+',
-            'icon' => 'fas fa-users'
-        ];
-        
-        // Total area
-        $areaSql = "SELECT SUM(area_sqkm) as total FROM geographic_info WHERE info_type = 'municipality'";
-        $totalArea = $conn->executeQuery($areaSql)->fetchOne();
-        $facts[] = [
-            'label' => 'Area',
-            'value' => number_format($totalArea, 0) . ' km²',
-            'icon' => 'fas fa-expand'
-        ];
+        $facts = $conn->executeQuery($sql)->fetchAllAssociative();
         
         return [
             'success' => true,
-            'data' => $facts
+            'data' => array_map(function($fact) {
+                return [
+                    'icon' => $fact['icon'],
+                    'title' => $fact['title'],
+                    'description' => $fact['description']
+                ];
+            }, $facts)
         ];
         
     } catch (\Exception $e) {
@@ -288,9 +260,9 @@ public function getQuickFacts()
         return [
             'success' => true,
             'data' => [
-                ['label' => 'Municipalities', 'value' => '19', 'icon' => 'fas fa-map'],
-                ['label' => 'Population', 'value' => '2.6M+', 'icon' => 'fas fa-users'],
-                ['label' => 'Area', 'value' => '2,181 km²', 'icon' => 'fas fa-expand']
+                ['icon' => 'fas fa-map', 'title' => '19', 'description' => 'Municipalities'],
+                ['icon' => 'fas fa-users', 'title' => '2.6M+', 'description' => 'Population'],
+                ['icon' => 'fas fa-expand', 'title' => '2,181 km²', 'description' => 'Area']
             ]
         ];
     }

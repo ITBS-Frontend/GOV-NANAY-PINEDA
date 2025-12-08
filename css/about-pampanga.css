@@ -205,16 +205,11 @@
 }
 
 .timeline-card {
-    background: var(--bg-primary);
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
+  
 }
 
 .timeline-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
+
 }
 
 .timeline-image {

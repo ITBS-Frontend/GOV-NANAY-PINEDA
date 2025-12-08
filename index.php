@@ -36,7 +36,7 @@ $additionalCSS = ['css/homepage.css'];
         </section>
 
         <!-- Projects Section -->
-        <section id="projects" class="projects-section">
+        <!-- <section id="projects" class="projects-section">
             <div class="section-header">
                 <h2 class="section-title">Governance Portfolio</h2>
                 <p class="section-subtitle">
@@ -45,7 +45,6 @@ $additionalCSS = ['css/homepage.css'];
                 </p>
             </div>
 
-            <!-- Enhanced Category Filter with Scroll -->
             <div class="category-tabs-container">
                 <button class="category-scroll-btn scroll-left" id="projectScrollLeft">
                     <i class="fas fa-chevron-left"></i>
@@ -67,7 +66,7 @@ $additionalCSS = ['css/homepage.css'];
                     <div class="loading-spinner"></div>
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <!-- UPDATED: About Pampanga Section -->
         <section id="about" class="about-pampanga-section">
@@ -624,45 +623,39 @@ $additionalCSS = ['css/homepage.css'];
 
             // NEW: Render Pampanga Preview
             function renderPampangaPreview(data) {
-                let html = '';
-                if (data.content) {
-                    html = `<p class="about-text">${data.content}</p>`;
-                }
-                $('#pampangaPreview').html(html);
-                
-                // Load showcase images
-                if (data.image_url) {
-                    $('#showcaseMainImage').html(`<img src="${data.image_url}" alt="Pampanga" class="showcase-img">`);
-                }
-                
-                if (data.showcase_images && data.showcase_images.length > 0) {
-                    if (data.showcase_images[0]) {
-                        $('#showcaseImage1').html(`<img src="${data.showcase_images[0]}" alt="Pampanga" class="showcase-img">`);
+                    const html = `<p class="about-text">${data.content || ''}</p>`;
+                    $('#pampangaPreview').html(html);
+                    
+                    // Update showcase images
+                    if (data.main_image) {
+                        $('#showcaseMainImage').html(`<img src="${data.main_image}" alt="Pampanga">`);
                     }
-                    if (data.showcase_images[1]) {
-                        $('#showcaseImage2').html(`<img src="${data.showcase_images[1]}" alt="Pampanga" class="showcase-img">`);
+                    
+                    if (data.showcase_image_1) {
+                        $('#showcaseImage1').html(`<img src="${data.showcase_image_1}" alt="Pampanga">`);
+                    }
+                    
+                    if (data.showcase_image_2) {
+                        $('#showcaseImage2').html(`<img src="${data.showcase_image_2}" alt="Pampanga">`);
                     }
                 }
-            }
 
-            // NEW: Render Quick Facts
-            function renderQuickFacts(facts) {
-                let html = '';
-                facts.forEach(fact => {
-                    html += `
+                            // NEW: Render Quick Facts
+                        function renderQuickFacts(facts) {
+                    const html = facts.map(fact => `
                         <div class="fact-item">
                             <div class="fact-icon">
                                 <i class="${fact.icon}"></i>
                             </div>
-                            <div class="fact-content">
-                                <div class="fact-value">${fact.value}</div>
-                                <div class="fact-label">${fact.label}</div>
+                            <div class="fact-details">
+                                <div class="fact-value">${fact.title}</div>
+                                <div class="fact-label">${fact.description}</div>
                             </div>
                         </div>
-                    `;
-                });
-                $('#quickFactsGrid').html(html);
-            }
+                    `).join('');
+                    
+                    $('#quickFactsGrid').html(html);
+                }
 
             // NEW: Render Governor Bio Preview
             function renderGovernorBioPreview(data) {
