@@ -37,11 +37,11 @@ window.addEventListener("load", function() {
 
             }).append(
                 jQuery("<h1>", {
-                    text: "Welcome to ITBS Shopping Cart!",
+                    // text: "Welcome to ITBS Shopping Cart!",
 
                 }),
                 jQuery("<p>", {
-                    text: "To keep connected with us please login with your personal info",
+                    // text: "To keep connected with us please login with your personal info",
 
                 })
             )
