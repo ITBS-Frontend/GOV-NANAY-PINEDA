@@ -130,8 +130,9 @@ while ($Page->fetch()) {
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <td<?= $Page->featured_image->cellAttributes() ?>>
 <span id="">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
 <?php } ?>

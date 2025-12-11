@@ -75,67 +75,75 @@ class GovernmentService
     /**
      * Get government facilities
      */
-    public function getFacilities($facilityTypeId = null, $municipality = null) 
-    {
-        try {
-            $conn = Conn();
-            
-            $whereClauses = ["gf.is_active = true"];
-            $params = [];
-            
-            if ($facilityTypeId) {
-                $whereClauses[] = "gf.facility_type_id = ?";
-                $params[] = $facilityTypeId;
-            }
-            
-            if ($municipality) {
-                $whereClauses[] = "gf.municipality = ?";
-                $params[] = $municipality;
-            }
-            
-            $whereClause = implode(' AND ', $whereClauses);
-            
-            $sql = "
-                SELECT 
-                    gf.id,
-                    ft.type_name as facility_type,
-                    ft.icon_class,
-                    gf.name,
-                    gf.address,
-                    gf.municipality,
-                    gf.contact_number,
-                    gf.email,
-                    gf.operating_hours,
-                    gf.services_offered,
-                    gf.coordinates,
-                    gf.featured_image
-                FROM government_facilities gf
-                LEFT JOIN facility_types ft ON gf.facility_type_id = ft.id
-                WHERE $whereClause
-                ORDER BY gf.municipality ASC, ft.display_order ASC, gf.name ASC
-            ";
-            
-            $facilities = $conn->executeQuery($sql, $params)->fetchAllAssociative();
-            
-            foreach ($facilities as &$facility) {
-                if (!empty($facility['featured_image'])) {
-                    $facility['image_url'] = getPresignedUrl('gov-pineda-images/' . $facility['featured_image']);
-                } else {
-                    $facility['image_url'] = null;
-                }
-            }
-            
-            return [
-                'success' => true,
-                'data' => $facilities
-            ];
-            
-        } catch (\Exception $e) {
-            error_log('Get facilities error: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'Failed to fetch government facilities'];
+/**
+ * Get government facilities
+ */
+public function getFacilities($facilityTypeId = null, $municipality = null) 
+{
+    try {
+        $conn = Conn();
+        
+        $whereClauses = ["gf.is_active = true"];
+        $params = [];
+        
+        if ($facilityTypeId) {
+            $whereClauses[] = "gf.facility_type_id = ?";
+            $params[] = $facilityTypeId;
         }
+        
+        if ($municipality) {
+            $whereClauses[] = "gf.municipality = ?";
+            $params[] = $municipality;
+        }
+        
+        $whereClause = implode(' AND ', $whereClauses);
+        
+        $sql = "
+            SELECT 
+                gf.id,
+                gf.facility_type_id,
+                ft.type_name as facility_type,
+                ft.icon_class,
+                gf.name,
+                gf.address,
+                gf.municipality,
+                gf.contact_number,
+                gf.email,
+                gf.operating_hours,
+                gf.services_offered,
+                gf.coordinates,
+                gf.featured_image
+            FROM government_facilities gf
+            LEFT JOIN facility_types ft ON gf.facility_type_id = ft.id
+            WHERE $whereClause
+            ORDER BY gf.municipality ASC, ft.display_order ASC, gf.name ASC
+        ";
+        
+        $facilities = $conn->executeQuery($sql, $params)->fetchAllAssociative();
+        
+        foreach ($facilities as &$facility) {
+            if (!empty($facility['featured_image'])) {
+                $facility['image_url'] = getPresignedUrl('gov-pineda-images/' . $facility['featured_image']);
+            } else {
+                $facility['image_url'] = null;
+            }
+            
+            // Ensure facility_type is not null - provide fallback
+            if (empty($facility['facility_type'])) {
+                $facility['facility_type'] = 'Other';
+            }
+        }
+        
+        return [
+            'success' => true,
+            'data' => $facilities
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get facilities error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch government facilities'];
     }
-    
+}
     /**
      * Get public services
      */
@@ -220,6 +228,38 @@ class GovernmentService
         } catch (\Exception $e) {
             error_log('Get service categories error: ' . $e->getMessage());
             return ['success' => false, 'message' => 'Failed to fetch service categories'];
+        }
+    }
+
+    /**
+     * Get facility types
+     */
+    public function getFacilityTypes() 
+    {
+        try {
+            $conn = Conn();
+            
+            $sql = "
+                SELECT 
+                    id,
+                    type_name,
+                    icon_class,
+                    display_order
+                FROM facility_types
+                WHERE is_active = true
+                ORDER BY display_order ASC, type_name ASC
+            ";
+            
+            $types = $conn->executeQuery($sql)->fetchAllAssociative();
+            
+            return [
+                'success' => true,
+                'data' => $types
+            ];
+            
+        } catch (\Exception $e) {
+            error_log('Get facility types error: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'Failed to fetch facility types'];
         }
     }
 }

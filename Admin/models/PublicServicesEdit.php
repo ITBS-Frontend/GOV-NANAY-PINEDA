@@ -522,6 +522,7 @@ class PublicServicesEdit extends PublicServices
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->category_id);
         $this->setupLookupOptions($this->is_active);
 
         // Check modal
@@ -717,7 +718,7 @@ class PublicServicesEdit extends PublicServices
             if (IsApi() && $val === null) {
                 $this->category_id->Visible = false; // Disable update for API request
             } else {
-                $this->category_id->setFormValue($val, true, $validate);
+                $this->category_id->setFormValue($val);
             }
         }
 
@@ -1002,8 +1003,27 @@ class PublicServicesEdit extends PublicServices
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // category_id
-            $this->category_id->ViewValue = $this->category_id->CurrentValue;
-            $this->category_id->ViewValue = FormatNumber($this->category_id->ViewValue, $this->category_id->formatPattern());
+            $curVal = strval($this->category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+                if ($this->category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
+                    } else {
+                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->category_id->ViewValue = null;
+            }
 
             // service_name
             $this->service_name->ViewValue = $this->service_name->CurrentValue;
@@ -1089,11 +1109,30 @@ class PublicServicesEdit extends PublicServices
 
             // category_id
             $this->category_id->setupEditAttributes();
-            $this->category_id->EditValue = $this->category_id->CurrentValue;
-            $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
-            if (strval($this->category_id->EditValue) != "" && is_numeric($this->category_id->EditValue)) {
-                $this->category_id->EditValue = FormatNumber($this->category_id->EditValue, null);
+            $curVal = trim(strval($this->category_id->CurrentValue));
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+            } else {
+                $this->category_id->ViewValue = $this->category_id->Lookup !== null && is_array($this->category_id->lookupOptions()) && count($this->category_id->lookupOptions()) > 0 ? $curVal : null;
             }
+            if ($this->category_id->ViewValue !== null) { // Load from cache
+                $this->category_id->EditValue = array_values($this->category_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->category_id->CurrentValue, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->category_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->category_id->EditValue = $arwrk;
+            }
+            $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
 
             // service_name
             $this->service_name->setupEditAttributes();
@@ -1231,9 +1270,6 @@ class PublicServicesEdit extends PublicServices
                 if (!$this->category_id->IsDetailKey && EmptyValue($this->category_id->FormValue)) {
                     $this->category_id->addErrorMessage(str_replace("%s", $this->category_id->caption(), $this->category_id->RequiredErrorMessage));
                 }
-            }
-            if (!CheckInteger($this->category_id->FormValue)) {
-                $this->category_id->addErrorMessage($this->category_id->getErrorMessage(false));
             }
             if ($this->service_name->Visible && $this->service_name->Required) {
                 if (!$this->service_name->IsDetailKey && EmptyValue($this->service_name->FormValue)) {
@@ -1493,6 +1529,8 @@ class PublicServicesEdit extends PublicServices
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_category_id":
+                    break;
                 case "x_is_active":
                     break;
                 default:

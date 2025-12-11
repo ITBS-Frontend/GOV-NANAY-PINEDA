@@ -29,7 +29,7 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-            ["category_id", [fields.category_id.visible && fields.category_id.required ? ew.Validators.required(fields.category_id.caption) : null, ew.Validators.integer], fields.category_id.isInvalid],
+            ["category_id", [fields.category_id.visible && fields.category_id.required ? ew.Validators.required(fields.category_id.caption) : null], fields.category_id.isInvalid],
             ["service_name", [fields.service_name.visible && fields.service_name.required ? ew.Validators.required(fields.service_name.caption) : null], fields.service_name.isInvalid],
             ["description", [fields.description.visible && fields.description.required ? ew.Validators.required(fields.description.caption) : null], fields.description.isInvalid],
             ["requirements", [fields.requirements.visible && fields.requirements.required ? ew.Validators.required(fields.requirements.caption) : null], fields.requirements.isInvalid],
@@ -56,6 +56,7 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "category_id": <?= $Page->category_id->toClientList($Page) ?>,
             "is_active": <?= $Page->is_active->toClientList($Page) ?>,
         })
         .build();
@@ -98,9 +99,43 @@ loadjs.ready("head", function () {
         <label id="elh_public_services_category_id" for="x_category_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->category_id->caption() ?><?= $Page->category_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->category_id->cellAttributes() ?>>
 <span id="el_public_services_category_id">
-<input type="<?= $Page->category_id->getInputTextType() ?>" name="x_category_id" id="x_category_id" data-table="public_services" data-field="x_category_id" value="<?= $Page->category_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->category_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->category_id->formatPattern()) ?>"<?= $Page->category_id->editAttributes() ?> aria-describedby="x_category_id_help">
-<?= $Page->category_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->category_id->getErrorMessage() ?></div>
+    <select
+        id="x_category_id"
+        name="x_category_id"
+        class="form-select ew-select<?= $Page->category_id->isInvalidClass() ?>"
+        <?php if (!$Page->category_id->IsNativeSelect) { ?>
+        data-select2-id="fpublic_servicesedit_x_category_id"
+        <?php } ?>
+        data-table="public_services"
+        data-field="x_category_id"
+        data-value-separator="<?= $Page->category_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->category_id->getPlaceHolder()) ?>"
+        <?= $Page->category_id->editAttributes() ?>>
+        <?= $Page->category_id->selectOptionListHtml("x_category_id") ?>
+    </select>
+    <?= $Page->category_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->category_id->getErrorMessage() ?></div>
+<?= $Page->category_id->Lookup->getParamTag($Page, "p_x_category_id") ?>
+<?php if (!$Page->category_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpublic_servicesedit", function() {
+    var options = { name: "x_category_id", selectId: "fpublic_servicesedit_x_category_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpublic_servicesedit.lists.category_id?.lookupOptions.length) {
+        options.data = { id: "x_category_id", form: "fpublic_servicesedit" };
+    } else {
+        options.ajax = { id: "x_category_id", form: "fpublic_servicesedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.public_services.fields.category_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

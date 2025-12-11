@@ -295,6 +295,8 @@ class ProvinceHistoryAdd extends ProvinceHistory
         if (is_object($rs)) { // Result set
             while ($row = $rs->fetch()) {
                 $this->loadRowValues($row); // Set up DbValue/CurrentValue
+                $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+                $this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
                 $row = $this->getRecordFromArray($row);
                 if ($current) {
                     return $row;
@@ -659,6 +661,9 @@ class ProvinceHistoryAdd extends ProvinceHistory
     protected function getUploadFiles()
     {
         global $CurrentForm, $Language;
+        $this->featured_image->Upload->Index = $CurrentForm->Index;
+        $this->featured_image->Upload->uploadFile();
+        $this->featured_image->CurrentValue = $this->featured_image->Upload->FileName;
     }
 
     // Load default values
@@ -715,16 +720,6 @@ class ProvinceHistoryAdd extends ProvinceHistory
             }
         }
 
-        // Check field name 'featured_image' first before field var 'x_featured_image'
-        $val = $CurrentForm->hasValue("featured_image") ? $CurrentForm->getValue("featured_image") : $CurrentForm->getValue("x_featured_image");
-        if (!$this->featured_image->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->featured_image->Visible = false; // Disable update for API request
-            } else {
-                $this->featured_image->setFormValue($val);
-            }
-        }
-
         // Check field name 'display_order' first before field var 'x_display_order'
         $val = $CurrentForm->hasValue("display_order") ? $CurrentForm->getValue("display_order") : $CurrentForm->getValue("x_display_order");
         if (!$this->display_order->IsDetailKey) {
@@ -758,6 +753,9 @@ class ProvinceHistoryAdd extends ProvinceHistory
 
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+		$this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+		$this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
+        $this->getUploadFiles(); // Get upload files
     }
 
     // Restore form values
@@ -768,7 +766,6 @@ class ProvinceHistoryAdd extends ProvinceHistory
         $this->period->CurrentValue = $this->period->FormValue;
         $this->_content->CurrentValue = $this->_content->FormValue;
         $this->timeline_year->CurrentValue = $this->timeline_year->FormValue;
-        $this->featured_image->CurrentValue = $this->featured_image->FormValue;
         $this->display_order->CurrentValue = $this->display_order->FormValue;
         $this->is_active->CurrentValue = $this->is_active->FormValue;
         $this->created_at->CurrentValue = $this->created_at->FormValue;
@@ -818,7 +815,8 @@ class ProvinceHistoryAdd extends ProvinceHistory
         $this->period->setDbValue($row['period']);
         $this->_content->setDbValue($row['content']);
         $this->timeline_year->setDbValue($row['timeline_year']);
-        $this->featured_image->setDbValue($row['featured_image']);
+        $this->featured_image->Upload->DbValue = $row['featured_image'];
+        $this->featured_image->setDbValue($this->featured_image->Upload->DbValue);
         $this->display_order->setDbValue($row['display_order']);
         $this->is_active->setDbValue((ConvertToBool($row['is_active']) ? "1" : "0"));
         $this->created_at->setDbValue($row['created_at']);
@@ -917,7 +915,16 @@ class ProvinceHistoryAdd extends ProvinceHistory
             $this->timeline_year->ViewValue = FormatNumber($this->timeline_year->ViewValue, $this->timeline_year->formatPattern());
 
             // featured_image
-            $this->featured_image->ViewValue = $this->featured_image->CurrentValue;
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->ImageWidth = 50;
+                $this->featured_image->ImageHeight = 50;
+                $this->featured_image->ImageAlt = $this->featured_image->alt();
+                $this->featured_image->ImageCssClass = "ew-image";
+                $this->featured_image->ViewValue = $this->featured_image->Upload->DbValue;
+            } else {
+                $this->featured_image->ViewValue = "";
+            }
 
             // display_order
             $this->display_order->ViewValue = $this->display_order->CurrentValue;
@@ -947,7 +954,17 @@ class ProvinceHistoryAdd extends ProvinceHistory
             $this->timeline_year->HrefValue = "";
 
             // featured_image
-            $this->featured_image->HrefValue = "";
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->HrefValue = GetFileUploadUrl($this->featured_image, $this->featured_image->htmlDecode($this->featured_image->Upload->DbValue)); // Add prefix/suffix
+                $this->featured_image->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->featured_image->HrefValue = FullUrl($this->featured_image->HrefValue, "href");
+                }
+            } else {
+                $this->featured_image->HrefValue = "";
+            }
+            $this->featured_image->ExportHrefValue = $this->featured_image->UploadPath . $this->featured_image->Upload->DbValue;
 
             // display_order
             $this->display_order->HrefValue = "";
@@ -989,11 +1006,25 @@ class ProvinceHistoryAdd extends ProvinceHistory
 
             // featured_image
             $this->featured_image->setupEditAttributes();
-            if (!$this->featured_image->Raw) {
-                $this->featured_image->CurrentValue = HtmlDecode($this->featured_image->CurrentValue);
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->ImageWidth = 50;
+                $this->featured_image->ImageHeight = 50;
+                $this->featured_image->ImageAlt = $this->featured_image->alt();
+                $this->featured_image->ImageCssClass = "ew-image";
+                $this->featured_image->EditValue = $this->featured_image->Upload->DbValue;
+            } else {
+                $this->featured_image->EditValue = "";
             }
-            $this->featured_image->EditValue = HtmlEncode($this->featured_image->CurrentValue);
-            $this->featured_image->PlaceHolder = RemoveHtml($this->featured_image->caption());
+            if (!EmptyValue($this->featured_image->CurrentValue)) {
+                $this->featured_image->Upload->FileName = $this->featured_image->CurrentValue;
+            }
+            if (!Config("CREATE_UPLOAD_FILE_ON_COPY")) {
+                $this->featured_image->Upload->DbValue = null;
+            }
+            if ($this->isShow() || $this->isCopy()) {
+                RenderUploadField($this->featured_image);
+            }
 
             // display_order
             $this->display_order->setupEditAttributes();
@@ -1024,7 +1055,17 @@ class ProvinceHistoryAdd extends ProvinceHistory
             $this->timeline_year->HrefValue = "";
 
             // featured_image
-            $this->featured_image->HrefValue = "";
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+            if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->HrefValue = GetFileUploadUrl($this->featured_image, $this->featured_image->htmlDecode($this->featured_image->Upload->DbValue)); // Add prefix/suffix
+                $this->featured_image->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->featured_image->HrefValue = FullUrl($this->featured_image->HrefValue, "href");
+                }
+            } else {
+                $this->featured_image->HrefValue = "";
+            }
+            $this->featured_image->ExportHrefValue = $this->featured_image->UploadPath . $this->featured_image->Upload->DbValue;
 
             // display_order
             $this->display_order->HrefValue = "";
@@ -1079,7 +1120,7 @@ class ProvinceHistoryAdd extends ProvinceHistory
                 $this->timeline_year->addErrorMessage($this->timeline_year->getErrorMessage(false));
             }
             if ($this->featured_image->Visible && $this->featured_image->Required) {
-                if (!$this->featured_image->IsDetailKey && EmptyValue($this->featured_image->FormValue)) {
+                if ($this->featured_image->Upload->FileName == "" && !$this->featured_image->Upload->KeepFile) {
                     $this->featured_image->addErrorMessage(str_replace("%s", $this->featured_image->caption(), $this->featured_image->RequiredErrorMessage));
                 }
             }
@@ -1121,6 +1162,14 @@ class ProvinceHistoryAdd extends ProvinceHistory
 
         // Get new row
         $rsnew = $this->getAddRow();
+        if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
+            $this->featured_image->UploadPath = $this->featured_image->getUploadPath();
+            if (!EmptyValue($this->featured_image->Upload->FileName)) {
+                $this->featured_image->Upload->DbValue = null;
+                FixUploadFileNames($this->featured_image);
+                $this->featured_image->setDbValueDef($rsnew, $this->featured_image->Upload->FileName, false);
+            }
+        }
 
         // Update current values
         $this->setCurrentValues($rsnew);
@@ -1128,12 +1177,21 @@ class ProvinceHistoryAdd extends ProvinceHistory
 
         // Load db values from old row
         $this->loadDbValues($rsold);
+        $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+        $this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
         if ($insertRow) {
             $addRow = $this->insert($rsnew);
             if ($addRow) {
+                if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
+                    $this->featured_image->Upload->DbValue = null;
+                    if (!SaveUploadFiles($this->featured_image, $rsnew['featured_image'], false)) {
+                        $this->setFailureMessage($Language->phrase("UploadError7"));
+                        return false;
+                    }
+                }
             } elseif (!EmptyValue($this->DbErrorMessage)) { // Show database error
                 $this->setFailureMessage($this->DbErrorMessage);
             }
@@ -1185,7 +1243,14 @@ class ProvinceHistoryAdd extends ProvinceHistory
         $this->timeline_year->setDbValueDef($rsnew, $this->timeline_year->CurrentValue, false);
 
         // featured_image
-        $this->featured_image->setDbValueDef($rsnew, $this->featured_image->CurrentValue, false);
+        if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
+            if ($this->featured_image->Upload->FileName == "") {
+                $rsnew['featured_image'] = null;
+            } else {
+                FixUploadTempFileNames($this->featured_image);
+                $rsnew['featured_image'] = $this->featured_image->Upload->FileName;
+            }
+        }
 
         // display_order
         $this->display_order->setDbValueDef($rsnew, $this->display_order->CurrentValue, strval($this->display_order->CurrentValue) == "");

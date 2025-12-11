@@ -148,12 +148,16 @@ class PublicServices extends DbTable
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'SELECT' // Edit Tag
         );
         $this->category_id->InputTextType = "text";
         $this->category_id->Raw = true;
+        $this->category_id->setSelectMultiple(false); // Select one
+        $this->category_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->category_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->category_id->Lookup = new Lookup($this->category_id, 'service_categories', false, 'id', ["name","","",""], '', '', [], [], [], [], [], [], false, '', '', "\"name\"");
         $this->category_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->category_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->category_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
         $this->Fields['category_id'] = &$this->category_id;
 
         // service_name
@@ -1370,8 +1374,27 @@ class PublicServices extends DbTable
         $this->id->ViewValue = $this->id->CurrentValue;
 
         // category_id
-        $this->category_id->ViewValue = $this->category_id->CurrentValue;
-        $this->category_id->ViewValue = FormatNumber($this->category_id->ViewValue, $this->category_id->formatPattern());
+        $curVal = strval($this->category_id->CurrentValue);
+        if ($curVal != "") {
+            $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+            if ($this->category_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
+                } else {
+                    $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
+                }
+            }
+        } else {
+            $this->category_id->ViewValue = null;
+        }
 
         // service_name
         $this->service_name->ViewValue = $this->service_name->CurrentValue;
@@ -1485,11 +1508,7 @@ class PublicServices extends DbTable
 
         // category_id
         $this->category_id->setupEditAttributes();
-        $this->category_id->EditValue = $this->category_id->CurrentValue;
         $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
-        if (strval($this->category_id->EditValue) != "" && is_numeric($this->category_id->EditValue)) {
-            $this->category_id->EditValue = FormatNumber($this->category_id->EditValue, null);
-        }
 
         // service_name
         $this->service_name->setupEditAttributes();

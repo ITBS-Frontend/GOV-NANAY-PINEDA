@@ -232,16 +232,17 @@ class ProvinceHistory extends DbTable
             200, // Type
             500, // Size
             -1, // Date/Time format
-            false, // Is upload field
+            true, // Is upload field
             '"featured_image"', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
+            'IMAGE', // View Tag
+            'FILE' // Edit Tag
         );
+        $this->featured_image->addMethod("getUploadPath", fn() => appConfig('s3.custom_path'));
         $this->featured_image->InputTextType = "text";
-        $this->featured_image->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->featured_image->SearchOperators = ["=", "<>", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['featured_image'] = &$this->featured_image;
 
         // display_order
@@ -847,7 +848,7 @@ class ProvinceHistory extends DbTable
         $this->period->DbValue = $row['period'];
         $this->_content->DbValue = $row['content'];
         $this->timeline_year->DbValue = $row['timeline_year'];
-        $this->featured_image->DbValue = $row['featured_image'];
+        $this->featured_image->Upload->DbValue = $row['featured_image'];
         $this->display_order->DbValue = $row['display_order'];
         $this->is_active->DbValue = (ConvertToBool($row['is_active']) ? "1" : "0");
         $this->created_at->DbValue = $row['created_at'];
@@ -857,6 +858,13 @@ class ProvinceHistory extends DbTable
     public function deleteUploadedFiles($row)
     {
         $this->loadDbValues($row);
+        $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
+        $oldFiles = EmptyValue($row['featured_image']) ? [] : [$row['featured_image']];
+        foreach ($oldFiles as $oldFile) {
+            if (file_exists($this->featured_image->oldPhysicalUploadPath() . $oldFile)) {
+                @unlink($this->featured_image->oldPhysicalUploadPath() . $oldFile);
+            }
+        }
     }
 
     // Record filter WHERE clause
@@ -1208,7 +1216,7 @@ class ProvinceHistory extends DbTable
         $this->period->setDbValue($row['period']);
         $this->_content->setDbValue($row['content']);
         $this->timeline_year->setDbValue($row['timeline_year']);
-        $this->featured_image->setDbValue($row['featured_image']);
+        $this->featured_image->Upload->DbValue = $row['featured_image'];
         $this->display_order->setDbValue($row['display_order']);
         $this->is_active->setDbValue(ConvertToBool($row['is_active']) ? "1" : "0");
         $this->created_at->setDbValue($row['created_at']);
@@ -1277,7 +1285,16 @@ class ProvinceHistory extends DbTable
         $this->timeline_year->ViewValue = FormatNumber($this->timeline_year->ViewValue, $this->timeline_year->formatPattern());
 
         // featured_image
-        $this->featured_image->ViewValue = $this->featured_image->CurrentValue;
+        $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+        if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+            $this->featured_image->ImageWidth = 50;
+            $this->featured_image->ImageHeight = 50;
+            $this->featured_image->ImageAlt = $this->featured_image->alt();
+            $this->featured_image->ImageCssClass = "ew-image";
+            $this->featured_image->ViewValue = $this->featured_image->Upload->DbValue;
+        } else {
+            $this->featured_image->ViewValue = "";
+        }
 
         // display_order
         $this->display_order->ViewValue = $this->display_order->CurrentValue;
@@ -1315,8 +1332,25 @@ class ProvinceHistory extends DbTable
         $this->timeline_year->TooltipValue = "";
 
         // featured_image
-        $this->featured_image->HrefValue = "";
+        $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+        if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+            $this->featured_image->HrefValue = GetFileUploadUrl($this->featured_image, $this->featured_image->htmlDecode($this->featured_image->Upload->DbValue)); // Add prefix/suffix
+            $this->featured_image->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->featured_image->HrefValue = FullUrl($this->featured_image->HrefValue, "href");
+            }
+        } else {
+            $this->featured_image->HrefValue = "";
+        }
+        $this->featured_image->ExportHrefValue = $this->featured_image->UploadPath . $this->featured_image->Upload->DbValue;
         $this->featured_image->TooltipValue = "";
+        if ($this->featured_image->UseColorbox) {
+            if (EmptyValue($this->featured_image->TooltipValue)) {
+                $this->featured_image->LinkAttrs["title"] = $Language->phrase("ViewImageGallery");
+            }
+            $this->featured_image->LinkAttrs["data-rel"] = "province_history_x_featured_image";
+            $this->featured_image->LinkAttrs->appendClass("ew-lightbox");
+        }
 
         // display_order
         $this->display_order->HrefValue = "";
@@ -1380,11 +1414,19 @@ class ProvinceHistory extends DbTable
 
         // featured_image
         $this->featured_image->setupEditAttributes();
-        if (!$this->featured_image->Raw) {
-            $this->featured_image->CurrentValue = HtmlDecode($this->featured_image->CurrentValue);
+        $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
+        if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+            $this->featured_image->ImageWidth = 50;
+            $this->featured_image->ImageHeight = 50;
+            $this->featured_image->ImageAlt = $this->featured_image->alt();
+            $this->featured_image->ImageCssClass = "ew-image";
+            $this->featured_image->EditValue = $this->featured_image->Upload->DbValue;
+        } else {
+            $this->featured_image->EditValue = "";
         }
-        $this->featured_image->EditValue = $this->featured_image->CurrentValue;
-        $this->featured_image->PlaceHolder = RemoveHtml($this->featured_image->caption());
+        if (!EmptyValue($this->featured_image->CurrentValue)) {
+            $this->featured_image->Upload->FileName = $this->featured_image->CurrentValue;
+        }
 
         // display_order
         $this->display_order->setupEditAttributes();
@@ -1509,8 +1551,123 @@ class ProvinceHistory extends DbTable
     public function getFileData($fldparm, $key, $resize, $width = 0, $height = 0, $plugins = [])
     {
         global $DownloadFileName;
+        $width = ($width > 0) ? $width : Config("THUMBNAIL_DEFAULT_WIDTH");
+        $height = ($height > 0) ? $height : Config("THUMBNAIL_DEFAULT_HEIGHT");
 
-        // No binary fields
+        // Set up field name / file name field / file type field
+        $fldName = "";
+        $fileNameFld = "";
+        $fileTypeFld = "";
+        if ($fldparm == 'featured_image') {
+            $fldName = "featured_image";
+            $fileNameFld = "featured_image";
+        } else {
+            return false; // Incorrect field
+        }
+
+        // Set up key values
+        $ar = explode(Config("COMPOSITE_KEY_SEPARATOR"), $key);
+        if (count($ar) == 1) {
+            $this->id->CurrentValue = $ar[0];
+        } else {
+            return false; // Incorrect key
+        }
+
+        // Set up filter (WHERE Clause)
+        $filter = $this->getRecordFilter();
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $dbtype = GetConnectionType($this->Dbid);
+        if ($row = $conn->fetchAssociative($sql)) {
+            $val = $row[$fldName];
+            if (!EmptyValue($val)) {
+                $fld = $this->Fields[$fldName];
+
+                // Binary data
+                if ($fld->DataType == DataType::BLOB) {
+                    if ($dbtype != "MYSQL") {
+                        if (is_resource($val) && get_resource_type($val) == "stream") { // Byte array
+                            $val = stream_get_contents($val);
+                        }
+                    }
+                    if ($resize) {
+                        ResizeBinary($val, $width, $height, $plugins);
+                    }
+
+                    // Write file type
+                    if ($fileTypeFld != "" && !EmptyValue($row[$fileTypeFld])) {
+                        AddHeader("Content-type", $row[$fileTypeFld]);
+                    } else {
+                        AddHeader("Content-type", ContentType($val));
+                    }
+
+                    // Write file name
+                    $downloadPdf = !Config("EMBED_PDF") && Config("DOWNLOAD_PDF_FILE");
+                    if ($fileNameFld != "" && !EmptyValue($row[$fileNameFld])) {
+                        $fileName = $row[$fileNameFld];
+                        $pathinfo = pathinfo($fileName);
+                        $ext = strtolower($pathinfo["extension"] ?? "");
+                        $isPdf = SameText($ext, "pdf");
+                        if ($downloadPdf || !$isPdf) { // Skip header if not download PDF
+                            AddHeader("Content-Disposition", "attachment; filename=\"" . $fileName . "\"");
+                        }
+                    } else {
+                        $ext = ContentExtension($val);
+                        $isPdf = SameText($ext, ".pdf");
+                        if ($isPdf && $downloadPdf) { // Add header if download PDF
+                            AddHeader("Content-Disposition", "attachment" . ($DownloadFileName ? "; filename=\"" . $DownloadFileName . "\"" : ""));
+                        }
+                    }
+
+                    // Write file data
+                    if (
+                        StartsString("PK", $val) &&
+                        ContainsString($val, "[Content_Types].xml") &&
+                        ContainsString($val, "_rels") &&
+                        ContainsString($val, "docProps")
+                    ) { // Fix Office 2007 documents
+                        if (!EndsString("\0\0\0", $val)) { // Not ends with 3 or 4 \0
+                            $val .= "\0\0\0\0";
+                        }
+                    }
+
+                    // Clear any debug message
+                    if (ob_get_length()) {
+                        ob_end_clean();
+                    }
+
+                    // Write binary data
+                    Write($val);
+
+                // Upload to folder
+                } else {
+                    if ($fld->UploadMultiple) {
+                        $files = explode(Config("MULTIPLE_UPLOAD_SEPARATOR"), $val);
+                    } else {
+                        $files = [$val];
+                    }
+                    $data = [];
+                    $ar = [];
+                    if ($fld->hasMethod("getUploadPath")) { // Check field level upload path
+                        $fld->UploadPath = $fld->getUploadPath();
+                    }
+                    foreach ($files as $file) {
+                        if (!EmptyValue($file)) {
+                            if (Config("ENCRYPT_FILE_PATH")) {
+                                $ar[$file] = FullUrl(GetApiUrl(Config("API_FILE_ACTION") .
+                                    "/" . $this->TableVar . "/" . Encrypt($fld->physicalUploadPath() . $file)));
+                            } else {
+                                $ar[$file] = FullUrl($fld->hrefPath() . $file);
+                            }
+                        }
+                    }
+                    $data[$fld->Param] = $ar;
+                    WriteJson($data);
+                }
+            }
+            return true;
+        }
         return false;
     }
 

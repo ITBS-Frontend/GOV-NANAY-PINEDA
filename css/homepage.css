@@ -662,4 +662,17 @@
         margin-left: 3rem;
         padding: 1.5rem;
     }
+
+        .history-item.left .history-content {
+        margin-right: 0;
+        padding-right: 0;
+    }
+    .history-dot{
+        left: 0;
+    }
+
+    .history-item.right .history-content {
+        margin-left: 0;
+        padding-left: 2rem;
+    }
 }

@@ -541,6 +541,7 @@ class PublicServicesView extends PublicServices
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->category_id);
         $this->setupLookupOptions($this->is_active);
 
         // Check modal
@@ -826,8 +827,27 @@ class PublicServicesView extends PublicServices
             $this->id->ViewValue = $this->id->CurrentValue;
 
             // category_id
-            $this->category_id->ViewValue = $this->category_id->CurrentValue;
-            $this->category_id->ViewValue = FormatNumber($this->category_id->ViewValue, $this->category_id->formatPattern());
+            $curVal = strval($this->category_id->CurrentValue);
+            if ($curVal != "") {
+                $this->category_id->ViewValue = $this->category_id->lookupCacheOption($curVal);
+                if ($this->category_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->category_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->category_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->category_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->category_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->category_id->ViewValue = $this->category_id->displayValue($arwrk);
+                    } else {
+                        $this->category_id->ViewValue = FormatNumber($this->category_id->CurrentValue, $this->category_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->category_id->ViewValue = null;
+            }
 
             // service_name
             $this->service_name->ViewValue = $this->service_name->CurrentValue;
@@ -951,6 +971,8 @@ class PublicServicesView extends PublicServices
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_category_id":
+                    break;
                 case "x_is_active":
                     break;
                 default:

@@ -20,6 +20,40 @@ $additionalCSS = ['css/development.css'];
         </div>
     </section>
 
+    <!-- Projects Section -->
+    <section id="projects" class="projects-section">
+        <div class="section-header">
+            <h2 class="section-title">Governance Projects</h2>
+            <p class="section-subtitle">
+                Transformative initiatives that have positioned Pampanga as a model 
+                province through innovative governance and inclusive development.
+            </p>
+        </div>
+
+        <!-- Enhanced Category Filter with Scroll -->
+        <div class="category-tabs-container">
+            <button class="category-scroll-btn scroll-left" id="projectScrollLeft">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <div class="category-tabs-wrapper" id="projectTabsWrapper">
+                <div class="category-tabs" id="categoryTabs">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+            
+            <button class="category-scroll-btn scroll-right" id="projectScrollRight">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid">
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- Economic Overview Section -->
     <section class="economic-overview">
         <div class="container">
@@ -54,39 +88,6 @@ $additionalCSS = ['css/development.css'];
         </div>
     </section>
 
-            <!-- Projects Section -->
-        <section id="projects" class="projects-section">
-            <div class="section-header">
-                <h2 class="section-title">Governance Portfolio</h2>
-                <p class="section-subtitle">
-                    Transformative initiatives that have positioned Pampanga as a model 
-                    province through innovative governance and inclusive development.
-                </p>
-            </div>
-
-            <!-- Enhanced Category Filter with Scroll -->
-            <div class="category-tabs-container">
-                <button class="category-scroll-btn scroll-left" id="projectScrollLeft">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                
-                <div class="category-tabs-wrapper" id="projectTabsWrapper">
-                    <div class="category-tabs" id="categoryTabs">
-                        <div class="loading-spinner"></div>
-                    </div>
-                </div>
-                
-                <button class="category-scroll-btn scroll-right" id="projectScrollRight">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-
-            <div class="projects-grid" id="projectsGrid">
-                <div class="loading-container">
-                    <div class="loading-spinner"></div>
-                </div>
-            </div>
-        </section>
 
     <!-- Infrastructure Projects Section -->
     <!-- <section class="infrastructure-projects">
@@ -138,6 +139,10 @@ $additionalCSS = ['css/development.css'];
     </div>
 
     <?php include 'components/footer.php'; ?>
+
+        <button class="scroll-top" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

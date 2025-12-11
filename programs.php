@@ -63,6 +63,10 @@ $additionalCSS = ['css/programs.css'];
 
     <?php include 'components/footer.php'; ?>
 
+    <button class="scroll-top" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     

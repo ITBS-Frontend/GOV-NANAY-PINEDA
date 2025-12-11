@@ -233,8 +233,9 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
     <?php if ($Page->featured_image->Visible) { // featured_image ?>
         <td data-name="featured_image"<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_province_history_featured_image" class="el_province_history_featured_image">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     <?php } ?>

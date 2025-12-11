@@ -111,8 +111,9 @@ loadjs.ready("head", function () {
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_province_history_featured_image"><?= $Page->featured_image->caption() ?></span></td>
         <td data-name="featured_image"<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el_province_history_featured_image">
-<span<?= $Page->featured_image->viewAttributes() ?>>
-<?= $Page->featured_image->getViewValue() ?></span>
+<span>
+<?= GetFileViewTag($Page->featured_image, $Page->featured_image->getViewValue(), false) ?>
+</span>
 </span>
 </td>
     </tr>

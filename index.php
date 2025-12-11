@@ -33,6 +33,7 @@ $additionalCSS = ['css/homepage.css'];
             <div class="carousel-nav carousel-next" style="display: none;">
                 <i class="fas fa-chevron-right"></i>
             </div>
+            <a class="view-more" href="development.php">View More</a>
         </section>
 
         <!-- Projects Section -->
@@ -85,11 +86,11 @@ $additionalCSS = ['css/homepage.css'];
                     </div>
 
                     <!-- Quick Facts Grid -->
-                    <div class="quick-facts-grid" id="quickFactsGrid">
+                    <!-- <div class="quick-facts-grid" id="quickFactsGrid">
                         <div class="loading-container">
                             <div class="loading-spinner"></div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <a href="about-pampanga.php" class="learn-more-btn">
                         Explore Pampanga's Rich History

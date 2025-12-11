@@ -33,7 +33,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["period", [fields.period.visible && fields.period.required ? ew.Validators.required(fields.period.caption) : null], fields.period.isInvalid],
             ["_content", [fields._content.visible && fields._content.required ? ew.Validators.required(fields._content.caption) : null], fields._content.isInvalid],
             ["timeline_year", [fields.timeline_year.visible && fields.timeline_year.required ? ew.Validators.required(fields.timeline_year.caption) : null, ew.Validators.integer], fields.timeline_year.isInvalid],
-            ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.required(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
+            ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.fileRequired(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
             ["display_order", [fields.display_order.visible && fields.display_order.required ? ew.Validators.required(fields.display_order.caption) : null, ew.Validators.integer], fields.display_order.isInvalid],
             ["is_active", [fields.is_active.visible && fields.is_active.required ? ew.Validators.required(fields.is_active.caption) : null], fields.is_active.isInvalid],
             ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid]
@@ -139,12 +139,35 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
     <div id="r_featured_image"<?= $Page->featured_image->rowAttributes() ?>>
-        <label id="elh_province_history_featured_image" for="x_featured_image" class="<?= $Page->LeftColumnClass ?>"><?= $Page->featured_image->caption() ?><?= $Page->featured_image->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_province_history_featured_image" class="<?= $Page->LeftColumnClass ?>"><?= $Page->featured_image->caption() ?><?= $Page->featured_image->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->featured_image->cellAttributes() ?>>
 <span id="el_province_history_featured_image">
-<input type="<?= $Page->featured_image->getInputTextType() ?>" name="x_featured_image" id="x_featured_image" data-table="province_history" data-field="x_featured_image" value="<?= $Page->featured_image->EditValue ?>" size="30" maxlength="500" placeholder="<?= HtmlEncode($Page->featured_image->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->featured_image->formatPattern()) ?>"<?= $Page->featured_image->editAttributes() ?> aria-describedby="x_featured_image_help">
-<?= $Page->featured_image->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->featured_image->getErrorMessage() ?></div>
+<div id="fd_x_featured_image" class="fileinput-button ew-file-drop-zone">
+    <input
+        type="file"
+        id="x_featured_image"
+        name="x_featured_image"
+        class="form-control ew-file-input"
+        title="<?= $Page->featured_image->title() ?>"
+        lang="<?= CurrentLanguageID() ?>"
+        data-table="province_history"
+        data-field="x_featured_image"
+        data-size="500"
+        data-accept-file-types="<?= $Page->featured_image->acceptFileTypes() ?>"
+        data-max-file-size="<?= $Page->featured_image->UploadMaxFileSize ?>"
+        data-max-number-of-files="null"
+        data-disable-image-crop="<?= $Page->featured_image->ImageCropper ? 0 : 1 ?>"
+        aria-describedby="x_featured_image_help"
+        <?= ($Page->featured_image->ReadOnly || $Page->featured_image->Disabled) ? " disabled" : "" ?>
+        <?= $Page->featured_image->editAttributes() ?>
+    >
+    <div class="text-body-secondary ew-file-text"><?= $Language->phrase("ChooseFile") ?></div>
+    <?= $Page->featured_image->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->featured_image->getErrorMessage() ?></div>
+</div>
+<input type="hidden" name="fn_x_featured_image" id= "fn_x_featured_image" value="<?= $Page->featured_image->Upload->FileName ?>">
+<input type="hidden" name="fa_x_featured_image" id= "fa_x_featured_image" value="<?= (Post("fa_x_featured_image") == "0") ? "0" : "1" ?>">
+<table id="ft_x_featured_image" class="table table-sm float-start ew-upload-table"><tbody class="files"></tbody></table>
 </span>
 </div></div>
     </div>

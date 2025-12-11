@@ -401,39 +401,68 @@
     transform: translateX(3px);
 }
 
-/* Facility Filters */
+/* Facility Filters - Scrollable on Mobile */
 .facility-filters {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
+    gap: 12px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+    padding-bottom: 8px;
+}
+
+.facility-filters::-webkit-scrollbar {
+    height: 6px;
+}
+
+.facility-filters::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.facility-filters::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 3px;
+}
+
+.facility-filters::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.5);
 }
 
 .filter-btn {
+    padding: 12px 24px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: var(--bg-primary);
-    border: 2px solid var(--border-color);
-    border-radius: 50px;
-    color: var(--text-secondary);
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
+    gap: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.filter-btn i {
+    font-size: 16px;
 }
 
 .filter-btn:hover {
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #eff6ff;
 }
 
 .filter-btn.active {
-    background: var(--primary-blue);
-    border-color: var(--primary-blue);
+    background: #3b82f6;
+    border-color: #3b82f6;
     color: white;
 }
+
 
 .municipality-filter {
     display: flex;
@@ -664,20 +693,40 @@
         grid-template-columns: 1fr;
     }
     
-    .facility-filters {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .filter-btn {
-        justify-content: center;
-    }
-    
     .municipality-filter {
         flex-direction: column;
     }
     
     .contact-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .facility-filters {
+        gap: 8px;
+        padding-bottom: 12px;
+        margin-bottom: 25px;
+    }
+
+    .filter-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .filter-btn i {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .facility-filters {
+        gap: 6px;
+    }
+
+    .filter-btn {
+        padding: 8px 16px;
+        font-size: 13px;
     }
 }

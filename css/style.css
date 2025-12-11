@@ -73,6 +73,7 @@ nav{
     justify-content: space-between;
     align-items: center;
     height: 80px;
+    padding: 1rem;
 }
 
 .nav-menu{
@@ -99,6 +100,80 @@ nav > .logo-icon > img{
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
+}
+
+.nav-item.has-dropdown {
+    position: relative;
+}
+
+.nav-item .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.dropdown-icon {
+    font-size: 0.75em;
+    transition: transform 0.3s ease;
+    margin-left: auto;
+}
+
+.nav-item.has-dropdown.active .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    min-width: 220px;
+    padding: 8px 0;
+    z-index: 1000;
+    margin-top: 8px;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+}
+
+.dropdown-item:hover {
+    background: #f5f5f5;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        background: #f9f9f9;
+    }
+
+    .nav-item.has-dropdown {
+    flex-direction: column;
+    position: relative;
+    justify-content: right;
+    align-items: flex-start;
+}
 }
 
 /* Hamburger Menu (hidden on desktop) */
@@ -1318,6 +1393,26 @@ section{
     margin: 0 auto;
 }
 
+.view-more{
+    position: absolute;
+    bottom: 3rem;
+    left: 10%;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: orange;
+    color: white;
+    box-shadow: var(--shadow-md);
+    z-index: 999;
+}
+
+.view-more:hover{
+    background-color: darkorange;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
 /* Mobile Responsive */
 @media (max-width: 1024px) {
     .category-tabs {
@@ -1505,3 +1600,25 @@ section{
     }
 }
 
+@media (max-width: 480px) {
+    .stats-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-section{
+        height: 30vh;
+    }
+
+    .slide-picture{
+        display: none;
+    }
+
+    .carousel-controls{
+        bottom: 1.5rem;
+    }
+
+    .view-more{
+        bottom: 4rem;
+    }
+
+}
