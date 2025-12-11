@@ -190,6 +190,7 @@ $(document).ready(function() {
     loadServices();
     loadMunicipalities();
     loadFacilityTypes();
+    loadFacilities();
     
     // Quick access scroll
     $('.quick-card').click(function() {
@@ -462,9 +463,9 @@ function renderFacilityTypeFilters(types) {
         let url = `${API_BASE}/Admin/api/government/facilities`;
         const params = [];
         
-        if (currentFacilityType !== 'all') {
-            params.push(`facility_type_id=${currentFacilityType}`);
-        }
+       if (currentFacilityType !== 'all') {
+    params.push(`type=${currentFacilityType}`);
+}
         
         if (currentMunicipality) {
             params.push(`municipality=${encodeURIComponent(currentMunicipality)}`);
