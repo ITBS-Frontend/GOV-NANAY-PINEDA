@@ -1606,7 +1606,11 @@ section{
     }
 
     .hero-section{
-        height: 30vh;
+        height: 75vh;
+    }
+
+    .slide-text{
+        justify-content: start;
     }
 
     .slide-picture{
