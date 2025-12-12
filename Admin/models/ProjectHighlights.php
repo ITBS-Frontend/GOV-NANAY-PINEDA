@@ -40,7 +40,7 @@ class ProjectHighlights extends DbTable
     public $ModalAdd = true;
     public $ModalEdit = true;
     public $ModalUpdate = false;
-    public $InlineDelete = false;
+    public $InlineDelete = true;
     public $ModalGridAdd = true;
     public $ModalGridEdit = true;
     public $ModalMultiEdit = false;

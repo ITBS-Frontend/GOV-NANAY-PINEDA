@@ -40,7 +40,7 @@ class NewsPostTags extends DbTable
     public $ModalAdd = true;
     public $ModalEdit = true;
     public $ModalUpdate = false;
-    public $InlineDelete = false;
+    public $InlineDelete = true;
     public $ModalGridAdd = false;
     public $ModalGridEdit = false;
     public $ModalMultiEdit = false;

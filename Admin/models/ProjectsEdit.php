@@ -139,7 +139,7 @@ class ProjectsEdit extends Projects
         $this->end_date->setVisibility();
         $this->status->setVisibility();
         $this->municipality->setVisibility();
-        $this->coordinates->setVisibility();
+        $this->coordinates->Visible = false;
         $this->economic_impact->setVisibility();
         $this->project_type_id->Visible = false;
     }
@@ -894,16 +894,6 @@ class ProjectsEdit extends Projects
             }
         }
 
-        // Check field name 'coordinates' first before field var 'x_coordinates'
-        $val = $CurrentForm->hasValue("coordinates") ? $CurrentForm->getValue("coordinates") : $CurrentForm->getValue("x_coordinates");
-        if (!$this->coordinates->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->coordinates->Visible = false; // Disable update for API request
-            } else {
-                $this->coordinates->setFormValue($val);
-            }
-        }
-
         // Check field name 'economic_impact' first before field var 'x_economic_impact'
         $val = $CurrentForm->hasValue("economic_impact") ? $CurrentForm->getValue("economic_impact") : $CurrentForm->getValue("x_economic_impact");
         if (!$this->economic_impact->IsDetailKey) {
@@ -942,7 +932,6 @@ class ProjectsEdit extends Projects
         $this->end_date->CurrentValue = UnFormatDateTime($this->end_date->CurrentValue, $this->end_date->formatPattern());
         $this->status->CurrentValue = $this->status->FormValue;
         $this->municipality->CurrentValue = $this->municipality->FormValue;
-        $this->coordinates->CurrentValue = $this->coordinates->FormValue;
         $this->economic_impact->CurrentValue = $this->economic_impact->FormValue;
     }
 
@@ -1319,9 +1308,6 @@ class ProjectsEdit extends Projects
             // municipality
             $this->municipality->HrefValue = "";
 
-            // coordinates
-            $this->coordinates->HrefValue = "";
-
             // economic_impact
             $this->economic_impact->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
@@ -1453,14 +1439,6 @@ class ProjectsEdit extends Projects
             $this->municipality->EditValue = HtmlEncode($this->municipality->CurrentValue);
             $this->municipality->PlaceHolder = RemoveHtml($this->municipality->caption());
 
-            // coordinates
-            $this->coordinates->setupEditAttributes();
-            if (!$this->coordinates->Raw) {
-                $this->coordinates->CurrentValue = HtmlDecode($this->coordinates->CurrentValue);
-            }
-            $this->coordinates->EditValue = HtmlEncode($this->coordinates->CurrentValue);
-            $this->coordinates->PlaceHolder = RemoveHtml($this->coordinates->caption());
-
             // economic_impact
             $this->economic_impact->setupEditAttributes();
             $this->economic_impact->EditValue = HtmlEncode($this->economic_impact->CurrentValue);
@@ -1528,9 +1506,6 @@ class ProjectsEdit extends Projects
 
             // municipality
             $this->municipality->HrefValue = "";
-
-            // coordinates
-            $this->coordinates->HrefValue = "";
 
             // economic_impact
             $this->economic_impact->HrefValue = "";
@@ -1650,11 +1625,6 @@ class ProjectsEdit extends Projects
             if ($this->municipality->Visible && $this->municipality->Required) {
                 if (!$this->municipality->IsDetailKey && EmptyValue($this->municipality->FormValue)) {
                     $this->municipality->addErrorMessage(str_replace("%s", $this->municipality->caption(), $this->municipality->RequiredErrorMessage));
-                }
-            }
-            if ($this->coordinates->Visible && $this->coordinates->Required) {
-                if (!$this->coordinates->IsDetailKey && EmptyValue($this->coordinates->FormValue)) {
-                    $this->coordinates->addErrorMessage(str_replace("%s", $this->coordinates->caption(), $this->coordinates->RequiredErrorMessage));
                 }
             }
             if ($this->economic_impact->Visible && $this->economic_impact->Required) {
@@ -1876,9 +1846,6 @@ class ProjectsEdit extends Projects
         // municipality
         $this->municipality->setDbValueDef($rsnew, $this->municipality->CurrentValue, $this->municipality->ReadOnly);
 
-        // coordinates
-        $this->coordinates->setDbValueDef($rsnew, $this->coordinates->CurrentValue, $this->coordinates->ReadOnly);
-
         // economic_impact
         $this->economic_impact->setDbValueDef($rsnew, $this->economic_impact->CurrentValue, $this->economic_impact->ReadOnly);
         return $rsnew;
@@ -1937,9 +1904,6 @@ class ProjectsEdit extends Projects
         }
         if (isset($row['municipality'])) { // municipality
             $this->municipality->CurrentValue = $row['municipality'];
-        }
-        if (isset($row['coordinates'])) { // coordinates
-            $this->coordinates->CurrentValue = $row['coordinates'];
         }
         if (isset($row['economic_impact'])) { // economic_impact
             $this->economic_impact->CurrentValue = $row['economic_impact'];
