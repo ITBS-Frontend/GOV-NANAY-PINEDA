@@ -119,275 +119,288 @@ $additionalCSS = ['css/project-detail.css'];
         <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            const API_BASE = window.location.origin;
-            
-            // Get project ID from URL parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const projectId = urlParams.get('id');
-            
-            if (!projectId) {
-                alert('No project specified');
+      $(document).ready(function() {
+    const API_BASE = window.location.origin;
+    
+    // Get project ID from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('id');
+    
+    if (!projectId) {
+        alert('No project specified');
+        window.location.href = 'index.php#projects';
+        return;
+    }
+    
+    // Load project details
+    loadProjectDetails(projectId);
+    
+    function loadProjectDetails(id) {
+        $.ajax({
+            url: `${API_BASE}/Admin/api/projects/${id}`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success && response.data) {
+                    renderProjectDetails(response.data);
+                    $('#loadingState').hide();
+                    $('#projectContent').fadeIn();
+                    
+                    // Load related projects
+                    if (response.data.category_id) {
+                        loadRelatedProjects(response.data.category_id, id);
+                    }
+                } else {
+                    alert('Project not found');
+                    window.location.href = 'index.php#projects';
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading project:', error);
+                alert('Failed to load project details');
                 window.location.href = 'index.php#projects';
-                return;
             }
-            
-            // Load project details
-            loadProjectDetails(projectId);
-            
-            function loadProjectDetails(id) {
-                $.ajax({
-                    url: `${API_BASE}/Admin/api/projects/${id}`,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            renderProjectDetails(response.data);
-                            $('#loadingState').hide();
-                            $('#projectContent').fadeIn();
-                            
-                            // Load related projects
-                            if (response.data.category_id) {
-                                loadRelatedProjects(response.data.category_id, id);
-                            }
-                        } else {
-                            alert('Project not found');
-                            window.location.href = 'index.php#projects';
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading project:', error);
-                        alert('Failed to load project details');
-                        window.location.href = 'index.php#projects';
-                    }
-                });
-            }
-            
-            function renderProjectDetails(project) {
-                // Update page title
-                document.title = `${project.title} - Gov. Lilia "Nanay" Pineda`;
-                
-                // Hero Section
-                if (project.image_url) {
-                    $('#projectHero').css('background-image', `url('${project.image_url}')`);
-                }
-                $('#heroCategory').text(project.category_name || 'Project');
-                $('#heroCategory').css('background', project.color_code || '#3B82F6');
-                $('#heroTitle').text(project.title);
-                
-                // Hero Meta
-                let metaHtml = '';
-                if (project.location) {
-                    metaHtml += `
-                        <div class="meta-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>${project.location}</span>
-                        </div>
-                    `;
-                }
-                if (project.status) {
-                    metaHtml += `
-                        <div class="meta-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>${project.status}</span>
-                        </div>
-                    `;
-                }
-                if (project.start_date) {
-                    const startYear = new Date(project.start_date).getFullYear();
-                    const endYear = project.end_date ? new Date(project.end_date).getFullYear() : 'Present';
-                    metaHtml += `
-                        <div class="meta-item">
-                            <i class="fas fa-calendar"></i>
-                            <span>${startYear} - ${endYear}</span>
-                        </div>
-                    `;
-                }
-                $('#heroMeta').html(metaHtml);
-                
-                // Overview
-                $('#overviewText').text(project.full_description || project.description);
-                
-                // Stats
-                if (project.stats && project.stats.length > 0) {
-                    let statsHtml = '';
-                    project.stats.forEach(stat => {
-                        statsHtml += `
-                            <div class="stat-card">
-                                <div class="stat-value">${stat.value}</div>
-                                <div class="stat-label">${stat.label}</div>
-                            </div>
-                        `;
-                    });
-                    $('#statsGrid').html(statsHtml);
-                } else {
-                    $('#statsGrid').closest('.detail-section').hide();
-                }
-                
-                // Objectives
-                $('#objectivesText').text(project.objectives || 'Information not available');
-                
-                // Highlights
-                if (project.highlights && project.highlights.length > 0) {
-                    let highlightsHtml = '';
-                    project.highlights.forEach(highlight => {
-                        highlightsHtml += `<li>${highlight.highlight_text}</li>`;
-                    });
-                    $('#highlightsList').html(highlightsHtml);
-                } else {
-                    $('#highlightsSection').hide();
-                }
-                
-                // Impact
-                $('#impactText').text(project.impact || 'Information not available');
-                
-                // Gallery
-                if (project.gallery && project.gallery.length > 0) {
-                    let galleryHtml = '';
-                    project.gallery.forEach(image => {
-                        galleryHtml += `
-                            <div class="gallery-item">
-                                <img src="${image.url}" alt="${image.caption || project.title}">
-                                ${image.caption ? `<p class="gallery-caption">${image.caption}</p>` : ''}
-                            </div>
-                        `;
-                    });
-                    $('#galleryGrid').html(galleryHtml);
-                    $('#gallerySection').show();
-                }
-                
-                // Sidebar Info
-                let infoHtml = '';
-                
-                if (project.category_name) {
-                    infoHtml += `
-                        <div class="info-item">
-                            <div class="info-icon" style="background: ${project.color_code || '#3B82F6'}">
-                                <i class="fas fa-folder"></i>
-                            </div>
-                            <div class="info-content">
-                                <h4>Category</h4>
-                                <p>${project.category_name}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                if (project.budget_display) {
-                    infoHtml += `
-                        <div class="info-item">
-                            <div class="info-icon" style="background: #10B981">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <div class="info-content">
-                                <h4>Budget</h4>
-                                <p>${project.budget_display}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                if (project.location) {
-                    infoHtml += `
-                        <div class="info-item">
-                            <div class="info-icon" style="background: #F59E0B">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <div class="info-content">
-                                <h4>Location</h4>
-                                <p>${project.location}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                if (project.start_date) {
-                    infoHtml += `
-                        <div class="info-item">
-                            <div class="info-icon" style="background: #8B5CF6">
-                                <i class="fas fa-calendar"></i>
-                            </div>
-                            <div class="info-content">
-                                <h4>Timeline</h4>
-                                <p>${formatDate(project.start_date)} - ${project.end_date ? formatDate(project.end_date) : 'Present'}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                if (project.status) {
-                    const statusColor = project.status === 'Ongoing' ? '#3B82F6' : '#10B981';
-                    infoHtml += `
-                        <div class="info-item">
-                            <div class="info-icon" style="background: ${statusColor}">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div class="info-content">
-                                <h4>Status</h4>
-                                <p>${project.status}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                $('#infoList').html(infoHtml);
-            }
-            
-            function loadRelatedProjects(categoryId, currentProjectId) {
-                $.ajax({
-                    url: `${API_BASE}/Admin/api/projects?category=${categoryId}`,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            const related = response.data.filter(p => p.id != currentProjectId).slice(0, 3);
-                            if (related.length > 0) {
-                                renderRelatedProjects(related);
-                            }
-                        }
-                    }
-                });
-            }
-            
-            function renderRelatedProjects(projects) {
-                let html = '';
-                projects.forEach(project => {
-                    html += `
-                        <a href="project-detail.php?id=${project.id}" class="related-item">
-                            <div class="related-image" style="background: linear-gradient(135deg, ${project.color_code}, ${project.color_code}99);">
-                                ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}">` : ''}
-                            </div>
-                            <div class="related-content">
-                                <h4>${project.title}</h4>
-                                <p>${project.category_name}</p>
-                            </div>
-                        </a>
-                    `;
-                });
-                $('#relatedProjects').html(html);
-                $('#relatedCard').show();
-            }
-            
-            function formatDate(dateString) {
-                const date = new Date(dateString);
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                return date.toLocaleDateString('en-US', options);
-            }
-            
-            // Smooth page load
-            $('body').css('opacity', '0').animate({opacity: 1}, 500);
-            
-            // Scroll to top button
-            $(window).scroll(function() {
-                if ($(this).scrollTop() > 300) {
-                    $('.scroll-top').addClass('show');
-                } else {
-                    $('.scroll-top').removeClass('show');
-                }
-            });
-            
-            $('.scroll-top').click(function() {
-                $('html, body').animate({ scrollTop: 0 }, 800);
-            });
         });
+    }
+    
+    function renderProjectDetails(project) {
+        // Update page title
+        document.title = `${project.title} - Gov. Lilia "Nanay" Pineda`;
+        
+        // Hero Section
+        if (project.image_url) {
+            $('#projectHero').css('background-image', `url('${project.image_url}')`);
+        }
+        $('#heroCategory').text(project.category_name || 'Project');
+        $('#heroCategory').css('background', project.color_code || '#3B82F6');
+        $('#heroTitle').text(project.title);
+        
+        // Hero Meta
+        let metaHtml = '';
+        if (project.location) {
+            metaHtml += `
+                <div class="meta-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${escapeHtml(project.location)}</span>
+                </div>
+            `;
+        }
+        if (project.status) {
+            metaHtml += `
+                <div class="meta-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${escapeHtml(project.status)}</span>
+                </div>
+            `;
+        }
+        if (project.start_date) {
+            const startYear = new Date(project.start_date).getFullYear();
+            const endYear = project.end_date ? new Date(project.end_date).getFullYear() : 'Present';
+            metaHtml += `
+                <div class="meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>${startYear} - ${endYear}</span>
+                </div>
+            `;
+        }
+        $('#heroMeta').html(metaHtml);
+        
+        // Overview - Use .html() for HTML editor content
+        $('#overviewText').html(project.full_description || project.description || 'No description available');
+        
+        // Stats
+        if (project.stats && project.stats.length > 0) {
+            let statsHtml = '';
+            project.stats.forEach(stat => {
+                statsHtml += `
+                    <div class="stat-card">
+                        <div class="stat-value">${escapeHtml(stat.value)}</div>
+                        <div class="stat-label">${escapeHtml(stat.label)}</div>
+                    </div>
+                `;
+            });
+            $('#statsGrid').html(statsHtml);
+        } else {
+            $('#statsGrid').closest('.detail-section').hide();
+        }
+        
+        // Objectives - Use .html() for HTML editor content
+        $('#objectivesText').html(project.objectives || 'Information not available');
+        
+        // Highlights
+        if (project.highlights && project.highlights.length > 0) {
+            let highlightsHtml = '';
+            project.highlights.forEach(highlight => {
+                highlightsHtml += `<li>${highlight.highlight_text}</li>`;
+            });
+            $('#highlightsList').html(highlightsHtml);
+        } else {
+            $('#highlightsSection').hide();
+        }
+        
+        // Impact - Use .html() for HTML editor content
+        $('#impactText').html(project.impact || 'Information not available');
+        
+        // Gallery
+        if (project.gallery && project.gallery.length > 0) {
+            let galleryHtml = '';
+            project.gallery.forEach(image => {
+                galleryHtml += `
+                    <div class="gallery-item">
+                        <img src="${image.url}" alt="${escapeHtml(image.caption || project.title)}">
+                        ${image.caption ? `<p class="gallery-caption">${escapeHtml(image.caption)}</p>` : ''}
+                    </div>
+                `;
+            });
+            $('#galleryGrid').html(galleryHtml);
+            $('#gallerySection').show();
+        }
+        
+        // Sidebar Info
+        let infoHtml = '';
+        
+        if (project.category_name) {
+            infoHtml += `
+                <div class="info-item">
+                    <div class="info-icon" style="background: ${project.color_code || '#3B82F6'}">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="info-content">
+                        <h4>Category</h4>
+                        <p>${escapeHtml(project.category_name)}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (project.budget_display) {
+            infoHtml += `
+                <div class="info-item">
+                    <div class="info-icon" style="background: #10B981">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="info-content">
+                        <h4>Budget</h4>
+                        <p>${escapeHtml(project.budget_display)}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (project.location) {
+            infoHtml += `
+                <div class="info-item">
+                    <div class="info-icon" style="background: #F59E0B">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        <h4>Location</h4>
+                        <p>${escapeHtml(project.location)}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (project.start_date) {
+            infoHtml += `
+                <div class="info-item">
+                    <div class="info-icon" style="background: #8B5CF6">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="info-content">
+                        <h4>Timeline</h4>
+                        <p>${formatDate(project.start_date)} - ${project.end_date ? formatDate(project.end_date) : 'Present'}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (project.status) {
+            const statusColor = project.status === 'Ongoing' ? '#3B82F6' : '#10B981';
+            infoHtml += `
+                <div class="info-item">
+                    <div class="info-icon" style="background: ${statusColor}">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="info-content">
+                        <h4>Status</h4>
+                        <p>${escapeHtml(project.status)}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        $('#infoList').html(infoHtml);
+    }
+    
+    function loadRelatedProjects(categoryId, currentProjectId) {
+        $.ajax({
+            url: `${API_BASE}/Admin/api/projects?category=${categoryId}`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success && response.data) {
+                    const related = response.data.filter(p => p.id != currentProjectId).slice(0, 3);
+                    if (related.length > 0) {
+                        renderRelatedProjects(related);
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderRelatedProjects(projects) {
+        let html = '';
+        projects.forEach(project => {
+            html += `
+                <a href="project-detail.php?id=${project.id}" class="related-item">
+                    <div class="related-image" style="background: linear-gradient(135deg, ${project.color_code}, ${project.color_code}99);">
+                        ${project.image_url ? `<img src="${project.image_url}" alt="${escapeHtml(project.title)}">` : ''}
+                    </div>
+                    <div class="related-content">
+                        <h4>${escapeHtml(project.title)}</h4>
+                        <p>${escapeHtml(project.category_name)}</p>
+                    </div>
+                </a>
+            `;
+        });
+        $('#relatedProjects').html(html);
+        $('#relatedCard').show();
+    }
+    
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+    
+    // Helper function to escape HTML for security
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.toString().replace(/[&<>"']/g, m => map[m]);
+    }
+    
+    // Smooth page load
+    $('body').css('opacity', '0').animate({opacity: 1}, 500);
+    
+    // Scroll to top button
+    $(window).scroll(function() {
+        if ($(this).scrollTop() > 300) {
+            $('.scroll-top').addClass('show');
+        } else {
+            $('.scroll-top').removeClass('show');
+        }
+    });
+    
+    $('.scroll-top').click(function() {
+        $('html, body').animate({ scrollTop: 0 }, 800);
+    });
+});
     </script>
 </body>
 </html>
