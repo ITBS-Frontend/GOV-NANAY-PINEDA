@@ -68,32 +68,11 @@ $Page->showMessage();
 <?php if ($Page->is_featured->Visible) { // is_featured ?>
         <th class="<?= $Page->is_featured->headerCellClass() ?>"><span id="elh_projects_is_featured" class="projects_is_featured"><?= $Page->is_featured->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->project_date->Visible) { // project_date ?>
-        <th class="<?= $Page->project_date->headerCellClass() ?>"><span id="elh_projects_project_date" class="projects_project_date"><?= $Page->project_date->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-        <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_projects_created_at" class="projects_created_at"><?= $Page->created_at->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->location->Visible) { // location ?>
-        <th class="<?= $Page->location->headerCellClass() ?>"><span id="elh_projects_location" class="projects_location"><?= $Page->location->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->start_date->Visible) { // start_date ?>
-        <th class="<?= $Page->start_date->headerCellClass() ?>"><span id="elh_projects_start_date" class="projects_start_date"><?= $Page->start_date->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->end_date->Visible) { // end_date ?>
-        <th class="<?= $Page->end_date->headerCellClass() ?>"><span id="elh_projects_end_date" class="projects_end_date"><?= $Page->end_date->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <th class="<?= $Page->status->headerCellClass() ?>"><span id="elh_projects_status" class="projects_status"><?= $Page->status->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->municipality->Visible) { // municipality ?>
         <th class="<?= $Page->municipality->headerCellClass() ?>"><span id="elh_projects_municipality" class="projects_municipality"><?= $Page->municipality->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->coordinates->Visible) { // coordinates ?>
-        <th class="<?= $Page->coordinates->headerCellClass() ?>"><span id="elh_projects_coordinates" class="projects_coordinates"><?= $Page->coordinates->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->project_type_id->Visible) { // project_type_id ?>
-        <th class="<?= $Page->project_type_id->headerCellClass() ?>"><span id="elh_projects_project_type_id" class="projects_project_type_id"><?= $Page->project_type_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -166,46 +145,6 @@ while ($Page->fetch()) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->project_date->Visible) { // project_date ?>
-        <td<?= $Page->project_date->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->project_date->viewAttributes() ?>>
-<?= $Page->project_date->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-        <td<?= $Page->created_at->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_at->viewAttributes() ?>>
-<?= $Page->created_at->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->location->Visible) { // location ?>
-        <td<?= $Page->location->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->location->viewAttributes() ?>>
-<?= $Page->location->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->start_date->Visible) { // start_date ?>
-        <td<?= $Page->start_date->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->start_date->viewAttributes() ?>>
-<?= $Page->start_date->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->end_date->Visible) { // end_date ?>
-        <td<?= $Page->end_date->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->end_date->viewAttributes() ?>>
-<?= $Page->end_date->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->status->Visible) { // status ?>
         <td<?= $Page->status->cellAttributes() ?>>
 <span id="">
@@ -219,22 +158,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->municipality->viewAttributes() ?>>
 <?= $Page->municipality->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->coordinates->Visible) { // coordinates ?>
-        <td<?= $Page->coordinates->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->coordinates->viewAttributes() ?>>
-<?= $Page->coordinates->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->project_type_id->Visible) { // project_type_id ?>
-        <td<?= $Page->project_type_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->project_type_id->viewAttributes() ?>>
-<?= $Page->project_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

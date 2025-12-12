@@ -56,9 +56,6 @@ $Page->showMessage();
 <?php if ($Page->_title->Visible) { // title ?>
         <th class="<?= $Page->_title->headerCellClass() ?>"><span id="elh_news_posts__title" class="news_posts__title"><?= $Page->_title->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->slug->Visible) { // slug ?>
-        <th class="<?= $Page->slug->headerCellClass() ?>"><span id="elh_news_posts_slug" class="news_posts_slug"><?= $Page->slug->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->category_id->Visible) { // category_id ?>
         <th class="<?= $Page->category_id->headerCellClass() ?>"><span id="elh_news_posts_category_id" class="news_posts_category_id"><?= $Page->category_id->caption() ?></span></th>
 <?php } ?>
@@ -76,18 +73,6 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->published_date->Visible) { // published_date ?>
         <th class="<?= $Page->published_date->headerCellClass() ?>"><span id="elh_news_posts_published_date" class="news_posts_published_date"><?= $Page->published_date->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->views_count->Visible) { // views_count ?>
-        <th class="<?= $Page->views_count->headerCellClass() ?>"><span id="elh_news_posts_views_count" class="news_posts_views_count"><?= $Page->views_count->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-        <th class="<?= $Page->created_at->headerCellClass() ?>"><span id="elh_news_posts_created_at" class="news_posts_created_at"><?= $Page->created_at->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->updated_at->Visible) { // updated_at ?>
-        <th class="<?= $Page->updated_at->headerCellClass() ?>"><span id="elh_news_posts_updated_at" class="news_posts_updated_at"><?= $Page->updated_at->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->news_type_id->Visible) { // news_type_id ?>
-        <th class="<?= $Page->news_type_id->headerCellClass() ?>"><span id="elh_news_posts_news_type_id" class="news_posts_news_type_id"><?= $Page->news_type_id->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -123,14 +108,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->_title->viewAttributes() ?>>
 <?= $Page->_title->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->slug->Visible) { // slug ?>
-        <td<?= $Page->slug->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->slug->viewAttributes() ?>>
-<?= $Page->slug->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -182,38 +159,6 @@ while ($Page->fetch()) {
 <span id="">
 <span<?= $Page->published_date->viewAttributes() ?>>
 <?= $Page->published_date->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->views_count->Visible) { // views_count ?>
-        <td<?= $Page->views_count->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->views_count->viewAttributes() ?>>
-<?= $Page->views_count->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-        <td<?= $Page->created_at->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->created_at->viewAttributes() ?>>
-<?= $Page->created_at->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->updated_at->Visible) { // updated_at ?>
-        <td<?= $Page->updated_at->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->updated_at->viewAttributes() ?>>
-<?= $Page->updated_at->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->news_type_id->Visible) { // news_type_id ?>
-        <td<?= $Page->news_type_id->cellAttributes() ?>>
-<span id="">
-<span<?= $Page->news_type_id->viewAttributes() ?>>
-<?= $Page->news_type_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

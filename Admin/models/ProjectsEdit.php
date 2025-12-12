@@ -141,7 +141,7 @@ class ProjectsEdit extends Projects
         $this->municipality->setVisibility();
         $this->coordinates->setVisibility();
         $this->economic_impact->setVisibility();
-        $this->project_type_id->setVisibility();
+        $this->project_type_id->Visible = false;
     }
 
     // Constructor
@@ -604,6 +604,9 @@ class ProjectsEdit extends Projects
         // Process form if post back
         if ($postBack) {
             $this->loadFormValues(); // Get form values
+
+            // Set up detail parameters
+            $this->setupDetailParms();
         }
 
         // Validate form if post back
@@ -630,9 +633,16 @@ class ProjectsEdit extends Projects
                         $this->terminate("ProjectsList"); // No matching record, return to list
                         return;
                     }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
+                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
+                } else {
+                    $returnUrl = $this->getReturnUrl();
+                }
                 if (GetPageName($returnUrl) == "ProjectsList") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
@@ -671,6 +681,9 @@ class ProjectsEdit extends Projects
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Restore form values if update failed
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -794,7 +807,7 @@ class ProjectsEdit extends Projects
             if (IsApi() && $val === null) {
                 $this->created_at->Visible = false; // Disable update for API request
             } else {
-                $this->created_at->setFormValue($val, true, $validate);
+                $this->created_at->setFormValue($val);
             }
             $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         }
@@ -900,16 +913,6 @@ class ProjectsEdit extends Projects
                 $this->economic_impact->setFormValue($val);
             }
         }
-
-        // Check field name 'project_type_id' first before field var 'x_project_type_id'
-        $val = $CurrentForm->hasValue("project_type_id") ? $CurrentForm->getValue("project_type_id") : $CurrentForm->getValue("x_project_type_id");
-        if (!$this->project_type_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->project_type_id->Visible = false; // Disable update for API request
-            } else {
-                $this->project_type_id->setFormValue($val);
-            }
-        }
 		$this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
 		$this->featured_image->UploadPath = $this->featured_image->OldUploadPath;
         $this->getUploadFiles(); // Get upload files
@@ -941,7 +944,6 @@ class ProjectsEdit extends Projects
         $this->municipality->CurrentValue = $this->municipality->FormValue;
         $this->coordinates->CurrentValue = $this->coordinates->FormValue;
         $this->economic_impact->CurrentValue = $this->economic_impact->FormValue;
-        $this->project_type_id->CurrentValue = $this->project_type_id->FormValue;
     }
 
     /**
@@ -1322,9 +1324,6 @@ class ProjectsEdit extends Projects
 
             // economic_impact
             $this->economic_impact->HrefValue = "";
-
-            // project_type_id
-            $this->project_type_id->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
             // id
             $this->id->setupEditAttributes();
@@ -1407,9 +1406,6 @@ class ProjectsEdit extends Projects
             $this->project_date->PlaceHolder = RemoveHtml($this->project_date->caption());
 
             // created_at
-            $this->created_at->setupEditAttributes();
-            $this->created_at->EditValue = HtmlEncode(FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()));
-            $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
 
             // full_description
             $this->full_description->setupEditAttributes();
@@ -1469,33 +1465,6 @@ class ProjectsEdit extends Projects
             $this->economic_impact->setupEditAttributes();
             $this->economic_impact->EditValue = HtmlEncode($this->economic_impact->CurrentValue);
             $this->economic_impact->PlaceHolder = RemoveHtml($this->economic_impact->caption());
-
-            // project_type_id
-            $this->project_type_id->setupEditAttributes();
-            $curVal = trim(strval($this->project_type_id->CurrentValue));
-            if ($curVal != "") {
-                $this->project_type_id->ViewValue = $this->project_type_id->lookupCacheOption($curVal);
-            } else {
-                $this->project_type_id->ViewValue = $this->project_type_id->Lookup !== null && is_array($this->project_type_id->lookupOptions()) && count($this->project_type_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->project_type_id->ViewValue !== null) { // Load from cache
-                $this->project_type_id->EditValue = array_values($this->project_type_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->project_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->project_type_id->CurrentValue, $this->project_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->project_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->project_type_id->EditValue = $arwrk;
-            }
-            $this->project_type_id->PlaceHolder = RemoveHtml($this->project_type_id->caption());
 
             // Edit refer script
 
@@ -1565,9 +1534,6 @@ class ProjectsEdit extends Projects
 
             // economic_impact
             $this->economic_impact->HrefValue = "";
-
-            // project_type_id
-            $this->project_type_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1640,9 +1606,6 @@ class ProjectsEdit extends Projects
                     $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
                 }
             }
-            if (!CheckDate($this->created_at->FormValue, $this->created_at->formatPattern())) {
-                $this->created_at->addErrorMessage($this->created_at->getErrorMessage(false));
-            }
             if ($this->full_description->Visible && $this->full_description->Required) {
                 if (!$this->full_description->IsDetailKey && EmptyValue($this->full_description->FormValue)) {
                     $this->full_description->addErrorMessage(str_replace("%s", $this->full_description->caption(), $this->full_description->RequiredErrorMessage));
@@ -1699,11 +1662,19 @@ class ProjectsEdit extends Projects
                     $this->economic_impact->addErrorMessage(str_replace("%s", $this->economic_impact->caption(), $this->economic_impact->RequiredErrorMessage));
                 }
             }
-            if ($this->project_type_id->Visible && $this->project_type_id->Required) {
-                if (!$this->project_type_id->IsDetailKey && EmptyValue($this->project_type_id->FormValue)) {
-                    $this->project_type_id->addErrorMessage(str_replace("%s", $this->project_type_id->caption(), $this->project_type_id->RequiredErrorMessage));
-                }
-            }
+
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("ProjectHighlightsGrid");
+        if (in_array("project_highlights", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("ProjectGalleryGrid");
+        if (in_array("project_gallery", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
 
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
@@ -1742,6 +1713,11 @@ class ProjectsEdit extends Projects
 
         // Update current values
         $this->setCurrentValues($rsnew);
+
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
         if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
             $this->featured_image->UploadPath = $this->featured_image->getUploadPath();
             if (!EmptyValue($this->featured_image->Upload->FileName)) {
@@ -1767,6 +1743,38 @@ class ProjectsEdit extends Projects
                     if (!SaveUploadFiles($this->featured_image, $rsnew['featured_image'], false)) {
                         $this->setFailureMessage($Language->phrase("UploadError7"));
                         return false;
+                    }
+                }
+            }
+
+            // Update detail records
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("ProjectHighlightsGrid");
+            if (in_array("project_highlights", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "project_highlights"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
+            $detailPage = Container("ProjectGalleryGrid");
+            if (in_array("project_gallery", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "project_gallery"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
+
+            // Commit/Rollback transaction
+            if ($this->getCurrentDetailTable() != "") {
+                if ($editRow) {
+                    if ($this->UseTransaction) { // Commit transaction
+                        if ($conn->isTransactionActive()) {
+                            $conn->commit();
+                        }
+                    }
+                } else {
+                    if ($this->UseTransaction) { // Rollback transaction
+                        if ($conn->isTransactionActive()) {
+                            $conn->rollback();
+                        }
                     }
                 }
             }
@@ -1841,6 +1849,7 @@ class ProjectsEdit extends Projects
         $this->project_date->setDbValueDef($rsnew, UnFormatDateTime($this->project_date->CurrentValue, $this->project_date->formatPattern()), $this->project_date->ReadOnly);
 
         // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
         $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), $this->created_at->ReadOnly);
 
         // full_description
@@ -1872,9 +1881,6 @@ class ProjectsEdit extends Projects
 
         // economic_impact
         $this->economic_impact->setDbValueDef($rsnew, $this->economic_impact->CurrentValue, $this->economic_impact->ReadOnly);
-
-        // project_type_id
-        $this->project_type_id->setDbValueDef($rsnew, $this->project_type_id->CurrentValue, $this->project_type_id->ReadOnly);
         return $rsnew;
     }
 
@@ -1938,8 +1944,50 @@ class ProjectsEdit extends Projects
         if (isset($row['economic_impact'])) { // economic_impact
             $this->economic_impact->CurrentValue = $row['economic_impact'];
         }
-        if (isset($row['project_type_id'])) { // project_type_id
-            $this->project_type_id->CurrentValue = $row['project_type_id'];
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("project_highlights", $detailTblVar)) {
+                $detailPageObj = Container("ProjectHighlightsGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->project_id->IsDetailKey = true;
+                    $detailPageObj->project_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->project_id->setSessionValue($detailPageObj->project_id->CurrentValue);
+                }
+            }
+            if (in_array("project_gallery", $detailTblVar)) {
+                $detailPageObj = Container("ProjectGalleryGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->project_id->IsDetailKey = true;
+                    $detailPageObj->project_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->project_id->setSessionValue($detailPageObj->project_id->CurrentValue);
+                }
+            }
         }
     }
 

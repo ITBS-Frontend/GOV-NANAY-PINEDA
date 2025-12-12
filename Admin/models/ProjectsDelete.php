@@ -128,20 +128,20 @@ class ProjectsDelete extends Projects
         $this->project_number->setVisibility();
         $this->featured_image->setVisibility();
         $this->is_featured->setVisibility();
-        $this->project_date->setVisibility();
+        $this->project_date->Visible = false;
         $this->budget_amount->Visible = false;
-        $this->created_at->setVisibility();
+        $this->created_at->Visible = false;
         $this->full_description->Visible = false;
         $this->objectives->Visible = false;
         $this->impact->Visible = false;
-        $this->location->setVisibility();
-        $this->start_date->setVisibility();
-        $this->end_date->setVisibility();
+        $this->location->Visible = false;
+        $this->start_date->Visible = false;
+        $this->end_date->Visible = false;
         $this->status->setVisibility();
         $this->municipality->setVisibility();
-        $this->coordinates->setVisibility();
+        $this->coordinates->Visible = false;
         $this->economic_impact->Visible = false;
-        $this->project_type_id->setVisibility();
+        $this->project_type_id->Visible = false;
     }
 
     // Constructor
@@ -868,26 +868,6 @@ class ProjectsDelete extends Projects
             $this->is_featured->HrefValue = "";
             $this->is_featured->TooltipValue = "";
 
-            // project_date
-            $this->project_date->HrefValue = "";
-            $this->project_date->TooltipValue = "";
-
-            // created_at
-            $this->created_at->HrefValue = "";
-            $this->created_at->TooltipValue = "";
-
-            // location
-            $this->location->HrefValue = "";
-            $this->location->TooltipValue = "";
-
-            // start_date
-            $this->start_date->HrefValue = "";
-            $this->start_date->TooltipValue = "";
-
-            // end_date
-            $this->end_date->HrefValue = "";
-            $this->end_date->TooltipValue = "";
-
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
@@ -895,14 +875,6 @@ class ProjectsDelete extends Projects
             // municipality
             $this->municipality->HrefValue = "";
             $this->municipality->TooltipValue = "";
-
-            // coordinates
-            $this->coordinates->HrefValue = "";
-            $this->coordinates->TooltipValue = "";
-
-            // project_type_id
-            $this->project_type_id->HrefValue = "";
-            $this->project_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event

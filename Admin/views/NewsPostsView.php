@@ -220,6 +220,14 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("news_post_tags", explode(",", $Page->getCurrentDetailTable())) && $news_post_tags->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("news_post_tags", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "NewsPostTagsGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

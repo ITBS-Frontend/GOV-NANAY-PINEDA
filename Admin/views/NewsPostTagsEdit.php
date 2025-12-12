@@ -70,12 +70,21 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "news_posts") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="news_posts">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->post_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->post_id->Visible) { // post_id ?>
     <div id="r_post_id"<?= $Page->post_id->rowAttributes() ?>>
         <label id="elh_news_post_tags_post_id" for="x_post_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->post_id->caption() ?><?= $Page->post_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->post_id->cellAttributes() ?>>
 <span id="el_news_post_tags_post_id">
+<?php if ($Page->post_id->getSessionValue() != "") { ?>
+<span<?= $Page->post_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->post_id->getDisplayValue($Page->post_id->EditValue) ?></span></span>
+<input type="hidden" id="x_post_id" name="x_post_id" value="<?= HtmlEncode($Page->post_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
     <select
         id="x_post_id"
         name="x_post_id"
@@ -112,6 +121,7 @@ loadjs.ready("fnews_post_tagsedit", function() {
     ew.createSelect(options);
 });
 </script>
+<?php } ?>
 <?php } ?>
 <input type="hidden" data-table="news_post_tags" data-field="x_post_id" data-hidden="1" data-old name="o_post_id" id="o_post_id" value="<?= HtmlEncode($Page->post_id->OldValue ?? $Page->post_id->CurrentValue) ?>">
 </span>

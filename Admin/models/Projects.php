@@ -135,6 +135,7 @@ class Projects extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -353,6 +354,7 @@ class Projects extends DbTable
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
+        $this->created_at->addMethod("getAutoUpdateValue", fn() => CurrentDateTime());
         $this->created_at->InputTextType = "text";
         $this->created_at->Raw = true;
         $this->created_at->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
@@ -673,6 +675,36 @@ class Projects extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "project_highlights") {
+            $detailUrl = Container("project_highlights")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "project_gallery") {
+            $detailUrl = Container("project_gallery")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "ProjectsList";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -1323,7 +1355,11 @@ class Projects extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("ProjectsEdit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("ProjectsEdit", $parm);
+        } else {
+            $url = $this->keyUrl("ProjectsEdit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1337,7 +1373,11 @@ class Projects extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("ProjectsAdd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("ProjectsAdd", $parm);
+        } else {
+            $url = $this->keyUrl("ProjectsAdd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1917,9 +1957,6 @@ class Projects extends DbTable
         }
 
         // created_at
-        $this->created_at->setupEditAttributes();
-        $this->created_at->EditValue = FormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
-        $this->created_at->PlaceHolder = RemoveHtml($this->created_at->caption());
 
         // full_description
         $this->full_description->setupEditAttributes();
@@ -2029,9 +2066,7 @@ class Projects extends DbTable
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->status);
                     $doc->exportCaption($this->municipality);
-                    $doc->exportCaption($this->coordinates);
                     $doc->exportCaption($this->economic_impact);
-                    $doc->exportCaption($this->project_type_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->_title);
@@ -2092,9 +2127,7 @@ class Projects extends DbTable
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->status);
                         $doc->exportField($this->municipality);
-                        $doc->exportField($this->coordinates);
                         $doc->exportField($this->economic_impact);
-                        $doc->exportField($this->project_type_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->_title);

@@ -29,7 +29,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.fileRequired(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
             ["is_featured", [fields.is_featured.visible && fields.is_featured.required ? ew.Validators.required(fields.is_featured.caption) : null], fields.is_featured.isInvalid],
             ["project_date", [fields.project_date.visible && fields.project_date.required ? ew.Validators.required(fields.project_date.caption) : null, ew.Validators.datetime(fields.project_date.clientFormatPattern)], fields.project_date.isInvalid],
-            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null, ew.Validators.datetime(fields.created_at.clientFormatPattern)], fields.created_at.isInvalid],
+            ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
             ["full_description", [fields.full_description.visible && fields.full_description.required ? ew.Validators.required(fields.full_description.caption) : null], fields.full_description.isInvalid],
             ["objectives", [fields.objectives.visible && fields.objectives.required ? ew.Validators.required(fields.objectives.caption) : null], fields.objectives.isInvalid],
             ["impact", [fields.impact.visible && fields.impact.required ? ew.Validators.required(fields.impact.caption) : null], fields.impact.isInvalid],
@@ -38,9 +38,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["end_date", [fields.end_date.visible && fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(fields.end_date.clientFormatPattern)], fields.end_date.isInvalid],
             ["status", [fields.status.visible && fields.status.required ? ew.Validators.required(fields.status.caption) : null], fields.status.isInvalid],
             ["municipality", [fields.municipality.visible && fields.municipality.required ? ew.Validators.required(fields.municipality.caption) : null], fields.municipality.isInvalid],
-            ["coordinates", [fields.coordinates.visible && fields.coordinates.required ? ew.Validators.required(fields.coordinates.caption) : null], fields.coordinates.isInvalid],
-            ["economic_impact", [fields.economic_impact.visible && fields.economic_impact.required ? ew.Validators.required(fields.economic_impact.caption) : null], fields.economic_impact.isInvalid],
-            ["project_type_id", [fields.project_type_id.visible && fields.project_type_id.required ? ew.Validators.required(fields.project_type_id.caption) : null], fields.project_type_id.isInvalid]
+            ["economic_impact", [fields.economic_impact.visible && fields.economic_impact.required ? ew.Validators.required(fields.economic_impact.caption) : null], fields.economic_impact.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -59,7 +57,6 @@ loadjs.ready(["wrapper", "head"], function () {
             "category_id": <?= $Page->category_id->toClientList($Page) ?>,
             "is_featured": <?= $Page->is_featured->toClientList($Page) ?>,
             "status": <?= $Page->status->toClientList($Page) ?>,
-            "project_type_id": <?= $Page->project_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -261,55 +258,20 @@ loadjs.ready(["fprojectsadd", "datetimepicker"], function () {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-    <div id="r_created_at"<?= $Page->created_at->rowAttributes() ?>>
-        <label id="elh_projects_created_at" for="x_created_at" class="<?= $Page->LeftColumnClass ?>"><?= $Page->created_at->caption() ?><?= $Page->created_at->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->created_at->cellAttributes() ?>>
-<span id="el_projects_created_at">
-<input type="<?= $Page->created_at->getInputTextType() ?>" name="x_created_at" id="x_created_at" data-table="projects" data-field="x_created_at" value="<?= $Page->created_at->EditValue ?>" placeholder="<?= HtmlEncode($Page->created_at->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->created_at->formatPattern()) ?>"<?= $Page->created_at->editAttributes() ?> aria-describedby="x_created_at_help">
-<?= $Page->created_at->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->created_at->getErrorMessage() ?></div>
-<?php if (!$Page->created_at->ReadOnly && !$Page->created_at->Disabled && !isset($Page->created_at->EditAttrs["readonly"]) && !isset($Page->created_at->EditAttrs["disabled"])) { ?>
-<script>
-loadjs.ready(["fprojectsadd", "datetimepicker"], function () {
-    let format = "<?= DateFormat(0) ?>",
-        options = {
-            localization: {
-                locale: ew.LANGUAGE_ID + "-u-nu-" + ew.getNumberingSystem(),
-                hourCycle: format.match(/H/) ? "h24" : "h12",
-                format,
-                ...ew.language.phrase("datetimepicker")
-            },
-            display: {
-                icons: {
-                    previous: ew.IS_RTL ? "fa-solid fa-chevron-right" : "fa-solid fa-chevron-left",
-                    next: ew.IS_RTL ? "fa-solid fa-chevron-left" : "fa-solid fa-chevron-right"
-                },
-                components: {
-                    clock: !!format.match(/h/i) || !!format.match(/m/) || !!format.match(/s/i),
-                    hours: !!format.match(/h/i),
-                    minutes: !!format.match(/m/),
-                    seconds: !!format.match(/s/i)
-                },
-                theme: ew.getPreferredTheme()
-            }
-        };
-    ew.createDateTimePicker("fprojectsadd", "x_created_at", ew.deepAssign({"useCurrent":false,"display":{"sideBySide":false}}, options));
-});
-</script>
-<?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->full_description->Visible) { // full_description ?>
     <div id="r_full_description"<?= $Page->full_description->rowAttributes() ?>>
-        <label id="elh_projects_full_description" for="x_full_description" class="<?= $Page->LeftColumnClass ?>"><?= $Page->full_description->caption() ?><?= $Page->full_description->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_projects_full_description" class="<?= $Page->LeftColumnClass ?>"><?= $Page->full_description->caption() ?><?= $Page->full_description->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->full_description->cellAttributes() ?>>
 <span id="el_projects_full_description">
+<?php $Page->full_description->EditAttrs->appendClass("editor"); ?>
 <textarea data-table="projects" data-field="x_full_description" name="x_full_description" id="x_full_description" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->full_description->getPlaceHolder()) ?>"<?= $Page->full_description->editAttributes() ?> aria-describedby="x_full_description_help"><?= $Page->full_description->EditValue ?></textarea>
 <?= $Page->full_description->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->full_description->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fprojectsadd", "editor"], function() {
+    ew.createEditor("fprojectsadd", "x_full_description", 35, 4, <?= $Page->full_description->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 </div></div>
     </div>
@@ -489,18 +451,6 @@ loadjs.ready("fprojectsadd", function() {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->coordinates->Visible) { // coordinates ?>
-    <div id="r_coordinates"<?= $Page->coordinates->rowAttributes() ?>>
-        <label id="elh_projects_coordinates" for="x_coordinates" class="<?= $Page->LeftColumnClass ?>"><?= $Page->coordinates->caption() ?><?= $Page->coordinates->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->coordinates->cellAttributes() ?>>
-<span id="el_projects_coordinates">
-<input type="<?= $Page->coordinates->getInputTextType() ?>" name="x_coordinates" id="x_coordinates" data-table="projects" data-field="x_coordinates" value="<?= $Page->coordinates->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Page->coordinates->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->coordinates->formatPattern()) ?>"<?= $Page->coordinates->editAttributes() ?> aria-describedby="x_coordinates_help">
-<?= $Page->coordinates->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->coordinates->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->economic_impact->Visible) { // economic_impact ?>
     <div id="r_economic_impact"<?= $Page->economic_impact->rowAttributes() ?>>
         <label id="elh_projects_economic_impact" for="x_economic_impact" class="<?= $Page->LeftColumnClass ?>"><?= $Page->economic_impact->caption() ?><?= $Page->economic_impact->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
@@ -513,53 +463,23 @@ loadjs.ready("fprojectsadd", function() {
 </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->project_type_id->Visible) { // project_type_id ?>
-    <div id="r_project_type_id"<?= $Page->project_type_id->rowAttributes() ?>>
-        <label id="elh_projects_project_type_id" for="x_project_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->project_type_id->caption() ?><?= $Page->project_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->project_type_id->cellAttributes() ?>>
-<span id="el_projects_project_type_id">
-    <select
-        id="x_project_type_id"
-        name="x_project_type_id"
-        class="form-select ew-select<?= $Page->project_type_id->isInvalidClass() ?>"
-        <?php if (!$Page->project_type_id->IsNativeSelect) { ?>
-        data-select2-id="fprojectsadd_x_project_type_id"
-        <?php } ?>
-        data-table="projects"
-        data-field="x_project_type_id"
-        data-value-separator="<?= $Page->project_type_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->project_type_id->getPlaceHolder()) ?>"
-        <?= $Page->project_type_id->editAttributes() ?>>
-        <?= $Page->project_type_id->selectOptionListHtml("x_project_type_id") ?>
-    </select>
-    <?= $Page->project_type_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->project_type_id->getErrorMessage() ?></div>
-<?= $Page->project_type_id->Lookup->getParamTag($Page, "p_x_project_type_id") ?>
-<?php if (!$Page->project_type_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fprojectsadd", function() {
-    var options = { name: "x_project_type_id", selectId: "fprojectsadd_x_project_type_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fprojectsadd.lists.project_type_id?.lookupOptions.length) {
-        options.data = { id: "x_project_type_id", form: "fprojectsadd" };
-    } else {
-        options.ajax = { id: "x_project_type_id", form: "fprojectsadd", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.projects.fields.project_type_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
-</span>
-</div></div>
-    </div>
-<?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("project_highlights", explode(",", $Page->getCurrentDetailTable())) && $project_highlights->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("project_highlights", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "ProjectHighlightsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("project_gallery", explode(",", $Page->getCurrentDetailTable())) && $project_gallery->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("project_gallery", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "ProjectGalleryGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fprojectsadd"><?= $Language->phrase("AddBtn") ?></button>

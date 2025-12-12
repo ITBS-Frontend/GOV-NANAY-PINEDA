@@ -543,6 +543,9 @@ class NewsPostTagsView extends NewsPostTags
         $loadCurrentRecord = false;
         $returnUrl = "";
         $matchRecord = false;
+
+        // Set up master/detail parameters
+        $this->setupMasterParms();
         if (($keyValue = Get("post_id") ?? Route("post_id")) !== null) {
             $this->post_id->setQueryStringValue($keyValue);
             $this->RecKey["post_id"] = $this->post_id->QueryStringValue;
@@ -840,6 +843,79 @@ class NewsPostTagsView extends NewsPostTags
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "news_posts") {
+                $validMaster = true;
+                $masterTbl = Container("news_posts");
+                if (($parm = Get("fk_id", Get("post_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->post_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->post_id->setSessionValue($this->post_id->QueryStringValue);
+                    $foreignKeys["post_id"] = $this->post_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "news_posts") {
+                $validMaster = true;
+                $masterTbl = Container("news_posts");
+                if (($parm = Post("fk_id", Post("post_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->post_id->FormValue = $masterTbl->id->FormValue;
+                    $this->post_id->setSessionValue($this->post_id->FormValue);
+                    $foreignKeys["post_id"] = $this->post_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "news_posts") {
+                if (!array_key_exists("post_id", $foreignKeys)) { // Not current foreign key
+                    $this->post_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

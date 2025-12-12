@@ -301,4 +301,36 @@ class TourismService
             return ['success' => false, 'message' => 'Failed to fetch tourism categories'];
         }
     }
+
+    /**
+ * Get tourism facility types
+ */
+public function getFacilityTypes() 
+{
+    try {
+        $conn = Conn();
+        
+        $sql = "
+            SELECT 
+                id,
+                type_name,
+                icon_class,
+                display_order
+            FROM tourism_facility_types
+            WHERE is_active = true
+            ORDER BY display_order ASC, type_name ASC
+        ";
+        
+        $types = $conn->executeQuery($sql)->fetchAllAssociative();
+        
+        return [
+            'success' => true,
+            'data' => $types
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get tourism facility types error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch tourism facility types'];
+    }
+}
 }

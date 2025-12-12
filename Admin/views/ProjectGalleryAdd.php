@@ -71,11 +71,20 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "projects") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="projects">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->project_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->project_id->Visible) { // project_id ?>
     <div id="r_project_id"<?= $Page->project_id->rowAttributes() ?>>
         <label id="elh_project_gallery_project_id" for="x_project_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->project_id->caption() ?><?= $Page->project_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->project_id->cellAttributes() ?>>
+<?php if ($Page->project_id->getSessionValue() != "") { ?>
+<span<?= $Page->project_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->project_id->getDisplayValue($Page->project_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_project_id" name="x_project_id" value="<?= HtmlEncode($Page->project_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_project_gallery_project_id">
     <select
         id="x_project_id"
@@ -115,6 +124,7 @@ loadjs.ready("fproject_galleryadd", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

@@ -123,7 +123,7 @@ class NewsPostsDelete extends NewsPosts
     {
         $this->id->setVisibility();
         $this->_title->setVisibility();
-        $this->slug->setVisibility();
+        $this->slug->Visible = false;
         $this->excerpt->Visible = false;
         $this->_content->Visible = false;
         $this->category_id->setVisibility();
@@ -132,10 +132,10 @@ class NewsPostsDelete extends NewsPosts
         $this->is_featured->setVisibility();
         $this->is_published->setVisibility();
         $this->published_date->setVisibility();
-        $this->views_count->setVisibility();
-        $this->created_at->setVisibility();
-        $this->updated_at->setVisibility();
-        $this->news_type_id->setVisibility();
+        $this->views_count->Visible = false;
+        $this->created_at->Visible = false;
+        $this->updated_at->Visible = false;
+        $this->news_type_id->Visible = false;
     }
 
     // Constructor
@@ -794,10 +794,6 @@ class NewsPostsDelete extends NewsPosts
             $this->_title->HrefValue = "";
             $this->_title->TooltipValue = "";
 
-            // slug
-            $this->slug->HrefValue = "";
-            $this->slug->TooltipValue = "";
-
             // category_id
             $this->category_id->HrefValue = "";
             $this->category_id->TooltipValue = "";
@@ -838,22 +834,6 @@ class NewsPostsDelete extends NewsPosts
             // published_date
             $this->published_date->HrefValue = "";
             $this->published_date->TooltipValue = "";
-
-            // views_count
-            $this->views_count->HrefValue = "";
-            $this->views_count->TooltipValue = "";
-
-            // created_at
-            $this->created_at->HrefValue = "";
-            $this->created_at->TooltipValue = "";
-
-            // updated_at
-            $this->updated_at->HrefValue = "";
-            $this->updated_at->TooltipValue = "";
-
-            // news_type_id
-            $this->news_type_id->HrefValue = "";
-            $this->news_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event

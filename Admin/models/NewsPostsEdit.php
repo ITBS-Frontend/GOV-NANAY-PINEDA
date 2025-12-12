@@ -598,6 +598,9 @@ class NewsPostsEdit extends NewsPosts
         // Process form if post back
         if ($postBack) {
             $this->loadFormValues(); // Get form values
+
+            // Set up detail parameters
+            $this->setupDetailParms();
         }
 
         // Validate form if post back
@@ -624,9 +627,16 @@ class NewsPostsEdit extends NewsPosts
                         $this->terminate("NewsPostsList"); // No matching record, return to list
                         return;
                     }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
+                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
+                } else {
+                    $returnUrl = $this->getReturnUrl();
+                }
                 if (GetPageName($returnUrl) == "NewsPostsList") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
@@ -665,6 +675,9 @@ class NewsPostsEdit extends NewsPosts
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Restore form values if update failed
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -1493,6 +1506,14 @@ class NewsPostsEdit extends NewsPosts
                 }
             }
 
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("NewsPostTagsGrid");
+        if (in_array("news_post_tags", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
 
@@ -1548,6 +1569,11 @@ class NewsPostsEdit extends NewsPosts
                 return false;
             }
         }
+
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
         if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
             $this->featured_image->UploadPath = $this->featured_image->getUploadPath();
             if (!EmptyValue($this->featured_image->Upload->FileName)) {
@@ -1573,6 +1599,32 @@ class NewsPostsEdit extends NewsPosts
                     if (!SaveUploadFiles($this->featured_image, $rsnew['featured_image'], false)) {
                         $this->setFailureMessage($Language->phrase("UploadError7"));
                         return false;
+                    }
+                }
+            }
+
+            // Update detail records
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("NewsPostTagsGrid");
+            if (in_array("news_post_tags", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "news_post_tags"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
+
+            // Commit/Rollback transaction
+            if ($this->getCurrentDetailTable() != "") {
+                if ($editRow) {
+                    if ($this->UseTransaction) { // Commit transaction
+                        if ($conn->isTransactionActive()) {
+                            $conn->commit();
+                        }
+                    }
+                } else {
+                    if ($this->UseTransaction) { // Rollback transaction
+                        if ($conn->isTransactionActive()) {
+                            $conn->rollback();
+                        }
                     }
                 }
             }
@@ -1722,6 +1774,36 @@ class NewsPostsEdit extends NewsPosts
         }
         if (isset($row['news_type_id'])) { // news_type_id
             $this->news_type_id->CurrentValue = $row['news_type_id'];
+        }
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("news_post_tags", $detailTblVar)) {
+                $detailPageObj = Container("NewsPostTagsGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->post_id->IsDetailKey = true;
+                    $detailPageObj->post_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->post_id->setSessionValue($detailPageObj->post_id->CurrentValue);
+                }
+            }
         }
     }
 

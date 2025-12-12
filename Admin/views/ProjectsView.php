@@ -240,17 +240,6 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->coordinates->Visible) { // coordinates ?>
-    <tr id="r_coordinates"<?= $Page->coordinates->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_coordinates"><?= $Page->coordinates->caption() ?></span></td>
-        <td data-name="coordinates"<?= $Page->coordinates->cellAttributes() ?>>
-<span id="el_projects_coordinates">
-<span<?= $Page->coordinates->viewAttributes() ?>>
-<?= $Page->coordinates->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->economic_impact->Visible) { // economic_impact ?>
     <tr id="r_economic_impact"<?= $Page->economic_impact->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_economic_impact"><?= $Page->economic_impact->caption() ?></span></td>
@@ -262,18 +251,23 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->project_type_id->Visible) { // project_type_id ?>
-    <tr id="r_project_type_id"<?= $Page->project_type_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_projects_project_type_id"><?= $Page->project_type_id->caption() ?></span></td>
-        <td data-name="project_type_id"<?= $Page->project_type_id->cellAttributes() ?>>
-<span id="el_projects_project_type_id">
-<span<?= $Page->project_type_id->viewAttributes() ?>>
-<?= $Page->project_type_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 </table>
+<?php
+    if (in_array("project_highlights", explode(",", $Page->getCurrentDetailTable())) && $project_highlights->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("project_highlights", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "ProjectHighlightsGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("project_gallery", explode(",", $Page->getCurrentDetailTable())) && $project_gallery->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("project_gallery", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "ProjectGalleryGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

@@ -147,7 +147,7 @@ class NewsPostsList extends NewsPosts
     {
         $this->id->setVisibility();
         $this->_title->setVisibility();
-        $this->slug->setVisibility();
+        $this->slug->Visible = false;
         $this->excerpt->Visible = false;
         $this->_content->Visible = false;
         $this->category_id->setVisibility();
@@ -156,10 +156,10 @@ class NewsPostsList extends NewsPosts
         $this->is_featured->setVisibility();
         $this->is_published->setVisibility();
         $this->published_date->setVisibility();
-        $this->views_count->setVisibility();
-        $this->created_at->setVisibility();
-        $this->updated_at->setVisibility();
-        $this->news_type_id->setVisibility();
+        $this->views_count->Visible = false;
+        $this->created_at->Visible = false;
+        $this->updated_at->Visible = false;
+        $this->news_type_id->Visible = false;
     }
 
     // Constructor
@@ -200,7 +200,7 @@ class NewsPostsList extends NewsPosts
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "NewsPostsAdd";
+        $this->AddUrl = "NewsPostsAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -1348,17 +1348,12 @@ class NewsPostsList extends NewsPosts
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
             $this->updateSort($this->_title); // title
-            $this->updateSort($this->slug); // slug
             $this->updateSort($this->category_id); // category_id
             $this->updateSort($this->featured_image); // featured_image
             $this->updateSort($this->author_name); // author_name
             $this->updateSort($this->is_featured); // is_featured
             $this->updateSort($this->is_published); // is_published
             $this->updateSort($this->published_date); // published_date
-            $this->updateSort($this->views_count); // views_count
-            $this->updateSort($this->created_at); // created_at
-            $this->updateSort($this->updated_at); // updated_at
-            $this->updateSort($this->news_type_id); // news_type_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1440,6 +1435,28 @@ class NewsPostsList extends NewsPosts
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
+
+        // "detail_news_post_tags"
+        $item = &$this->ListOptions->add("detail_news_post_tags");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'news_post_tags');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("news_post_tags");
+        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1591,6 +1608,77 @@ class NewsPostsList extends NewsPosts
                 $opt->Body = $body;
             }
         }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_news_post_tags"
+        $opt = $this->ListOptions["detail_news_post_tags"];
+        if ($Security->allowList(CurrentProjectID() . 'news_post_tags')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("news_post_tags", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("NewsPostTagsList?" . Config("TABLE_SHOW_MASTER") . "=news_posts&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("NewsPostTagsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'news_posts')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=news_post_tags");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "news_post_tags";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'news_posts')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=news_post_tags");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "news_post_tags";
+            }
+            if ($detailPage->DetailAdd && $Security->canAdd() && $Security->allowAdd(CurrentProjectID() . 'news_posts')) {
+                $caption = $Language->phrase("MasterDetailCopyLink", null);
+                $url = $this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=news_post_tags");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailCopyTblVar != "") {
+                    $detailCopyTblVar .= ",";
+                }
+                $detailCopyTblVar .= "news_post_tags";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
+        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
@@ -1624,6 +1712,37 @@ class NewsPostsList extends NewsPosts
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        $option = $options["detail"];
+        $detailTableLink = "";
+        $item = &$option->add("detailadd_news_post_tags");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=news_post_tags");
+        $detailPage = Container("NewsPostTagsGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'news_posts') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "news_post_tags";
+        }
+
+        // Add multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$option->add("detailsadd");
+            $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailTableLink);
+            $caption = $Language->phrase("AddMasterDetailLink");
+            $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+            $item->Visible = $detailTableLink != "" && $Security->canAdd();
+            // Hide single master/detail items
+            $ar = explode(",", $detailTableLink);
+            $cnt = count($ar);
+            for ($i = 0; $i < $cnt; $i++) {
+                if ($item = $option["detailadd_" . $ar[$i]]) {
+                    $item->Visible = false;
+                }
+            }
+        }
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -1634,17 +1753,12 @@ class NewsPostsList extends NewsPosts
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "id");
             $this->createColumnOption($option, "title");
-            $this->createColumnOption($option, "slug");
             $this->createColumnOption($option, "category_id");
             $this->createColumnOption($option, "featured_image");
             $this->createColumnOption($option, "author_name");
             $this->createColumnOption($option, "is_featured");
             $this->createColumnOption($option, "is_published");
             $this->createColumnOption($option, "published_date");
-            $this->createColumnOption($option, "views_count");
-            $this->createColumnOption($option, "created_at");
-            $this->createColumnOption($option, "updated_at");
-            $this->createColumnOption($option, "news_type_id");
         }
 
         // Set up custom actions
@@ -2300,10 +2414,6 @@ class NewsPostsList extends NewsPosts
             $this->_title->HrefValue = "";
             $this->_title->TooltipValue = "";
 
-            // slug
-            $this->slug->HrefValue = "";
-            $this->slug->TooltipValue = "";
-
             // category_id
             $this->category_id->HrefValue = "";
             $this->category_id->TooltipValue = "";
@@ -2344,22 +2454,6 @@ class NewsPostsList extends NewsPosts
             // published_date
             $this->published_date->HrefValue = "";
             $this->published_date->TooltipValue = "";
-
-            // views_count
-            $this->views_count->HrefValue = "";
-            $this->views_count->TooltipValue = "";
-
-            // created_at
-            $this->created_at->HrefValue = "";
-            $this->created_at->TooltipValue = "";
-
-            // updated_at
-            $this->updated_at->HrefValue = "";
-            $this->updated_at->TooltipValue = "";
-
-            // news_type_id
-            $this->news_type_id->HrefValue = "";
-            $this->news_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event

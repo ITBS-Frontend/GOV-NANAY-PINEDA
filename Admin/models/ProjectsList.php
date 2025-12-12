@@ -152,20 +152,20 @@ class ProjectsList extends Projects
         $this->project_number->setVisibility();
         $this->featured_image->setVisibility();
         $this->is_featured->setVisibility();
-        $this->project_date->setVisibility();
+        $this->project_date->Visible = false;
         $this->budget_amount->Visible = false;
-        $this->created_at->setVisibility();
+        $this->created_at->Visible = false;
         $this->full_description->Visible = false;
         $this->objectives->Visible = false;
         $this->impact->Visible = false;
-        $this->location->setVisibility();
-        $this->start_date->setVisibility();
-        $this->end_date->setVisibility();
+        $this->location->Visible = false;
+        $this->start_date->Visible = false;
+        $this->end_date->Visible = false;
         $this->status->setVisibility();
         $this->municipality->setVisibility();
-        $this->coordinates->setVisibility();
+        $this->coordinates->Visible = false;
         $this->economic_impact->Visible = false;
-        $this->project_type_id->setVisibility();
+        $this->project_type_id->Visible = false;
     }
 
     // Constructor
@@ -206,7 +206,7 @@ class ProjectsList extends Projects
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "ProjectsAdd";
+        $this->AddUrl = "ProjectsAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -474,6 +474,9 @@ class ProjectsList extends Projects
     {
         if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
             $this->id->Visible = false;
+        }
+        if ($this->isAddOrEdit()) {
+            $this->created_at->Visible = false;
         }
     }
 
@@ -1411,15 +1414,8 @@ class ProjectsList extends Projects
             $this->updateSort($this->project_number); // project_number
             $this->updateSort($this->featured_image); // featured_image
             $this->updateSort($this->is_featured); // is_featured
-            $this->updateSort($this->project_date); // project_date
-            $this->updateSort($this->created_at); // created_at
-            $this->updateSort($this->location); // location
-            $this->updateSort($this->start_date); // start_date
-            $this->updateSort($this->end_date); // end_date
             $this->updateSort($this->status); // status
             $this->updateSort($this->municipality); // municipality
-            $this->updateSort($this->coordinates); // coordinates
-            $this->updateSort($this->project_type_id); // project_type_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1507,6 +1503,36 @@ class ProjectsList extends Projects
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
+
+        // "detail_project_highlights"
+        $item = &$this->ListOptions->add("detail_project_highlights");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'project_highlights');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_project_gallery"
+        $item = &$this->ListOptions->add("detail_project_gallery");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'project_gallery');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("project_highlights");
+        $pages->add("project_gallery");
+        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1658,6 +1684,124 @@ class ProjectsList extends Projects
                 $opt->Body = $body;
             }
         }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_project_highlights"
+        $opt = $this->ListOptions["detail_project_highlights"];
+        if ($Security->allowList(CurrentProjectID() . 'project_highlights')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("project_highlights", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ProjectHighlightsList?" . Config("TABLE_SHOW_MASTER") . "=projects&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("ProjectHighlightsGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'projects')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=project_highlights");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "project_highlights";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'projects')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=project_highlights");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "project_highlights";
+            }
+            if ($detailPage->DetailAdd && $Security->canAdd() && $Security->allowAdd(CurrentProjectID() . 'projects')) {
+                $caption = $Language->phrase("MasterDetailCopyLink", null);
+                $url = $this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=project_highlights");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailCopyTblVar != "") {
+                    $detailCopyTblVar .= ",";
+                }
+                $detailCopyTblVar .= "project_highlights";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_project_gallery"
+        $opt = $this->ListOptions["detail_project_gallery"];
+        if ($Security->allowList(CurrentProjectID() . 'project_gallery')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("project_gallery", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("ProjectGalleryList?" . Config("TABLE_SHOW_MASTER") . "=projects&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("ProjectGalleryGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'projects')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=project_gallery");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "project_gallery";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'projects')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=project_gallery");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "project_gallery";
+            }
+            if ($detailPage->DetailAdd && $Security->canAdd() && $Security->allowAdd(CurrentProjectID() . 'projects')) {
+                $caption = $Language->phrase("MasterDetailCopyLink", null);
+                $url = $this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=project_gallery");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailCopyTblVar != "") {
+                    $detailCopyTblVar .= ",";
+                }
+                $detailCopyTblVar .= "project_gallery";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
+        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
@@ -1691,6 +1835,49 @@ class ProjectsList extends Projects
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        $option = $options["detail"];
+        $detailTableLink = "";
+        $item = &$option->add("detailadd_project_highlights");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=project_highlights");
+        $detailPage = Container("ProjectHighlightsGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'projects') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "project_highlights";
+        }
+        $item = &$option->add("detailadd_project_gallery");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=project_gallery");
+        $detailPage = Container("ProjectGalleryGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'projects') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "project_gallery";
+        }
+
+        // Add multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$option->add("detailsadd");
+            $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailTableLink);
+            $caption = $Language->phrase("AddMasterDetailLink");
+            $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+            $item->Visible = $detailTableLink != "" && $Security->canAdd();
+            // Hide single master/detail items
+            $ar = explode(",", $detailTableLink);
+            $cnt = count($ar);
+            for ($i = 0; $i < $cnt; $i++) {
+                if ($item = $option["detailadd_" . $ar[$i]]) {
+                    $item->Visible = false;
+                }
+            }
+        }
         $option = $options["action"];
 
         // Show column list for column visibility
@@ -1705,15 +1892,8 @@ class ProjectsList extends Projects
             $this->createColumnOption($option, "project_number");
             $this->createColumnOption($option, "featured_image");
             $this->createColumnOption($option, "is_featured");
-            $this->createColumnOption($option, "project_date");
-            $this->createColumnOption($option, "created_at");
-            $this->createColumnOption($option, "location");
-            $this->createColumnOption($option, "start_date");
-            $this->createColumnOption($option, "end_date");
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "municipality");
-            $this->createColumnOption($option, "coordinates");
-            $this->createColumnOption($option, "project_type_id");
         }
 
         // Set up custom actions
@@ -2437,26 +2617,6 @@ class ProjectsList extends Projects
             $this->is_featured->HrefValue = "";
             $this->is_featured->TooltipValue = "";
 
-            // project_date
-            $this->project_date->HrefValue = "";
-            $this->project_date->TooltipValue = "";
-
-            // created_at
-            $this->created_at->HrefValue = "";
-            $this->created_at->TooltipValue = "";
-
-            // location
-            $this->location->HrefValue = "";
-            $this->location->TooltipValue = "";
-
-            // start_date
-            $this->start_date->HrefValue = "";
-            $this->start_date->TooltipValue = "";
-
-            // end_date
-            $this->end_date->HrefValue = "";
-            $this->end_date->TooltipValue = "";
-
             // status
             $this->status->HrefValue = "";
             $this->status->TooltipValue = "";
@@ -2464,14 +2624,6 @@ class ProjectsList extends Projects
             // municipality
             $this->municipality->HrefValue = "";
             $this->municipality->TooltipValue = "";
-
-            // coordinates
-            $this->coordinates->HrefValue = "";
-            $this->coordinates->TooltipValue = "";
-
-            // project_type_id
-            $this->project_type_id->HrefValue = "";
-            $this->project_type_id->TooltipValue = "";
         }
 
         // Call Row Rendered event

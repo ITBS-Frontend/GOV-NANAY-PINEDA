@@ -153,9 +153,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->_title->Visible) { // title ?>
         <th data-name="_title" class="<?= $Page->_title->headerCellClass() ?>"><div id="elh_news_posts__title" class="news_posts__title"><?= $Page->renderFieldHeader($Page->_title) ?></div></th>
 <?php } ?>
-<?php if ($Page->slug->Visible) { // slug ?>
-        <th data-name="slug" class="<?= $Page->slug->headerCellClass() ?>"><div id="elh_news_posts_slug" class="news_posts_slug"><?= $Page->renderFieldHeader($Page->slug) ?></div></th>
-<?php } ?>
 <?php if ($Page->category_id->Visible) { // category_id ?>
         <th data-name="category_id" class="<?= $Page->category_id->headerCellClass() ?>"><div id="elh_news_posts_category_id" class="news_posts_category_id"><?= $Page->renderFieldHeader($Page->category_id) ?></div></th>
 <?php } ?>
@@ -173,18 +170,6 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->published_date->Visible) { // published_date ?>
         <th data-name="published_date" class="<?= $Page->published_date->headerCellClass() ?>"><div id="elh_news_posts_published_date" class="news_posts_published_date"><?= $Page->renderFieldHeader($Page->published_date) ?></div></th>
-<?php } ?>
-<?php if ($Page->views_count->Visible) { // views_count ?>
-        <th data-name="views_count" class="<?= $Page->views_count->headerCellClass() ?>"><div id="elh_news_posts_views_count" class="news_posts_views_count"><?= $Page->renderFieldHeader($Page->views_count) ?></div></th>
-<?php } ?>
-<?php if ($Page->created_at->Visible) { // created_at ?>
-        <th data-name="created_at" class="<?= $Page->created_at->headerCellClass() ?>"><div id="elh_news_posts_created_at" class="news_posts_created_at"><?= $Page->renderFieldHeader($Page->created_at) ?></div></th>
-<?php } ?>
-<?php if ($Page->updated_at->Visible) { // updated_at ?>
-        <th data-name="updated_at" class="<?= $Page->updated_at->headerCellClass() ?>"><div id="elh_news_posts_updated_at" class="news_posts_updated_at"><?= $Page->renderFieldHeader($Page->updated_at) ?></div></th>
-<?php } ?>
-<?php if ($Page->news_type_id->Visible) { // news_type_id ?>
-        <th data-name="news_type_id" class="<?= $Page->news_type_id->headerCellClass() ?>"><div id="elh_news_posts_news_type_id" class="news_posts_news_type_id"><?= $Page->renderFieldHeader($Page->news_type_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -226,14 +211,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_news_posts__title" class="el_news_posts__title">
 <span<?= $Page->_title->viewAttributes() ?>>
 <?= $Page->_title->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->slug->Visible) { // slug ?>
-        <td data-name="slug"<?= $Page->slug->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_news_posts_slug" class="el_news_posts_slug">
-<span<?= $Page->slug->viewAttributes() ?>>
-<?= $Page->slug->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -285,38 +262,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_news_posts_published_date" class="el_news_posts_published_date">
 <span<?= $Page->published_date->viewAttributes() ?>>
 <?= $Page->published_date->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->views_count->Visible) { // views_count ?>
-        <td data-name="views_count"<?= $Page->views_count->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_news_posts_views_count" class="el_news_posts_views_count">
-<span<?= $Page->views_count->viewAttributes() ?>>
-<?= $Page->views_count->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->created_at->Visible) { // created_at ?>
-        <td data-name="created_at"<?= $Page->created_at->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_news_posts_created_at" class="el_news_posts_created_at">
-<span<?= $Page->created_at->viewAttributes() ?>>
-<?= $Page->created_at->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->updated_at->Visible) { // updated_at ?>
-        <td data-name="updated_at"<?= $Page->updated_at->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_news_posts_updated_at" class="el_news_posts_updated_at">
-<span<?= $Page->updated_at->viewAttributes() ?>>
-<?= $Page->updated_at->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->news_type_id->Visible) { // news_type_id ?>
-        <td data-name="news_type_id"<?= $Page->news_type_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_news_posts_news_type_id" class="el_news_posts_news_type_id">
-<span<?= $Page->news_type_id->viewAttributes() ?>>
-<?= $Page->news_type_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

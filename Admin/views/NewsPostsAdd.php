@@ -353,6 +353,14 @@ loadjs.ready("fnews_postsadd", function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("news_post_tags", explode(",", $Page->getCurrentDetailTable())) && $news_post_tags->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("news_post_tags", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "NewsPostTagsGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="fnews_postsadd"><?= $Language->phrase("AddBtn") ?></button>

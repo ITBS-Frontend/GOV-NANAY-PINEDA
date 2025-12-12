@@ -682,6 +682,9 @@ class NewsPostTagsList extends NewsPostTags
             $this->InlineDelete = true;
         }
 
+        // Set up master detail parameters
+        $this->setupMasterParms();
+
         // Setup other options
         $this->setupOtherOptions();
 
@@ -768,8 +771,28 @@ class NewsPostTagsList extends NewsPostTags
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
+
+        // Restore master/detail filter from session
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
+
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "news_posts") {
+            $masterTbl = Container("news_posts");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("NewsPostsList"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = RowType::MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -997,6 +1020,14 @@ class NewsPostTagsList extends NewsPostTags
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
+            // Reset master/detail keys
+            if ($this->Command == "resetall") {
+                $this->setCurrentMasterTable(""); // Clear master table
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+                        $this->post_id->setSessionValue("");
+            }
+
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
@@ -1823,6 +1854,90 @@ class NewsPostTagsList extends NewsPostTags
         if (!$this->hasSearchFields() && $this->SearchOptions["searchtoggle"]) {
             $this->SearchOptions["searchtoggle"]->Visible = false;
         }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "news_posts") {
+                $validMaster = true;
+                $masterTbl = Container("news_posts");
+                if (($parm = Get("fk_id", Get("post_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->post_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->post_id->setSessionValue($this->post_id->QueryStringValue);
+                    $foreignKeys["post_id"] = $this->post_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "news_posts") {
+                $validMaster = true;
+                $masterTbl = Container("news_posts");
+                if (($parm = Post("fk_id", Post("post_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->post_id->FormValue = $masterTbl->id->FormValue;
+                    $this->post_id->setSessionValue($this->post_id->FormValue);
+                    $foreignKeys["post_id"] = $this->post_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Update URL
+            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
+            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
+            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
+            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
+            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
+
+            // Set up Breadcrumb
+            if (!$this->isExport()) {
+                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
+            }
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "news_posts") {
+                if (!array_key_exists("post_id", $foreignKeys)) { // Not current foreign key
+                    $this->post_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

@@ -572,6 +572,9 @@ class ProjectHighlightsEdit extends ProjectHighlights
                 }
             }
 
+            // Set up master detail parameters
+            $this->setupMasterParms();
+
             // Load result set
             if ($this->isShow()) {
                     // Load current record
@@ -622,7 +625,7 @@ class ProjectHighlightsEdit extends ProjectHighlights
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "ProjectHighlightsList") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -920,30 +923,55 @@ class ProjectHighlightsEdit extends ProjectHighlights
 
             // project_id
             $this->project_id->setupEditAttributes();
-            $curVal = trim(strval($this->project_id->CurrentValue));
-            if ($curVal != "") {
-                $this->project_id->ViewValue = $this->project_id->lookupCacheOption($curVal);
-            } else {
-                $this->project_id->ViewValue = $this->project_id->Lookup !== null && is_array($this->project_id->lookupOptions()) && count($this->project_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->project_id->ViewValue !== null) { // Load from cache
-                $this->project_id->EditValue = array_values($this->project_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+            if ($this->project_id->getSessionValue() != "") {
+                $this->project_id->CurrentValue = GetForeignKeyValue($this->project_id->getSessionValue());
+                $curVal = strval($this->project_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->project_id->ViewValue = $this->project_id->lookupCacheOption($curVal);
+                    if ($this->project_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->project_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->project_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->project_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->project_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->project_id->ViewValue = $this->project_id->displayValue($arwrk);
+                        } else {
+                            $this->project_id->ViewValue = FormatNumber($this->project_id->CurrentValue, $this->project_id->formatPattern());
+                        }
+                    }
                 } else {
-                    $filterWrk = SearchFilter($this->project_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->project_id->CurrentValue, $this->project_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $this->project_id->ViewValue = null;
                 }
-                $sqlWrk = $this->project_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->project_id->EditValue = $arwrk;
+            } else {
+                $curVal = trim(strval($this->project_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->project_id->ViewValue = $this->project_id->lookupCacheOption($curVal);
+                } else {
+                    $this->project_id->ViewValue = $this->project_id->Lookup !== null && is_array($this->project_id->lookupOptions()) && count($this->project_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->project_id->ViewValue !== null) { // Load from cache
+                    $this->project_id->EditValue = array_values($this->project_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->project_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->project_id->CurrentValue, $this->project_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->project_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->project_id->EditValue = $arwrk;
+                }
+                $this->project_id->PlaceHolder = RemoveHtml($this->project_id->caption());
             }
-            $this->project_id->PlaceHolder = RemoveHtml($this->project_id->caption());
 
             // highlight_text
             $this->highlight_text->setupEditAttributes();
@@ -1115,6 +1143,9 @@ class ProjectHighlightsEdit extends ProjectHighlights
         $rsnew = [];
 
         // project_id
+        if ($this->project_id->getSessionValue() != "") {
+            $this->project_id->ReadOnly = true;
+        }
         $this->project_id->setDbValueDef($rsnew, $this->project_id->CurrentValue, $this->project_id->ReadOnly);
 
         // highlight_text
@@ -1147,6 +1178,79 @@ class ProjectHighlightsEdit extends ProjectHighlights
         if (isset($row['created_at'])) { // created_at
             $this->created_at->CurrentValue = $row['created_at'];
         }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "projects") {
+                $validMaster = true;
+                $masterTbl = Container("projects");
+                if (($parm = Get("fk_id", Get("project_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->project_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->project_id->setSessionValue($this->project_id->QueryStringValue);
+                    $foreignKeys["project_id"] = $this->project_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "projects") {
+                $validMaster = true;
+                $masterTbl = Container("projects");
+                if (($parm = Post("fk_id", Post("project_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->project_id->FormValue = $masterTbl->id->FormValue;
+                    $this->project_id->setSessionValue($this->project_id->FormValue);
+                    $foreignKeys["project_id"] = $this->project_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "projects") {
+                if (!array_key_exists("project_id", $foreignKeys)) { // Not current foreign key
+                    $this->project_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

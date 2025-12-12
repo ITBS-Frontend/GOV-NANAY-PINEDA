@@ -545,6 +545,10 @@ class NewsPostTagsAdd extends NewsPostTags
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
+        // Set up master/detail parameters
+        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
+        $this->setupMasterParms();
+
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
@@ -589,7 +593,7 @@ class NewsPostTagsAdd extends NewsPostTags
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "NewsPostTagsList") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -841,30 +845,55 @@ class NewsPostTagsAdd extends NewsPostTags
         } elseif ($this->RowType == RowType::ADD) {
             // post_id
             $this->post_id->setupEditAttributes();
-            $curVal = trim(strval($this->post_id->CurrentValue));
-            if ($curVal != "") {
-                $this->post_id->ViewValue = $this->post_id->lookupCacheOption($curVal);
-            } else {
-                $this->post_id->ViewValue = $this->post_id->Lookup !== null && is_array($this->post_id->lookupOptions()) && count($this->post_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->post_id->ViewValue !== null) { // Load from cache
-                $this->post_id->EditValue = array_values($this->post_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+            if ($this->post_id->getSessionValue() != "") {
+                $this->post_id->CurrentValue = GetForeignKeyValue($this->post_id->getSessionValue());
+                $curVal = strval($this->post_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->post_id->ViewValue = $this->post_id->lookupCacheOption($curVal);
+                    if ($this->post_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->post_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->post_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->post_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->post_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->post_id->ViewValue = $this->post_id->displayValue($arwrk);
+                        } else {
+                            $this->post_id->ViewValue = FormatNumber($this->post_id->CurrentValue, $this->post_id->formatPattern());
+                        }
+                    }
                 } else {
-                    $filterWrk = SearchFilter($this->post_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->post_id->CurrentValue, $this->post_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $this->post_id->ViewValue = null;
                 }
-                $sqlWrk = $this->post_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->post_id->EditValue = $arwrk;
+            } else {
+                $curVal = trim(strval($this->post_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->post_id->ViewValue = $this->post_id->lookupCacheOption($curVal);
+                } else {
+                    $this->post_id->ViewValue = $this->post_id->Lookup !== null && is_array($this->post_id->lookupOptions()) && count($this->post_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->post_id->ViewValue !== null) { // Load from cache
+                    $this->post_id->EditValue = array_values($this->post_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->post_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->post_id->CurrentValue, $this->post_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->post_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->post_id->EditValue = $arwrk;
+                }
+                $this->post_id->PlaceHolder = RemoveHtml($this->post_id->caption());
             }
-            $this->post_id->PlaceHolder = RemoveHtml($this->post_id->caption());
 
             // tag_id
             $this->tag_id->setupEditAttributes();
@@ -1045,6 +1074,78 @@ class NewsPostTagsAdd extends NewsPostTags
         if (isset($row['tag_id'])) { // tag_id
             $this->tag_id->setFormValue($row['tag_id']);
         }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "news_posts") {
+                $validMaster = true;
+                $masterTbl = Container("news_posts");
+                if (($parm = Get("fk_id", Get("post_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->post_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->post_id->setSessionValue($this->post_id->QueryStringValue);
+                    $foreignKeys["post_id"] = $this->post_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "news_posts") {
+                $validMaster = true;
+                $masterTbl = Container("news_posts");
+                if (($parm = Post("fk_id", Post("post_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->post_id->FormValue = $masterTbl->id->FormValue;
+                    $this->post_id->setSessionValue($this->post_id->FormValue);
+                    $foreignKeys["post_id"] = $this->post_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "news_posts") {
+                if (!array_key_exists("post_id", $foreignKeys)) { // Not current foreign key
+                    $this->post_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

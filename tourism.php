@@ -7,7 +7,7 @@ $additionalCSS = ['css/tourism.css'];
 <html lang="en">
 <head>
     <?php include 'components/head.php'; ?>
-     <?php include 'components/scripts.php'; ?>
+    <?php include 'components/scripts.php'; ?>
 </head>
 <body>
     <?php include 'components/header.php'; ?>
@@ -100,19 +100,19 @@ $additionalCSS = ['css/tourism.css'];
                         <i class="fas fa-th"></i>
                         <span>All</span>
                     </button>
-                    <button class="facility-tab" data-type="hotel">
+                    <button class="facility-tab" data-type="Hotel">
                         <i class="fas fa-hotel"></i>
                         <span>Hotels</span>
                     </button>
-                    <button class="facility-tab" data-type="restaurant">
+                    <button class="facility-tab" data-type="Restaurant">
                         <i class="fas fa-utensils"></i>
                         <span>Restaurants</span>
                     </button>
-                    <button class="facility-tab" data-type="transport">
+                    <button class="facility-tab" data-type="Transport Service">
                         <i class="fas fa-bus"></i>
                         <span>Transport</span>
                     </button>
-                    <button class="facility-tab" data-type="tour_operator">
+                    <button class="facility-tab" data-type="Tour Operator">
                         <i class="fas fa-suitcase"></i>
                         <span>Tour Operators</span>
                     </button>
@@ -121,8 +121,8 @@ $additionalCSS = ['css/tourism.css'];
                 <!-- Ownership Filter -->
                 <div class="ownership-filter">
                     <button class="ownership-btn active" data-ownership="all">All Facilities</button>
-                    <button class="ownership-btn" data-ownership="government">Government</button>
-                    <button class="ownership-btn" data-ownership="private">Private</button>
+                    <button class="ownership-btn" data-ownership="Government">Government</button>
+                    <button class="ownership-btn" data-ownership="Private">Private</button>
                 </div>
 
                 <!-- Facilities Grid -->
@@ -131,7 +131,8 @@ $additionalCSS = ['css/tourism.css'];
                         <div class="loading-spinner"></div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
         <!-- Travel Tips Section -->
         <section class="travel-tips-section">
@@ -181,384 +182,437 @@ $additionalCSS = ['css/tourism.css'];
         <i class="fas fa-chevron-up"></i>
     </button>
 
-    <?php include 'components/scripts.php'; ?>
-    
     <script>
-        $(document).ready(function() {
-            const API_BASE = window.location.origin;
-            let currentCategory = 'all';
-            let currentFacilityType = 'all';
-            let currentOwnership = 'all';
-            
-            // Load data
-            loadFeaturedDestinations();
-            loadCategories();
-            loadDestinations();
+    $(document).ready(function() {
+        const API_BASE = window.location.origin;
+        let currentCategory = 'all';
+        let currentFacilityType = 'all';
+        let currentOwnership = 'all';
+        let facilityTypes = {}; // Store type name to ID mapping
+        let ownershipTypes = {}; // Store ownership name to ID mapping
+        
+        // Load facility types first
+        loadFacilityTypes();
+        
+        // Load data
+        loadFeaturedDestinations();
+        loadCategories();
+        loadDestinations();
+        
+        // Wait for facility types to load before loading facilities
+        setTimeout(function() {
             loadFacilities();
-            loadCounts();
-            
-            // Category scroll functionality
-            function updateCategoryScrollButtons() {
-                const container = $('#categoryTabs')[0];
-                const wrapper = $('#categoryTabsWrapper');
-                
-                if (!container) return;
-                
-                const isScrollable = container.scrollWidth > container.clientWidth;
-                const isAtStart = container.scrollLeft <= 10;
-                const isAtEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth - 10;
-                
-                if (isScrollable) {
-                    $('#categoryScrollLeft').toggleClass('show', !isAtStart);
-                    $('#categoryScrollRight').toggleClass('show', !isAtEnd);
-                    wrapper.toggleClass('show-left-gradient', !isAtStart);
-                    wrapper.toggleClass('show-right-gradient', !isAtEnd);
-                } else {
-                    $('#categoryScrollLeft, #categoryScrollRight').removeClass('show');
-                    wrapper.removeClass('show-left-gradient show-right-gradient');
+        }, 500);
+        
+        loadCounts();
+        
+        // Load facility types
+        function loadFacilityTypes() {
+            $.ajax({
+                url: `${API_BASE}/Admin/api/tourism/facility-types`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        response.data.forEach(type => {
+                            // Store by exact type_name from database
+                            facilityTypes[type.type_name] = type.id;
+                        });
+                    }
                 }
-            }
-            
-            $('#categoryScrollLeft').click(function() {
-                $('#categoryTabs')[0].scrollBy({ left: -200, behavior: 'smooth' });
-                setTimeout(updateCategoryScrollButtons, 300);
             });
             
-            $('#categoryScrollRight').click(function() {
-                $('#categoryTabs')[0].scrollBy({ left: 200, behavior: 'smooth' });
-                setTimeout(updateCategoryScrollButtons, 300);
+            // Store ownership type IDs
+            ownershipTypes = {
+                'Government': 1,
+                'Private': 2
+            };
+        }
+        
+        // Category scroll functionality
+        function updateCategoryScrollButtons() {
+            const container = $('#categoryTabs')[0];
+            const wrapper = $('#categoryTabsWrapper');
+            
+            if (!container) return;
+            
+            const isScrollable = container.scrollWidth > container.clientWidth;
+            const isAtStart = container.scrollLeft <= 10;
+            const isAtEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - 10;
+            
+            if (isScrollable) {
+                wrapper.addClass('has-scroll');
+                wrapper.toggleClass('at-start', isAtStart);
+                wrapper.toggleClass('at-end', isAtEnd);
+            } else {
+                wrapper.removeClass('has-scroll at-start at-end');
+            }
+        }
+        
+        $('#categoryScrollLeft').click(function() {
+            $('#categoryTabs').animate({ scrollLeft: '-=200' }, 300, updateCategoryScrollButtons);
+        });
+        
+        $('#categoryScrollRight').click(function() {
+            $('#categoryTabs').animate({ scrollLeft: '+=200' }, 300, updateCategoryScrollButtons);
+        });
+        
+        $('#categoryTabs').scroll(updateCategoryScrollButtons);
+        $(window).resize(updateCategoryScrollButtons);
+        
+        // Load counts
+        function loadCounts() {
+            $.ajax({
+                url: `${API_BASE}/Admin/api/tourism/destinations`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        $('#destinationsCount').text(response.data.length);
+                    }
+                }
             });
             
-            $('#categoryTabs').on('scroll', updateCategoryScrollButtons);
-            $(window).on('resize', updateCategoryScrollButtons);
-            
-            // Load counts
-            function loadCounts() {
-                $.ajax({
-                    url: `${API_BASE}/Admin/api/tourism/destinations`,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            $('#destinationsCount').text(response.data.length);
-                        }
+            $.ajax({
+                url: `${API_BASE}/Admin/api/tourism/facilities`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        $('#facilitiesCount').text(response.data.length);
                     }
-                });
-                
-                $.ajax({
-                    url: `${API_BASE}/Admin/api/tourism/facilities`,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            $('#facilitiesCount').text(response.data.length);
-                        }
-                    }
-                });
-            }
-            
-            // Load featured destinations
-            function loadFeaturedDestinations() {
-                $.ajax({
-                    url: `${API_BASE}/Admin/api/tourism/destinations?featured=true`,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            renderFeaturedDestinations(response.data);
-                        }
-                    },
-                    error: function() {
-                        $('#featuredGrid').html('<p class="no-data">Failed to load featured destinations</p>');
-                    }
-                });
-            }
-            
-            function renderFeaturedDestinations(destinations) {
-                if (destinations.length === 0) {
-                    $('#featuredGrid').html('<p class="no-data">No featured destinations available</p>');
-                    return;
                 }
-                
-                let html = '';
-                destinations.forEach((dest, index) => {
-                    const size = index === 0 ? 'large' : 'small';
-                    html += `
-                        <a href="tourism-detail.php?id=${dest.id}" class="featured-card ${size}">
-                            <div class="featured-image" style="background-image: url('${dest.image_url || 'assets/placeholder.jpg'}')">
-                                <div class="featured-overlay"></div>
-                                <span class="featured-badge" style="background: ${dest.color_code || '#3B82F6'}">
-                                    ${dest.category_name}
-                                </span>
-                                <div class="featured-content">
-                                    <h3 class="featured-title">${dest.name}</h3>
-                                    <p class="featured-location">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        ${dest.municipality}
-                                    </p>
-                                    ${dest.description ? `<p class="featured-description">${dest.description}</p>` : ''}
-                                </div>
-                            </div>
-                        </a>
-                    `;
-                });
-                
-                $('#featuredGrid').html(html);
-            }
-            
-            // Load categories
-            function loadCategories() {
-                $.ajax({
-                    url: `${API_BASE}/Admin/api/tourism/categories`,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            renderCategories(response.data);
-                            setTimeout(updateCategoryScrollButtons, 100);
-                        }
-                    }
-                });
-            }
-            
-            function renderCategories(categories) {
-                let html = `
-                    <button class="category-tab active" data-category="all">
-                        <i class="fas fa-th"></i>
-                        <span>All Destinations</span>
-                    </button>
-                `;
-                
-                categories.forEach(cat => {
-                    html += `
-                        <button class="category-tab" data-category="${cat.id}" style="--tab-color: ${cat.color_code}">
-                            <i class="${cat.icon_class || 'fas fa-map-marker-alt'}"></i>
-                            <span>${cat.name}</span>
-                            ${cat.destination_count > 0 ? `<span class="tab-count">${cat.destination_count}</span>` : ''}
-                        </button>
-                    `;
-                });
-                
-                $('#categoryTabs').html(html);
-            }
-            
-            // Category tab click
-            $(document).on('click', '.category-tab', function() {
-                $('.category-tab').removeClass('active');
-                $(this).addClass('active');
-                currentCategory = $(this).data('category');
-                loadDestinations();
             });
-            
-            // Load destinations
-            function loadDestinations() {
-                const url = currentCategory === 'all' ? 
-                    `${API_BASE}/Admin/api/tourism/destinations` : 
-                    `${API_BASE}/Admin/api/tourism/destinations?category=${currentCategory}`;
-                
-                $('#destinationsGrid').html('<div class="loading-container"><div class="loading-spinner"></div></div>');
-                
-                $.ajax({
-                    url: url,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            renderDestinations(response.data);
-                        }
-                    },
-                    error: function() {
-                        $('#destinationsGrid').html('<p class="no-data">Failed to load destinations</p>');
+        }
+        
+        // Load featured destinations
+        function loadFeaturedDestinations() {
+            $.ajax({
+                url: `${API_BASE}/Admin/api/tourism/destinations?featured=true`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        renderFeaturedDestinations(response.data);
                     }
-                });
+                },
+                error: function() {
+                    $('#featuredGrid').html('<p class="no-data">Failed to load featured destinations</p>');
+                }
+            });
+        }
+        
+        function renderFeaturedDestinations(destinations) {
+            if (destinations.length === 0) {
+                $('#featuredGrid').html('<p class="no-data">No featured destinations available</p>');
+                return;
             }
             
-            function renderDestinations(destinations) {
-                if (destinations.length === 0) {
-                    $('#destinationsGrid').html('<p class="no-data">No destinations found</p>');
-                    return;
-                }
-                
-                let html = '';
-                destinations.forEach(dest => {
-                    html += `
-                        <a href="tourism-detail.php?id=${dest.id}" class="destination-card">
-                            <div class="dest-image" style="background-image: url('${dest.image_url || 'assets/placeholder.jpg'}')">
-                                <span class="dest-category" style="background: ${dest.color_code || '#3B82F6'}">
-                                    ${dest.category_name}
-                                </span>
-                            </div>
-                            <div class="dest-content">
-                                <h3 class="dest-title">${dest.name}</h3>
-                                <p class="dest-location">
+            let html = '';
+            destinations.forEach((dest, index) => {
+                const size = index === 0 ? 'large' : 'small';
+                html += `
+                    <a href="tourism-detail.php?id=${dest.id}" class="featured-card ${size}">
+                        <div class="featured-image" style="background-image: url('${dest.image_url || 'assets/placeholder.jpg'}')">
+                            <div class="featured-overlay"></div>
+                            <span class="featured-badge" style="background: ${dest.color_code || '#3B82F6'}">
+                                ${dest.category_name}
+                            </span>
+                            <div class="featured-content">
+                                <h3 class="featured-title">${dest.name}</h3>
+                                <p class="featured-location">
                                     <i class="fas fa-map-marker-alt"></i>
                                     ${dest.municipality}
                                 </p>
-                                <p class="dest-description">${dest.description || ''}</p>
-                                <div class="dest-info">
-                                    ${dest.entry_fee ? `
-                                        <span class="dest-info-item">
-                                            <i class="fas fa-ticket-alt"></i>
-                                            ${dest.entry_fee}
-                                        </span>
-                                    ` : ''}
-                                    ${dest.operating_hours ? `
-                                        <span class="dest-info-item">
-                                            <i class="fas fa-clock"></i>
-                                            ${dest.operating_hours}
-                                        </span>
-                                    ` : ''}
-                                </div>
-                                ${dest.activities && dest.activities.length > 0 ? `
-                                    <div class="dest-activities">
-                                        <i class="fas fa-hiking"></i>
-                                        <span>${dest.activities.length} Activities</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </a>
-                    `;
-                });
-                
-                $('#destinationsGrid').html(html);
-            }
-            
-            // Facility type tabs
-            $('.facility-tab').click(function() {
-                $('.facility-tab').removeClass('active');
-                $(this).addClass('active');
-                currentFacilityType = $(this).data('type');
-                loadFacilities();
-            });
-            
-            // Ownership filter
-            $('.ownership-btn').click(function() {
-                $('.ownership-btn').removeClass('active');
-                $(this).addClass('active');
-                currentOwnership = $(this).data('ownership');
-                loadFacilities();
-            });
-            
-            // Load facilities
-            function loadFacilities() {
-                let url = `${API_BASE}/Admin/api/tourism/facilities`;
-                const params = [];
-                
-                if (currentFacilityType !== 'all') {
-                    params.push(`type=${currentFacilityType}`);
-                }
-                
-                if (currentOwnership !== 'all') {
-                    params.push(`ownership=${currentOwnership}`);
-                }
-                
-                if (params.length > 0) {
-                    url += '?' + params.join('&');
-                }
-                
-                $('#facilitiesGrid').html('<div class="loading-container"><div class="loading-spinner"></div></div>');
-                
-                $.ajax({
-                    url: url,
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            renderFacilities(response.data);
-                        }
-                    },
-                    error: function() {
-                        $('#facilitiesGrid').html('<p class="no-data">Failed to load facilities</p>');
-                    }
-                });
-            }
-            
-            function renderFacilities(facilities) {
-                if (facilities.length === 0) {
-                    $('#facilitiesGrid').html('<p class="no-data">No facilities found</p>');
-                    return;
-                }
-                
-                let html = '';
-                facilities.forEach(facility => {
-                    const typeIcons = {
-                        'hotel': 'fas fa-hotel',
-                        'restaurant': 'fas fa-utensils',
-                        'transport': 'fas fa-bus',
-                        'tour_operator': 'fas fa-suitcase'
-                    };
-                    
-                    const icon = typeIcons[facility.facility_type] || 'fas fa-building';
-                    
-                    html += `
-                        <div class="facility-card">
-                            ${facility.image_url ? `
-                                <div class="facility-image" style="background-image: url('${facility.image_url}')"></div>
-                            ` : `
-                                <div class="facility-image-placeholder">
-                                    <i class="${icon}"></i>
-                                </div>
-                            `}
-                            
-                            <div class="facility-content">
-                                <div class="facility-header">
-                                    <span class="facility-type">
-                                        <i class="${icon}"></i>
-                                        ${facility.facility_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                    </span>
-                                    ${facility.is_verified ? '<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>' : ''}
-                                </div>
-                                
-                                <h3 class="facility-name">${facility.name}</h3>
-                                
-                                ${facility.description ? `<p class="facility-description">${facility.description}</p>` : ''}
-                                
-                                <div class="facility-details">
-                                    ${facility.municipality ? `
-                                        <span class="facility-detail">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            ${facility.municipality}
-                                        </span>
-                                    ` : ''}
-                                    
-                                    ${facility.price_range ? `
-                                        <span class="facility-detail">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                            ${facility.price_range}
-                                        </span>
-                                    ` : ''}
-                                    
-                                    ${facility.rating > 0 ? `
-                                        <span class="facility-detail">
-                                            <i class="fas fa-star"></i>
-                                            ${facility.rating}/5
-                                        </span>
-                                    ` : ''}
-                                </div>
-                                
-                                ${facility.amenities ? `
-                                    <div class="facility-amenities">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>${facility.amenities}</span>
-                                    </div>
-                                ` : ''}
-                                
-                                <div class="facility-contact">
-                                    ${facility.contact_number ? `
-                                        <a href="tel:${facility.contact_number}" class="contact-btn">
-                                            <i class="fas fa-phone"></i>
-                                            ${facility.contact_number}
-                                        </a>
-                                    ` : ''}
-                                    ${facility.website ? `
-                                        <a href="${facility.website}" target="_blank" class="contact-btn">
-                                            <i class="fas fa-globe"></i>
-                                            Visit Website
-                                        </a>
-                                    ` : ''}
-                                </div>
+                                ${dest.description ? `<p class="featured-description">${dest.description}</p>` : ''}
                             </div>
                         </div>
-                    `;
-                });
+                    </a>
+                `;
+            });
+            
+            $('#featuredGrid').html(html);
+        }
+        
+        // Load categories
+        function loadCategories() {
+            $.ajax({
+                url: `${API_BASE}/Admin/api/tourism/categories`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        renderCategories(response.data);
+                        setTimeout(updateCategoryScrollButtons, 100);
+                    }
+                }
+            });
+        }
+        
+        function renderCategories(categories) {
+            let html = `
+                <button class="category-tab active" data-category="all">
+                    <i class="fas fa-th"></i>
+                    <span>All Destinations</span>
+                </button>
+            `;
+            
+            categories.forEach(cat => {
+                html += `
+                    <button class="category-tab" data-category="${cat.id}" style="--tab-color: ${cat.color_code}">
+                        <i class="${cat.icon_class || 'fas fa-map-marker-alt'}"></i>
+                        <span>${cat.name}</span>
+                        ${cat.destination_count > 0 ? `<span class="tab-count">${cat.destination_count}</span>` : ''}
+                    </button>
+                `;
+            });
+            
+            $('#categoryTabs').html(html);
+        }
+        
+        // Category tab click
+        $(document).on('click', '.category-tab', function() {
+            $('.category-tab').removeClass('active');
+            $(this).addClass('active');
+            currentCategory = $(this).data('category');
+            loadDestinations();
+        });
+        
+        // Load destinations
+        function loadDestinations() {
+            const url = currentCategory === 'all' 
+                ? `${API_BASE}/Admin/api/tourism/destinations`
+                : `${API_BASE}/Admin/api/tourism/destinations?category=${currentCategory}`;
+            
+            $('#destinationsGrid').html('<div class="loading-container"><div class="loading-spinner"></div></div>');
+            
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        renderDestinations(response.data);
+                    }
+                },
+                error: function() {
+                    $('#destinationsGrid').html('<p class="no-data">Failed to load destinations</p>');
+                }
+            });
+        }
+        
+        function renderDestinations(destinations) {
+            if (destinations.length === 0) {
+                $('#destinationsGrid').html('<p class="no-data">No destinations found</p>');
+                return;
+            }
+            
+            let html = '';
+            destinations.forEach(dest => {
+                html += `
+                    <a href="tourism-detail.php?id=${dest.id}" class="destination-card">
+                        <div class="dest-image" style="background-image: url('${dest.image_url || 'assets/placeholder.jpg'}')">
+                            <span class="dest-category" style="background: ${dest.color_code || '#3B82F6'}">
+                                ${dest.category_name}
+                            </span>
+                        </div>
+                        <div class="dest-content">
+                            <h3 class="dest-title">${dest.name}</h3>
+                            <p class="dest-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${dest.municipality}
+                            </p>
+                            ${dest.description ? `<p class="dest-description">${dest.description}</p>` : ''}
+                            <div class="dest-info">
+                                ${dest.entry_fee ? `
+                                    <span class="dest-info-item">
+                                        <i class="fas fa-ticket-alt"></i>
+                                        ${dest.entry_fee}
+                                    </span>
+                                ` : ''}
+                                ${dest.operating_hours ? `
+                                    <span class="dest-info-item">
+                                        <i class="fas fa-clock"></i>
+                                        ${dest.operating_hours}
+                                    </span>
+                                ` : ''}
+                            </div>
+                            ${dest.activities && dest.activities.length > 0 ? `
+                                <div class="dest-activities">
+                                    <i class="fas fa-hiking"></i>
+                                    <span>${dest.activities.length} Activities</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </a>
+                `;
+            });
+            
+            $('#destinationsGrid').html(html);
+        }
+        
+        // Facility type tabs
+        $('.facility-tab').click(function() {
+            $('.facility-tab').removeClass('active');
+            $(this).addClass('active');
+            currentFacilityType = $(this).data('type');
+            loadFacilities();
+        });
+        
+        // Ownership filter
+        $('.ownership-btn').click(function() {
+            $('.ownership-btn').removeClass('active');
+            $(this).addClass('active');
+            currentOwnership = $(this).data('ownership');
+            loadFacilities();
+        });
+        
+        // Load facilities
+        function loadFacilities() {
+            let url = `${API_BASE}/Admin/api/tourism/facilities`;
+            const params = [];
+            
+            if (currentFacilityType !== 'all') {
+                // Get ID from mapping
+                const typeId = facilityTypes[currentFacilityType];
+                if (typeId) {
+                    params.push(`type=${typeId}`);
+                }
+            }
+            
+            if (currentOwnership !== 'all') {
+                // Get ID from mapping
+                const ownershipId = ownershipTypes[currentOwnership];
+                if (ownershipId) {
+                    params.push(`ownership=${ownershipId}`);
+                }
+            }
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            $('#facilitiesGrid').html('<div class="loading-container"><div class="loading-spinner"></div></div>');
+            
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        renderFacilities(response.data);
+                    }
+                },
+                error: function() {
+                    $('#facilitiesGrid').html('<p class="no-data">Failed to load facilities</p>');
+                }
+            });
+        }
+        
+        function renderFacilities(facilities) {
+            if (facilities.length === 0) {
+                $('#facilitiesGrid').html('<p class="no-data">No facilities found</p>');
+                return;
+            }
+            
+            let html = '';
+            facilities.forEach(facility => {
+                const typeIcons = {
+                    'Hotel': 'fas fa-hotel',
+                    'Restaurant': 'fas fa-utensils',
+                    'Transport Service': 'fas fa-bus',
+                    'Tour Operator': 'fas fa-suitcase'
+                };
                 
-                $('#facilitiesGrid').html(html);
+                const icon = typeIcons[facility.facility_type] || 'fas fa-building';
+                
+                html += `
+                    <div class="facility-card">
+                        ${facility.image_url ? `
+                            <div class="facility-image" style="background-image: url('${facility.image_url}')"></div>
+                        ` : `
+                            <div class="facility-image-placeholder">
+                                <i class="${icon}"></i>
+                            </div>
+                        `}
+                        
+                        <div class="facility-content">
+                            <div class="facility-header">
+                                <span class="facility-type">
+                                    <i class="${icon}"></i>
+                                    ${facility.facility_type}
+                                </span>
+                                ${facility.is_verified ? '<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>' : ''}
+                            </div>
+                            
+                            <h3 class="facility-name">${facility.name}</h3>
+                            
+                            ${facility.description ? `<p class="facility-description">${facility.description}</p>` : ''}
+                            
+                            <div class="facility-details">
+                                <div class="facility-detail">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${facility.municipality}</span>
+                                </div>
+                                ${facility.ownership ? `
+                                    <div class="facility-detail">
+                                        <i class="fas fa-building"></i>
+                                        <span>${facility.ownership}</span>
+                                    </div>
+                                ` : ''}
+                                ${facility.price_range ? `
+                                    <div class="facility-detail">
+                                        <i class="fas fa-tag"></i>
+                                        <span>${facility.price_range}</span>
+                                    </div>
+                                ` : ''}
+                                ${facility.rating ? `
+                                    <div class="facility-detail">
+                                        <i class="fas fa-star"></i>
+                                        <span>${facility.rating}/5.0</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            ${facility.amenities ? `
+                                <div class="facility-amenities">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>${facility.amenities}</span>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="facility-actions">
+                                ${facility.contact_number ? `
+                                    <a href="tel:${facility.contact_number}" class="facility-btn">
+                                        <i class="fas fa-phone"></i>
+                                        Call
+                                    </a>
+                                ` : ''}
+                                ${facility.website ? `
+                                    <a href="${facility.website}" target="_blank" class="facility-btn">
+                                        <i class="fas fa-globe"></i>
+                                        Website
+                                    </a>
+                                ` : ''}
+                                ${facility.email ? `
+                                    <a href="mailto:${facility.email}" class="facility-btn">
+                                        <i class="fas fa-envelope"></i>
+                                        Email
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            $('#facilitiesGrid').html(html);
+        }
+        
+        // Smooth scroll to sections
+        $('a[href^="#"]').click(function(e) {
+            e.preventDefault();
+            const target = $(this.getAttribute('href'));
+            if (target.length) {
+                $('html, body').animate({
+                    scrollTop: target.offset().top - 80
+                }, 800);
             }
         });
+    });
     </script>
 </body>
 </html>
