@@ -33,7 +33,7 @@ $additionalCSS = ['css/homepage.css'];
             <div class="carousel-nav carousel-next" style="display: none;">
                 <i class="fas fa-chevron-right"></i>
             </div>
-            <a class="view-more" href="development.php">View More</a>
+            
         </section>
 
         <!-- Projects Section -->
@@ -75,10 +75,10 @@ $additionalCSS = ['css/homepage.css'];
                 <div class="about-content">
                     <div class="section-label">Discover</div>
                     <h2>About Pampanga</h2>
-                    <p class="about-intro">
+                    <!-- <p class="about-intro">
                         The Culinary Capital of the Philippines and the heartland of Central Luzon
                     </p>
-                    
+                     -->
                     <div id="pampangaPreview">
                         <div class="loading-container">
                             <div class="loading-spinner"></div>
@@ -489,6 +489,13 @@ $additionalCSS = ['css/homepage.css'];
                                     </span>
                                     <h1 class="slide-title">${project.title}</h1>
                                     <p class="slide-description">${project.description}</p>
+                                    <div class="slide-links">
+                                        <a href="project-detail.php?id=${project.id}" class="project-read-more-home">
+                                        Read More
+                                    
+                                         </a>
+                                         <a class="view-more" href="development.php">View More Projects</a>
+                                    </div>
                                 </div>
                                 <div class="slide-picture">
                                     <img src="${project.image_url || 'assets/placeholder.jpg'}" alt="${project.title}" />

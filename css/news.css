@@ -182,7 +182,8 @@
     left: 0;
     right: 0;
     padding: 2.5rem;
-    color: white;
+    background: white;
+    color: var(--text-primary);
     z-index: 2;
 }
 
@@ -254,7 +255,7 @@
     display: flex;
     gap: 1rem;
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-tertiary);
 }
 
 .hero-side-content .hero-meta {
