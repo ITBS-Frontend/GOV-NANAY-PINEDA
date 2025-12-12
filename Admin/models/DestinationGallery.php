@@ -37,10 +37,10 @@ class DestinationGallery extends DbTable
     public $UseAjaxActions = false;
     public $ModalSearch = false;
     public $ModalView = false;
-    public $ModalAdd = false;
-    public $ModalEdit = false;
+    public $ModalAdd = true;
+    public $ModalEdit = true;
     public $ModalUpdate = false;
-    public $InlineDelete = false;
+    public $InlineDelete = true;
     public $ModalGridAdd = false;
     public $ModalGridEdit = false;
     public $ModalMultiEdit = false;
@@ -145,6 +145,7 @@ class DestinationGallery extends DbTable
         );
         $this->destination_id->InputTextType = "text";
         $this->destination_id->Raw = true;
+        $this->destination_id->IsForeignKey = true; // Foreign key field
         $this->destination_id->setSelectMultiple(false); // Select one
         $this->destination_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->destination_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -306,6 +307,88 @@ class DestinationGallery extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "tourism_destinations") {
+            $masterTable = Container("tourism_destinations");
+            if ($this->destination_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->destination_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "tourism_destinations") {
+            $masterTable = Container("tourism_destinations");
+            if ($this->destination_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->destination_id, $this->destination_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "tourism_destinations":
+                $key = $keys["destination_id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["destination_id"], $this->destination_id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "tourism_destinations":
+                return GetKeyFilter($this->destination_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
     }
 
     // Render X Axis for chart
@@ -979,6 +1062,10 @@ class DestinationGallery extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "tourism_destinations" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->destination_id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -1294,7 +1381,32 @@ class DestinationGallery extends DbTable
 
         // destination_id
         $this->destination_id->setupEditAttributes();
-        $this->destination_id->PlaceHolder = RemoveHtml($this->destination_id->caption());
+        if ($this->destination_id->getSessionValue() != "") {
+            $this->destination_id->CurrentValue = GetForeignKeyValue($this->destination_id->getSessionValue());
+            $curVal = strval($this->destination_id->CurrentValue);
+            if ($curVal != "") {
+                $this->destination_id->ViewValue = $this->destination_id->lookupCacheOption($curVal);
+                if ($this->destination_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->destination_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->destination_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->destination_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->destination_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->destination_id->ViewValue = $this->destination_id->displayValue($arwrk);
+                    } else {
+                        $this->destination_id->ViewValue = FormatNumber($this->destination_id->CurrentValue, $this->destination_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->destination_id->ViewValue = null;
+            }
+        } else {
+            $this->destination_id->PlaceHolder = RemoveHtml($this->destination_id->caption());
+        }
 
         // image_path
         $this->image_path->setupEditAttributes();

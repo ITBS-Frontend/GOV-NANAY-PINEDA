@@ -201,7 +201,7 @@ class TourismDestinationsList extends TourismDestinations
         $pageUrl = $this->pageUrl(false);
 
         // Initialize URLs
-        $this->AddUrl = "TourismDestinationsAdd";
+        $this->AddUrl = "TourismDestinationsAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -1452,6 +1452,36 @@ class TourismDestinationsList extends TourismDestinations
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
 
+        // "detail_tourism_activities"
+        $item = &$this->ListOptions->add("detail_tourism_activities");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'tourism_activities');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_destination_gallery"
+        $item = &$this->ListOptions->add("detail_destination_gallery");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'destination_gallery');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails && $this->ListOptions->detailVisible();
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+            $this->ListOptions->hideDetailItems();
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("tourism_activities");
+        $pages->add("destination_gallery");
+        $this->DetailPages = $pages;
+
         // List actions
         $item = &$this->ListOptions->add("listactions");
         $item->CssClass = "text-nowrap";
@@ -1602,6 +1632,124 @@ class TourismDestinationsList extends TourismDestinations
                 $opt->Body = $body;
             }
         }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_tourism_activities"
+        $opt = $this->ListOptions["detail_tourism_activities"];
+        if ($Security->allowList(CurrentProjectID() . 'tourism_activities')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("tourism_activities", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("TourismActivitiesList?" . Config("TABLE_SHOW_MASTER") . "=tourism_destinations&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("TourismActivitiesGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'tourism_destinations')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=tourism_activities");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "tourism_activities";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'tourism_destinations')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=tourism_activities");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "tourism_activities";
+            }
+            if ($detailPage->DetailAdd && $Security->canAdd() && $Security->allowAdd(CurrentProjectID() . 'tourism_destinations')) {
+                $caption = $Language->phrase("MasterDetailCopyLink", null);
+                $url = $this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=tourism_activities");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailCopyTblVar != "") {
+                    $detailCopyTblVar .= ",";
+                }
+                $detailCopyTblVar .= "tourism_activities";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_destination_gallery"
+        $opt = $this->ListOptions["detail_destination_gallery"];
+        if ($Security->allowList(CurrentProjectID() . 'destination_gallery')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("destination_gallery", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("DestinationGalleryList?" . Config("TABLE_SHOW_MASTER") . "=tourism_destinations&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("DestinationGalleryGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'tourism_destinations')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=destination_gallery");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "destination_gallery";
+            }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'tourism_destinations')) {
+                $caption = $Language->phrase("MasterDetailEditLink", null);
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=destination_gallery");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "destination_gallery";
+            }
+            if ($detailPage->DetailAdd && $Security->canAdd() && $Security->allowAdd(CurrentProjectID() . 'tourism_destinations')) {
+                $caption = $Language->phrase("MasterDetailCopyLink", null);
+                $url = $this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=destination_gallery");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailCopyTblVar != "") {
+                    $detailCopyTblVar .= ",";
+                }
+                $detailCopyTblVar .= "destination_gallery";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailViewLink", true)) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailEditLink", true)) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . $Language->phrase("MasterDetailEditLink", null) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlEncode($Language->phrase("MasterDetailCopyLink", true)) . "\" href=\"" . HtmlEncode($this->getCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . $Language->phrase("MasterDetailCopyLink", null) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlEncode($Language->phrase("MultipleMasterDetails", true)) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-dropdown-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
+        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
@@ -1635,6 +1783,49 @@ class TourismDestinationsList extends TourismDestinations
             $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         }
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        $option = $options["detail"];
+        $detailTableLink = "";
+        $item = &$option->add("detailadd_tourism_activities");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=tourism_activities");
+        $detailPage = Container("TourismActivitiesGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'tourism_destinations') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "tourism_activities";
+        }
+        $item = &$option->add("detailadd_destination_gallery");
+        $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=destination_gallery");
+        $detailPage = Container("DestinationGalleryGrid");
+        $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+        $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+        $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'tourism_destinations') && $Security->canAdd());
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "destination_gallery";
+        }
+
+        // Add multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$option->add("detailsadd");
+            $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailTableLink);
+            $caption = $Language->phrase("AddMasterDetailLink");
+            $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+            $item->Visible = $detailTableLink != "" && $Security->canAdd();
+            // Hide single master/detail items
+            $ar = explode(",", $detailTableLink);
+            $cnt = count($ar);
+            for ($i = 0; $i < $cnt; $i++) {
+                if ($item = $option["detailadd_" . $ar[$i]]) {
+                    $item->Visible = false;
+                }
+            }
+        }
         $option = $options["action"];
 
         // Show column list for column visibility

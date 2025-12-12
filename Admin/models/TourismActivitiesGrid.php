@@ -15,18 +15,18 @@ use Closure;
 /**
  * Page class
  */
-class TourismActivitiesList extends TourismActivities
+class TourismActivitiesGrid extends TourismActivities
 {
     use MessagesTrait;
 
     // Page ID
-    public $PageID = "list";
+    public $PageID = "grid";
 
     // Project ID
     public $ProjectID = PROJECT_ID;
 
     // Page object name
-    public $PageObjName = "TourismActivitiesList";
+    public $PageObjName = "TourismActivitiesGrid";
 
     // View file path
     public $View = null;
@@ -38,13 +38,13 @@ class TourismActivitiesList extends TourismActivities
     public $RenderingView = false;
 
     // Grid form hidden field names
-    public $FormName = "ftourism_activitieslist";
+    public $FormName = "ftourism_activitiesgrid";
     public $FormActionName = "";
     public $FormBlankRowName = "";
     public $FormKeyCountName = "";
 
     // CSS class/style
-    public $CurrentPageName = "TourismActivitiesList";
+    public $CurrentPageName = "TourismActivitiesGrid";
 
     // Page URLs
     public $AddUrl;
@@ -53,16 +53,6 @@ class TourismActivitiesList extends TourismActivities
     public $ViewUrl;
     public $CopyUrl;
     public $ListUrl;
-
-    // Update URLs
-    public $InlineAddUrl;
-    public $InlineCopyUrl;
-    public $InlineEditUrl;
-    public $GridAddUrl;
-    public $GridEditUrl;
-    public $MultiEditUrl;
-    public $MultiDeleteUrl;
-    public $MultiUpdateUrl;
 
     // Page headings
     public $Heading = "";
@@ -179,7 +169,11 @@ class TourismActivitiesList extends TourismActivities
         }
 
         // Initialize
-        $GLOBALS["Page"] = &$this;
+        $this->FormActionName .= "_" . $this->FormName;
+        $this->OldKeyName .= "_" . $this->FormName;
+        $this->FormBlankRowName .= "_" . $this->FormName;
+        $this->FormKeyCountName .= "_" . $this->FormName;
+        $GLOBALS["Grid"] = &$this;
 
         // Language object
         $Language = Container("app.language");
@@ -188,18 +182,7 @@ class TourismActivitiesList extends TourismActivities
         if (!isset($GLOBALS["tourism_activities"]) || $GLOBALS["tourism_activities"]::class == PROJECT_NAMESPACE . "tourism_activities") {
             $GLOBALS["tourism_activities"] = &$this;
         }
-
-        // Page URL
-        $pageUrl = $this->pageUrl(false);
-
-        // Initialize URLs
         $this->AddUrl = "TourismActivitiesAdd";
-        $this->InlineAddUrl = $pageUrl . "action=add";
-        $this->GridAddUrl = $pageUrl . "action=gridadd";
-        $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiEditUrl = $pageUrl . "action=multiedit";
-        $this->MultiDeleteUrl = "TourismActivitiesDelete";
-        $this->MultiUpdateUrl = "TourismActivitiesUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -221,12 +204,6 @@ class TourismActivitiesList extends TourismActivities
         // List options
         $this->ListOptions = new ListOptions(Tag: "td", TableVar: $this->TableVar);
 
-        // Export options
-        $this->ExportOptions = new ListOptions(TagClassName: "ew-export-option");
-
-        // Import options
-        $this->ImportOptions = new ListOptions(TagClassName: "ew-import-option");
-
         // Other options
         $this->OtherOptions = new ListOptionsArray();
 
@@ -237,28 +214,6 @@ class TourismActivitiesList extends TourismActivities
             DropDownButtonPhrase: $Language->phrase("ButtonAddEdit"),
             UseButtonGroup: true
         );
-
-        // Detail tables
-        $this->OtherOptions["detail"] = new ListOptions(TagClassName: "ew-detail-option");
-        // Actions
-        $this->OtherOptions["action"] = new ListOptions(TagClassName: "ew-action-option");
-
-        // Column visibility
-        $this->OtherOptions["column"] = new ListOptions(
-            TableVar: $this->TableVar,
-            TagClassName: "ew-column-option",
-            ButtonGroupClass: "ew-column-dropdown",
-            UseDropDownButton: true,
-            DropDownButtonPhrase: $Language->phrase("Columns"),
-            DropDownAutoClose: "outside",
-            UseButtonGroup: false
-        );
-
-        // Filter options
-        $this->FilterOptions = new ListOptions(TagClassName: "ew-filter-option");
-
-        // List actions
-        $this->ListActions = new ListActions();
     }
 
     // Get content from stream
@@ -313,18 +268,13 @@ class TourismActivitiesList extends TourismActivities
 
         // Page is terminated
         $this->terminated = true;
-
-        // Page Unload event
-        if (method_exists($this, "pageUnload")) {
-            $this->pageUnload();
+        unset($GLOBALS["Grid"]);
+        if ($url === "") {
+            return;
         }
-        DispatchEvent(new PageUnloadedEvent($this), PageUnloadedEvent::NAME);
         if (!IsApi() && method_exists($this, "pageRedirecting")) {
             $this->pageRedirecting($url);
         }
-
-        // Close connection
-        CloseConnections();
 
         // Return for API
         if (IsApi()) {
@@ -347,23 +297,8 @@ class TourismActivitiesList extends TourismActivities
             if (!Config("DEBUG") && ob_get_length()) {
                 ob_end_clean();
             }
-
-            // Handle modal response
-            if ($this->IsModal) { // Show as modal
-                $pageName = GetPageName($url);
-                $result = ["url" => GetUrl($url), "modal" => "1"];  // Assume return to modal for simplicity
-                if (!SameString($pageName, GetPageName($this->getListUrl()))) { // Not List page
-                    $result["caption"] = $this->getModalCaption($pageName);
-                    $result["view"] = SameString($pageName, "TourismActivitiesView"); // If View page, no primary button
-                } else { // List page
-                    $result["error"] = $this->getFailureMessage(); // List page should not be shown as modal => error
-                    $this->clearFailureMessage();
-                }
-                WriteJson($result);
-            } else {
-                SaveDebugMessage();
-                Redirect(GetUrl($url));
-            }
+            SaveDebugMessage();
+            Redirect(GetUrl($url));
         }
         return; // Return to controller
     }
@@ -429,9 +364,6 @@ class TourismActivitiesList extends TourismActivities
                             }
                         }
                     } else {
-                        if ($fld->DataType == DataType::MEMO && $fld->MemoMaxLength > 0) {
-                            $val = TruncateMemo($val, $fld->MemoMaxLength, $fld->TruncateMemoRemoveHtml);
-                        }
                         $row[$fldname] = $val;
                     }
                 }
@@ -550,6 +482,7 @@ class TourismActivitiesList extends TourismActivities
     public $ListActions; // List actions
     public $SelectedCount = 0;
     public $SelectedIndex = 0;
+    public $ShowOtherOptions = false;
     public $DisplayRecords = 20;
     public $StartRecord;
     public $StopRecord;
@@ -580,9 +513,6 @@ class TourismActivitiesList extends TourismActivities
     public $RestoreSearch = false;
     public $HashValue; // Hash value
     public $DetailPages;
-    public $TopContentClass = "ew-top";
-    public $MiddleContentClass = "ew-middle";
-    public $BottomContentClass = "ew-bottom";
     public $PageAction;
     public $RecKeys = [];
     public $IsModal = false;
@@ -632,9 +562,6 @@ class TourismActivitiesList extends TourismActivities
         $this->MultiColumnListOptionsPosition = Config("MULTI_COLUMN_LIST_OPTIONS_POSITION");
         $DashboardReport ??= Param(Config("PAGE_DASHBOARD"));
 
-        // Is modal
-        $this->IsModal = ConvertToBool(Param("modal"));
-
         // Use layout
         $this->UseLayout = $this->UseLayout && ConvertToBool(Param(Config("PAGE_LAYOUT"), true));
 
@@ -645,21 +572,9 @@ class TourismActivitiesList extends TourismActivities
         if (IsLoggedIn()) {
             Profile()->setUserName(CurrentUserName())->loadFromStorage();
         }
-
-        // Get export parameters
-        $custom = "";
         if (Param("export") !== null) {
             $this->Export = Param("export");
-            $custom = Param("custom", "");
-        } else {
-            $this->setExportReturnUrl(CurrentUrl());
         }
-        $ExportType = $this->Export; // Get export parameter, used in header
-        if ($ExportType != "") {
-            global $SkipHeaderFooter;
-            $SkipHeaderFooter = true;
-        }
-        $this->CurrentAction = Param("action"); // Set up current action
 
         // Get grid add count
         $gridaddcnt = Get(Config("TABLE_GRID_ADD_ROW_COUNT"), "");
@@ -702,6 +617,9 @@ class TourismActivitiesList extends TourismActivities
         // Set up lookup cache
         $this->setupLookupOptions($this->difficulty_level_id);
 
+        // Load default values for add
+        $this->loadDefaultValues();
+
         // Update form name to avoid conflict
         if ($this->IsModal) {
             $this->FormName = "ftourism_activitiesgrid";
@@ -726,22 +644,11 @@ class TourismActivitiesList extends TourismActivities
         // Get command
         $this->Command = strtolower(Get("cmd", ""));
 
-        // Process list action first
-        if ($this->processListAction()) { // Ajax request
-            $this->terminate();
-            return;
-        }
-
         // Set up records per page
         $this->setupDisplayRecords();
 
         // Handle reset command
         $this->resetCmd();
-
-        // Set up Breadcrumb
-        if (!$this->isExport()) {
-            $this->setupBreadcrumb();
-        }
 
         // Hide list options
         if ($this->isExport()) {
@@ -754,45 +661,23 @@ class TourismActivitiesList extends TourismActivities
             $this->ListOptions->UseButtonGroup = false; // Disable button group
         }
 
-        // Hide options
-        if ($this->isExport() || !(EmptyValue($this->CurrentAction) || $this->isSearch())) {
-            $this->ExportOptions->hideAllOptions();
-            $this->FilterOptions->hideAllOptions();
-            $this->ImportOptions->hideAllOptions();
-        }
-
         // Hide other options
         if ($this->isExport()) {
             $this->OtherOptions->hideAllOptions();
         }
 
-        // Get default search criteria
-        AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
-
-        // Get basic search values
-        $this->loadBasicSearchValues();
-
-        // Process filter list
-        if ($this->processFilterList()) {
-            $this->terminate();
-            return;
+        // Show grid delete link for grid add / grid edit
+        if ($this->AllowAddDeleteRow) {
+            if ($this->isGridAdd() || $this->isGridEdit()) {
+                $item = $this->ListOptions["griddelete"];
+                if ($item) {
+                    $item->Visible = $Security->allowDelete(CurrentProjectID() . $this->TableName);
+                }
+            }
         }
-
-        // Restore search parms from Session if not searching / reset / export
-        if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
-            $this->restoreSearchParms();
-        }
-
-        // Call Recordset SearchValidated event
-        $this->recordsetSearchValidated();
 
         // Set up sorting order
         $this->setupSortOrder();
-
-        // Get basic search criteria
-        if (!$this->hasInvalidFields()) {
-            $srchBasic = $this->basicSearchWhere();
-        }
 
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
@@ -800,35 +685,6 @@ class TourismActivitiesList extends TourismActivities
         } else {
             $this->DisplayRecords = 20; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
-        }
-
-        // Load search default if no existing search criteria
-        if (!$this->checkSearchParms() && !$query) {
-            // Load basic search from default
-            $this->BasicSearch->loadDefault();
-            if ($this->BasicSearch->Keyword != "") {
-                $srchBasic = $this->basicSearchWhere(); // Save to session
-            }
-        }
-
-        // Build search criteria
-        if ($query) {
-            AddFilter($this->SearchWhere, $query);
-        } else {
-            AddFilter($this->SearchWhere, $srchAdvanced);
-            AddFilter($this->SearchWhere, $srchBasic);
-        }
-
-        // Call Recordset_Searching event
-        $this->recordsetSearching($this->SearchWhere);
-
-        // Save search criteria
-        if ($this->Command == "search" && !$this->RestoreSearch) {
-            $this->setSearchWhere($this->SearchWhere); // Save to Session
-            $this->StartRecord = 1; // Reset start record counter
-            $this->setStartRecordNumber($this->StartRecord);
-        } elseif ($this->Command != "json" && !$query) {
-            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -868,9 +724,16 @@ class TourismActivitiesList extends TourismActivities
         }
         $this->Filter = $this->applyUserIDFilters($this->Filter);
         if ($this->isGridAdd()) {
-            $this->CurrentFilter = "0=1";
-            $this->StartRecord = 1;
-            $this->DisplayRecords = $this->GridAddRowCount;
+            if ($this->CurrentMode == "copy") {
+                $this->TotalRecords = $this->listRecordCount();
+                $this->StartRecord = 1;
+                $this->DisplayRecords = $this->TotalRecords;
+                $this->Recordset = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords);
+            } else {
+                $this->CurrentFilter = "0=1";
+                $this->StartRecord = 1;
+                $this->DisplayRecords = $this->GridAddRowCount;
+            }
             $this->TotalRecords = $this->DisplayRecords;
             $this->StopRecord = $this->DisplayRecords;
         } elseif (($this->isEdit() || $this->isCopy() || $this->isInlineInserted() || $this->isInlineUpdated()) && $this->UseInfiniteScroll) { // Get current record only
@@ -893,48 +756,8 @@ class TourismActivitiesList extends TourismActivities
         } else {
             $this->TotalRecords = $this->listRecordCount();
             $this->StartRecord = 1;
-            if ($this->DisplayRecords <= 0 || ($this->isExport() && $this->ExportAll)) { // Display all records
-                $this->DisplayRecords = $this->TotalRecords;
-            }
-            if (!($this->isExport() && $this->ExportAll)) { // Set up start record position
-                $this->setupStartRecord();
-            }
+            $this->DisplayRecords = $this->TotalRecords; // Display all records
             $this->Recordset = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords);
-
-            // Set no record found message
-            if ((EmptyValue($this->CurrentAction) || $this->isSearch()) && $this->TotalRecords == 0) {
-                if (!$Security->canList()) {
-                    $this->setWarningMessage(DeniedMessage());
-                }
-                if ($this->SearchWhere == "0=101") {
-                    $this->setWarningMessage($Language->phrase("EnterSearchCriteria"));
-                } else {
-                    $this->setWarningMessage($Language->phrase("NoRecord"));
-                }
-            }
-        }
-
-        // Set up list action columns
-        foreach ($this->ListActions as $listAction) {
-            if ($listAction->Allowed) {
-                if ($listAction->Select == ACTION_MULTIPLE) { // Show checkbox column if multiple action
-                    $this->ListOptions["checkbox"]->Visible = true;
-                } elseif ($listAction->Select == ACTION_SINGLE) { // Show list action column
-                        $this->ListOptions["listactions"]->Visible = true; // Set visible if any list action is allowed
-                }
-            }
-        }
-
-        // Search options
-        $this->setupSearchOptions();
-
-        // Set up search panel class
-        if ($this->SearchWhere != "") {
-            if ($query) { // Hide search panel if using QueryBuilder
-                RemoveClass($this->SearchPanelClass, "show");
-            } else {
-                AppendClass($this->SearchPanelClass, "show");
-            }
         }
 
         // API list action
@@ -1021,6 +844,130 @@ class TourismActivitiesList extends TourismActivities
         }
     }
 
+    // Exit inline mode
+    protected function clearInlineMode()
+    {
+        $this->LastAction = $this->CurrentAction; // Save last action
+        $this->CurrentAction = ""; // Clear action
+        $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
+    }
+
+    // Switch to grid add mode
+    protected function gridAddMode()
+    {
+        $this->CurrentAction = "gridadd";
+        $_SESSION[SESSION_INLINE_MODE] = "gridadd";
+        $this->hideFieldsForAddEdit();
+    }
+
+    // Switch to grid edit mode
+    protected function gridEditMode()
+    {
+        $this->CurrentAction = "gridedit";
+        $_SESSION[SESSION_INLINE_MODE] = "gridedit";
+        $this->hideFieldsForAddEdit();
+    }
+
+    // Perform update to grid
+    public function gridUpdate()
+    {
+        global $Language, $CurrentForm;
+        $gridUpdate = true;
+
+        // Get old result set
+        $this->CurrentFilter = $this->buildKeyFilter();
+        if ($this->CurrentFilter == "") {
+            $this->CurrentFilter = "0=1";
+        }
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        if ($rs = $conn->executeQuery($sql)) {
+            $rsold = $rs->fetchAllAssociative();
+        }
+
+        // Call Grid Updating event
+        if (!$this->gridUpdating($rsold)) {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("GridEditCancelled")); // Set grid edit cancelled message
+            }
+            $this->EventCancelled = true;
+            return false;
+        }
+        $this->loadDefaultValues();
+        $wrkfilter = "";
+        $key = "";
+
+        // Update row index and get row key
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Update all rows based on key
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            $CurrentForm->Index = $rowindex;
+            $this->setKey($CurrentForm->getValue($this->OldKeyName));
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+
+            // Load all values and keys
+            if ($rowaction != "insertdelete" && $rowaction != "hide") { // Skip insert then deleted rows / hidden rows for grid edit
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
+                    $gridUpdate = $this->OldKey != ""; // Key must not be empty
+                } else {
+                    $gridUpdate = true;
+                }
+
+                // Skip empty row
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                // Validate form and insert/update/delete record
+                } elseif ($gridUpdate) {
+                    if ($rowaction == "delete") {
+                        $this->CurrentFilter = $this->getRecordFilter();
+                        $gridUpdate = $this->deleteRows(); // Delete this row
+                    } else {
+                        if ($rowaction == "insert") {
+                            $gridUpdate = $this->addRow(); // Insert this row
+                        } else {
+                            if ($this->OldKey != "") {
+                                $this->SendEmail = false; // Do not send email on update success
+                                $gridUpdate = $this->editRow(); // Update this row
+                            }
+                        } // End update
+                        if ($gridUpdate) { // Get inserted or updated filter
+                            AddFilter($wrkfilter, $this->getRecordFilter(), "OR");
+                        }
+                    }
+                }
+                if ($gridUpdate) {
+                    if ($key != "") {
+                        $key .= ", ";
+                    }
+                    $key .= $this->OldKey;
+                } else {
+                    $this->EventCancelled = true;
+                    break;
+                }
+            }
+        }
+        if ($gridUpdate) {
+            $this->FilterForModalActions = $wrkfilter;
+
+            // Get new records
+            $rsnew = $conn->fetchAllAssociative($sql);
+
+            // Call Grid_Updated event
+            $this->gridUpdated($rsold, $rsnew);
+            $this->clearInlineMode(); // Clear inline edit mode
+        } else {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
+            }
+        }
+        return $gridUpdate;
+    }
+
     // Build filter for all keys
     protected function buildKeyFilter()
     {
@@ -1052,225 +999,224 @@ class TourismActivitiesList extends TourismActivities
         return $wrkFilter;
     }
 
-    // Get list of filters
-    public function getFilterList()
+    // Perform grid add
+    public function gridInsert()
     {
-        // Initialize
-        $filterList = "";
-        $savedFilterList = "";
-        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
-        $filterList = Concat($filterList, $this->destination_id->AdvancedSearch->toJson(), ","); // Field destination_id
-        $filterList = Concat($filterList, $this->activity_name->AdvancedSearch->toJson(), ","); // Field activity_name
-        $filterList = Concat($filterList, $this->description->AdvancedSearch->toJson(), ","); // Field description
-        $filterList = Concat($filterList, $this->duration->AdvancedSearch->toJson(), ","); // Field duration
-        $filterList = Concat($filterList, $this->display_order->AdvancedSearch->toJson(), ","); // Field display_order
-        $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
-        $filterList = Concat($filterList, $this->difficulty_level_id->AdvancedSearch->toJson(), ","); // Field difficulty_level_id
-        if ($this->BasicSearch->Keyword != "") {
-            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
-            $filterList = Concat($filterList, $wrk, ",");
-        }
+        global $Language, $CurrentForm;
+        $rowindex = 1;
+        $gridInsert = false;
+        $conn = $this->getConnection();
 
-        // Return filter list in JSON
-        if ($filterList != "") {
-            $filterList = "\"data\":{" . $filterList . "}";
-        }
-        if ($savedFilterList != "") {
-            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
-        }
-        return ($filterList != "") ? "{" . $filterList . "}" : "null";
-    }
-
-    // Process filter list
-    protected function processFilterList()
-    {
-        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
-            $filters = Post("filters");
-            Profile()->setSearchFilters("ftourism_activitiessrch", $filters);
-            WriteJson([["success" => true]]); // Success
-            return true;
-        } elseif (Post("cmd") == "resetfilter") {
-            $this->restoreFilterList();
-        }
-        return false;
-    }
-
-    // Restore list of filters
-    protected function restoreFilterList()
-    {
-        // Return if not reset filter
-        if (Post("cmd") !== "resetfilter") {
+        // Call Grid Inserting event
+        if (!$this->gridInserting()) {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("GridAddCancelled")); // Set grid add cancelled message
+            }
+            $this->EventCancelled = true;
             return false;
         }
-        $filter = json_decode(Post("filter"), true);
-        $this->Command = "search";
+        $this->loadDefaultValues();
 
-        // Field id
-        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
-        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
-        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
-        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
-        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
-        $this->id->AdvancedSearch->save();
+        // Init key filter
+        $wrkfilter = "";
+        $addcnt = 0;
+        $key = "";
 
-        // Field destination_id
-        $this->destination_id->AdvancedSearch->SearchValue = @$filter["x_destination_id"];
-        $this->destination_id->AdvancedSearch->SearchOperator = @$filter["z_destination_id"];
-        $this->destination_id->AdvancedSearch->SearchCondition = @$filter["v_destination_id"];
-        $this->destination_id->AdvancedSearch->SearchValue2 = @$filter["y_destination_id"];
-        $this->destination_id->AdvancedSearch->SearchOperator2 = @$filter["w_destination_id"];
-        $this->destination_id->AdvancedSearch->save();
-
-        // Field activity_name
-        $this->activity_name->AdvancedSearch->SearchValue = @$filter["x_activity_name"];
-        $this->activity_name->AdvancedSearch->SearchOperator = @$filter["z_activity_name"];
-        $this->activity_name->AdvancedSearch->SearchCondition = @$filter["v_activity_name"];
-        $this->activity_name->AdvancedSearch->SearchValue2 = @$filter["y_activity_name"];
-        $this->activity_name->AdvancedSearch->SearchOperator2 = @$filter["w_activity_name"];
-        $this->activity_name->AdvancedSearch->save();
-
-        // Field description
-        $this->description->AdvancedSearch->SearchValue = @$filter["x_description"];
-        $this->description->AdvancedSearch->SearchOperator = @$filter["z_description"];
-        $this->description->AdvancedSearch->SearchCondition = @$filter["v_description"];
-        $this->description->AdvancedSearch->SearchValue2 = @$filter["y_description"];
-        $this->description->AdvancedSearch->SearchOperator2 = @$filter["w_description"];
-        $this->description->AdvancedSearch->save();
-
-        // Field duration
-        $this->duration->AdvancedSearch->SearchValue = @$filter["x_duration"];
-        $this->duration->AdvancedSearch->SearchOperator = @$filter["z_duration"];
-        $this->duration->AdvancedSearch->SearchCondition = @$filter["v_duration"];
-        $this->duration->AdvancedSearch->SearchValue2 = @$filter["y_duration"];
-        $this->duration->AdvancedSearch->SearchOperator2 = @$filter["w_duration"];
-        $this->duration->AdvancedSearch->save();
-
-        // Field display_order
-        $this->display_order->AdvancedSearch->SearchValue = @$filter["x_display_order"];
-        $this->display_order->AdvancedSearch->SearchOperator = @$filter["z_display_order"];
-        $this->display_order->AdvancedSearch->SearchCondition = @$filter["v_display_order"];
-        $this->display_order->AdvancedSearch->SearchValue2 = @$filter["y_display_order"];
-        $this->display_order->AdvancedSearch->SearchOperator2 = @$filter["w_display_order"];
-        $this->display_order->AdvancedSearch->save();
-
-        // Field created_at
-        $this->created_at->AdvancedSearch->SearchValue = @$filter["x_created_at"];
-        $this->created_at->AdvancedSearch->SearchOperator = @$filter["z_created_at"];
-        $this->created_at->AdvancedSearch->SearchCondition = @$filter["v_created_at"];
-        $this->created_at->AdvancedSearch->SearchValue2 = @$filter["y_created_at"];
-        $this->created_at->AdvancedSearch->SearchOperator2 = @$filter["w_created_at"];
-        $this->created_at->AdvancedSearch->save();
-
-        // Field difficulty_level_id
-        $this->difficulty_level_id->AdvancedSearch->SearchValue = @$filter["x_difficulty_level_id"];
-        $this->difficulty_level_id->AdvancedSearch->SearchOperator = @$filter["z_difficulty_level_id"];
-        $this->difficulty_level_id->AdvancedSearch->SearchCondition = @$filter["v_difficulty_level_id"];
-        $this->difficulty_level_id->AdvancedSearch->SearchValue2 = @$filter["y_difficulty_level_id"];
-        $this->difficulty_level_id->AdvancedSearch->SearchOperator2 = @$filter["w_difficulty_level_id"];
-        $this->difficulty_level_id->AdvancedSearch->save();
-        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
-        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
-    }
-
-    // Show list of filters
-    public function showFilterList()
-    {
-        global $Language;
-
-        // Initialize
-        $filterList = "";
-        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
-        $captionSuffix = $this->isExport("email") ? ": " : "";
-        if ($this->BasicSearch->Keyword != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
+        // Get row count
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
         }
 
-        // Show Filters
-        if ($filterList != "") {
-            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
-                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
-            $this->messageShowing($message, "");
-            Write($message);
-        } else { // Output empty tag
-            Write("<div id=\"ew-filter-list\"></div>");
-        }
-    }
+        // Insert all rows
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "" && $rowaction != "insert") {
+                continue; // Skip
+            }
+            $rsold = null;
+            if ($rowaction == "insert") {
+                $this->OldKey = strval($CurrentForm->getValue($this->OldKeyName));
+                $rsold = $this->loadOldRecord(); // Load old record
+            }
+            $this->loadFormValues(); // Get form values
+            if (!$this->emptyRow()) {
+                $addcnt++;
+                $this->SendEmail = false; // Do not send email on insert success
+                $gridInsert = $this->addRow($rsold); // Insert row (already validated by validateGridForm())
+                if ($gridInsert) {
+                    if ($key != "") {
+                        $key .= Config("COMPOSITE_KEY_SEPARATOR");
+                    }
+                    $key .= $this->id->CurrentValue;
 
-    // Return basic search WHERE clause based on search keyword and type
-    public function basicSearchWhere($default = false)
-    {
-        global $Security;
-        $searchStr = "";
-        if (!$Security->canSearch()) {
-            return "";
-        }
-
-        // Fields to search
-        $searchFlds = [];
-        $searchFlds[] = &$this->activity_name;
-        $searchFlds[] = &$this->description;
-        $searchFlds[] = &$this->duration;
-        $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-        $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-
-        // Get search SQL
-        if ($searchKeyword != "") {
-            $ar = $this->BasicSearch->keywordList($default);
-            $searchStr = GetQuickSearchFilter($searchFlds, $ar, $searchType, Config("BASIC_SEARCH_ANY_FIELDS"), $this->Dbid);
-            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
-                $this->Command = "search";
+                    // Add filter for this record
+                    AddFilter($wrkfilter, $this->getRecordFilter(), "OR");
+                } else {
+                    $this->EventCancelled = true;
+                    break;
+                }
             }
         }
-        if (!$default && $this->Command == "search") {
-            $this->BasicSearch->setKeyword($searchKeyword);
-            $this->BasicSearch->setType($searchType);
-
-            // Clear rules for QueryBuilder
-            $this->setSessionRules("");
-        }
-        return $searchStr;
-    }
-
-    // Check if search parm exists
-    protected function checkSearchParms()
-    {
-        // Check basic search
-        if ($this->BasicSearch->issetSession()) {
+        if ($addcnt == 0) { // No record inserted
+            $this->clearInlineMode(); // Clear grid add mode and return
             return true;
         }
-        return false;
+        if ($gridInsert) {
+            // Get new records
+            $this->CurrentFilter = $wrkfilter;
+            $this->FilterForModalActions = $wrkfilter;
+            $sql = $this->getCurrentSql();
+            $rsnew = $conn->fetchAllAssociative($sql);
+
+            // Call Grid_Inserted event
+            $this->gridInserted($rsnew);
+            $this->clearInlineMode(); // Clear grid add mode
+        } else {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("InsertFailed")); // Set insert failed message
+            }
+        }
+        return $gridInsert;
     }
 
-    // Clear all search parameters
-    protected function resetSearchParms()
+    // Check if empty row
+    public function emptyRow()
     {
-        // Clear search WHERE clause
-        $this->SearchWhere = "";
-        $this->setSearchWhere($this->SearchWhere);
-
-        // Clear basic search parameters
-        $this->resetBasicSearchParms();
+        global $CurrentForm;
+        if (
+            $CurrentForm->hasValue("x_destination_id") &&
+            $CurrentForm->hasValue("o_destination_id") &&
+            $this->destination_id->CurrentValue != $this->destination_id->DefaultValue &&
+            !($this->destination_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->destination_id->CurrentValue == $this->destination_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_activity_name") &&
+            $CurrentForm->hasValue("o_activity_name") &&
+            $this->activity_name->CurrentValue != $this->activity_name->DefaultValue &&
+            !($this->activity_name->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->activity_name->CurrentValue == $this->activity_name->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_duration") &&
+            $CurrentForm->hasValue("o_duration") &&
+            $this->duration->CurrentValue != $this->duration->DefaultValue &&
+            !($this->duration->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->duration->CurrentValue == $this->duration->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_display_order") &&
+            $CurrentForm->hasValue("o_display_order") &&
+            $this->display_order->CurrentValue != $this->display_order->DefaultValue &&
+            !($this->display_order->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->display_order->CurrentValue == $this->display_order->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_difficulty_level_id") &&
+            $CurrentForm->hasValue("o_difficulty_level_id") &&
+            $this->difficulty_level_id->CurrentValue != $this->difficulty_level_id->DefaultValue &&
+            !($this->difficulty_level_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->difficulty_level_id->CurrentValue == $this->difficulty_level_id->getSessionValue())
+        ) {
+            return false;
+        }
+        return true;
     }
 
-    // Load advanced search default values
-    protected function loadAdvancedSearchDefault()
+    // Validate grid form
+    public function validateGridForm()
     {
-        return false;
+        global $CurrentForm;
+
+        // Get row count
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Load default values for emptyRow checking
+        $this->loadDefaultValues();
+
+        // Validate all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete" && $rowaction != "hide") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } elseif (!$this->validateForm()) {
+                    $this->ValidationErrors[$rowindex] = $this->getValidationErrors();
+                    $this->EventCancelled = true;
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
-    // Clear all basic search parameters
-    protected function resetBasicSearchParms()
+    // Get all form values of the grid
+    public function getGridFormValues()
     {
-        $this->BasicSearch->unsetSession();
+        global $CurrentForm;
+        // Get row count
+        $CurrentForm->resetIndex();
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+        $rows = [];
+
+        // Loop through all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } else {
+                    $rows[] = $this->getFieldValues("FormValue"); // Return row as array
+                }
+            }
+        }
+        return $rows; // Return as array of array
     }
 
-    // Restore all search parameters
-    protected function restoreSearchParms()
+    // Restore form values for current row
+    public function restoreCurrentRowFormValues($idx)
     {
-        $this->RestoreSearch = true;
+        global $CurrentForm;
 
-        // Restore basic search values
-        $this->BasicSearch->load();
+        // Get row based on current index
+        $CurrentForm->Index = $idx;
+        $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+        $this->loadFormValues(); // Load form values
+        // Set up invalid status correctly
+        $this->resetFormError();
+        if ($rowaction == "insert" && $this->emptyRow()) {
+            // Ignore
+        } else {
+            $this->validateForm();
+        }
+    }
+
+    // Reset form status
+    public function resetFormError()
+    {
+        foreach ($this->Fields as $field) {
+            $field->clearErrorMessage();
+        }
     }
 
     // Set up sort parameters
@@ -1288,13 +1234,6 @@ class TourismActivitiesList extends TourismActivities
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
-            $this->updateSort($this->id); // id
-            $this->updateSort($this->destination_id); // destination_id
-            $this->updateSort($this->activity_name); // activity_name
-            $this->updateSort($this->duration); // duration
-            $this->updateSort($this->display_order); // display_order
-            $this->updateSort($this->created_at); // created_at
-            $this->updateSort($this->difficulty_level_id); // difficulty_level_id
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1310,11 +1249,6 @@ class TourismActivitiesList extends TourismActivities
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
-            // Reset search criteria
-            if ($this->Command == "reset" || $this->Command == "resetall") {
-                $this->resetSearchParms();
-            }
-
             // Reset master/detail keys
             if ($this->Command == "resetall") {
                 $this->setCurrentMasterTable(""); // Clear master table
@@ -1327,14 +1261,6 @@ class TourismActivitiesList extends TourismActivities
             if ($this->Command == "resetsort") {
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
-                $this->id->setSort("");
-                $this->destination_id->setSort("");
-                $this->activity_name->setSort("");
-                $this->description->setSort("");
-                $this->duration->setSort("");
-                $this->display_order->setSort("");
-                $this->created_at->setSort("");
-                $this->difficulty_level_id->setSort("");
             }
 
             // Reset start position
@@ -1347,6 +1273,14 @@ class TourismActivitiesList extends TourismActivities
     protected function setupListOptions()
     {
         global $Security, $Language;
+
+        // "griddelete"
+        if ($this->AllowAddDeleteRow) {
+            $item = &$this->ListOptions->add("griddelete");
+            $item->CssClass = "text-nowrap";
+            $item->OnLeft = false;
+            $item->Visible = false; // Default hidden
+        }
 
         // Add group option item ("button")
         $item = &$this->ListOptions->addGroupOption();
@@ -1378,25 +1312,6 @@ class TourismActivitiesList extends TourismActivities
         $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
 
-        // List actions
-        $item = &$this->ListOptions->add("listactions");
-        $item->CssClass = "text-nowrap";
-        $item->OnLeft = false;
-        $item->Visible = false;
-        $item->ShowInButtonGroup = false;
-        $item->ShowInDropDown = false;
-
-        // "checkbox"
-        $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = false;
-        $item->OnLeft = false;
-        $item->Header = "<div class=\"form-check\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"form-check-input\" data-ew-action=\"select-all-keys\"></div>";
-        if ($item->OnLeft) {
-            $item->moveTo(0);
-        }
-        $item->ShowInDropDown = false;
-        $item->ShowInButtonGroup = false;
-
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1409,7 +1324,6 @@ class TourismActivitiesList extends TourismActivities
 
         // Call ListOptions_Load event
         $this->listOptionsLoad();
-        $this->setupListOptionsExt();
         $item = $this->ListOptions[$this->ListOptions->GroupOptionName];
         $item->Visible = $this->ListOptions->groupOptionVisible();
     }
@@ -1434,7 +1348,38 @@ class TourismActivitiesList extends TourismActivities
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
-        $pageUrl = $this->pageUrl(false);
+
+        // Set up row action and key
+        if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
+            $CurrentForm->Index = $this->RowIndex;
+            $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
+            $oldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->OldKeyName);
+            $blankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
+            if ($this->RowAction != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $actionName . "\" id=\"" . $actionName . "\" value=\"" . $this->RowAction . "\">";
+            }
+            $oldKey = $this->getKey(false); // Get from OldValue
+            if ($oldKeyName != "" && $oldKey != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $oldKeyName . "\" id=\"" . $oldKeyName . "\" value=\"" . HtmlEncode($oldKey) . "\">";
+            }
+            if ($this->RowAction == "insert" && $this->isConfirm() && $this->emptyRow()) {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $blankRowName . "\" id=\"" . $blankRowName . "\" value=\"1\">";
+            }
+        }
+
+        // "delete"
+        if ($this->AllowAddDeleteRow) {
+            if ($this->CurrentMode == "add" || $this->CurrentMode == "copy" || $this->CurrentMode == "edit") {
+                $options = &$this->ListOptions;
+                $options->UseButtonGroup = true; // Use button group for grid delete button
+                $opt = $options["griddelete"];
+                if (!$Security->allowDelete(CurrentProjectID() . $this->TableName) && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+                    $opt->Body = "&nbsp;";
+                } else {
+                    $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-ew-action=\"delete-grid-row\" data-rowindex=\"" . $this->RowIndex . "\">" . $Language->phrase("DeleteLink") . "</a>";
+                }
+            }
+        }
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
@@ -1491,47 +1436,6 @@ class TourismActivitiesList extends TourismActivities
                 $opt->Body = "";
             }
         } // End View mode
-
-        // Set up list action buttons
-        $opt = $this->ListOptions["listactions"];
-        if ($opt && !$this->isExport() && !$this->CurrentAction) {
-            $body = "";
-            $links = [];
-            foreach ($this->ListActions as $listAction) {
-                $action = $listAction->Action;
-                $allowed = $listAction->Allowed;
-                $disabled = false;
-                if ($listAction->Select == ACTION_SINGLE && $allowed) {
-                    $caption = $listAction->Caption;
-                    $title = HtmlTitle($caption);
-                    if ($action != "") {
-                        $icon = ($listAction->Icon != "") ? "<i class=\"" . HtmlEncode(str_replace(" ew-icon", "", $listAction->Icon)) . "\" data-caption=\"" . $title . "\"></i> " : "";
-                        $link = $disabled
-                            ? "<li><div class=\"alert alert-light\">" . $icon . " " . $caption . "</div></li>"
-                            : "<li><button type=\"button\" class=\"dropdown-item ew-action ew-list-action\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"ftourism_activitieslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button></li>";
-                        $links[] = $link;
-                        if ($body == "") { // Setup first button
-                            $body = $disabled
-                            ? "<div class=\"alert alert-light\">" . $icon . " " . $caption . "</div>"
-                            : "<button type=\"button\" class=\"btn btn-default ew-action ew-list-action\" title=\"" . $title . "\" data-caption=\"" . $title . "\" data-ew-action=\"submit\" form=\"ftourism_activitieslist\" data-key=\"" . $this->keyToJson(true) . "\"" . $listAction->toDataAttributes() . ">" . $icon . " " . $caption . "</button>";
-                        }
-                    }
-                }
-            }
-            if (count($links) > 1) { // More than one buttons, use dropdown
-                $body = "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-actions\" title=\"" . HtmlTitle($Language->phrase("ListActionButton")) . "\" data-bs-toggle=\"dropdown\">" . $Language->phrase("ListActionButton") . "</button>";
-                $content = implode(array_map(fn($link) => "<li>" . $link . "</li>", $links));
-                $body .= "<ul class=\"dropdown-menu" . ($opt->OnLeft ? "" : " dropdown-menu-right") . "\">" . $content . "</ul>";
-                $body = "<div class=\"btn-group btn-group-sm\">" . $body . "</div>";
-            }
-            if (count($links) > 0) {
-                $opt->Body = $body;
-            }
-        }
-
-        // "checkbox"
-        $opt = $this->ListOptions["checkbox"];
-        $opt->Body = "<div class=\"form-check\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"form-check-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" data-ew-action=\"select-key\"></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1549,82 +1453,23 @@ class TourismActivitiesList extends TourismActivities
     protected function setupOtherOptions()
     {
         global $Language, $Security;
-        $options = &$this->OtherOptions;
-        $option = $options["addedit"];
+        $option = $this->OtherOptions["addedit"];
+        $item = &$option->addGroupOption();
+        $item->Body = "";
+        $item->Visible = false;
 
         // Add
-        $item = &$option->add("add");
-        $addcaption = HtmlTitle($Language->phrase("AddLink"));
-        if ($this->ModalAdd && !IsMobile()) {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"tourism_activities\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
-        } else {
-            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
-        }
-        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
-        $option = $options["action"];
-
-        // Show column list for column visibility
-        if ($this->UseColumnVisibility) {
-            $option = $this->OtherOptions["column"];
-            $item = &$option->addGroupOption();
-            $item->Body = "";
-            $item->Visible = $this->UseColumnVisibility;
-            $this->createColumnOption($option, "id");
-            $this->createColumnOption($option, "destination_id");
-            $this->createColumnOption($option, "activity_name");
-            $this->createColumnOption($option, "duration");
-            $this->createColumnOption($option, "display_order");
-            $this->createColumnOption($option, "created_at");
-            $this->createColumnOption($option, "difficulty_level_id");
-        }
-
-        // Set up custom actions
-        foreach ($this->CustomActions as $name => $action) {
-            $this->ListActions[$name] = $action;
-        }
-
-        // Set up options default
-        foreach ($options as $name => $option) {
-            if ($name != "column") { // Always use dropdown for column
-                $option->UseDropDownButton = false;
-                $option->UseButtonGroup = true;
+        if ($this->CurrentMode == "view") { // Check view mode
+            $item = &$option->add("add");
+            $addcaption = HtmlTitle($Language->phrase("AddLink"));
+            $this->AddUrl = $this->getAddUrl();
+            if ($this->ModalAdd && !IsMobile()) {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-table=\"tourism_activities\" data-caption=\"" . $addcaption . "\" data-ew-action=\"modal\" data-action=\"add\" data-ajax=\"" . ($this->UseAjaxActions ? "true" : "false") . "\" data-url=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\" data-btn=\"AddBtn\">" . $Language->phrase("AddLink") . "</a>";
+            } else {
+                $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
             }
-            //$option->ButtonClass = ""; // Class for button group
-            $item = &$option->addGroupOption();
-            $item->Body = "";
-            $item->Visible = false;
+            $item->Visible = $this->AddUrl != "" && $Security->canAdd();
         }
-        $options["addedit"]->DropDownButtonPhrase = $Language->phrase("ButtonAddEdit");
-        $options["detail"]->DropDownButtonPhrase = $Language->phrase("ButtonDetails");
-        $options["action"]->DropDownButtonPhrase = $Language->phrase("ButtonActions");
-
-        // Filter button
-        $item = &$this->FilterOptions->add("savecurrentfilter");
-        $item->Body = "<a class=\"ew-save-filter\" data-form=\"ftourism_activitiessrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = true;
-        $item = &$this->FilterOptions->add("deletefilter");
-        $item->Body = "<a class=\"ew-delete-filter\" data-form=\"ftourism_activitiessrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = true;
-        $this->FilterOptions->UseDropDownButton = true;
-        $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
-        $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
-
-        // Add group option item
-        $item = &$this->FilterOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-
-        // Page header/footer options
-        $this->HeaderOptions = new ListOptions(TagClassName: "ew-header-option", UseDropDownButton: false, UseButtonGroup: false);
-        $item = &$this->HeaderOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-        $this->FooterOptions = new ListOptions(TagClassName: "ew-footer-option", UseDropDownButton: false, UseButtonGroup: false);
-        $item = &$this->FooterOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
-
-        // Show active user count from SQL
     }
 
     // Active user filter
@@ -1656,154 +1501,36 @@ class TourismActivitiesList extends TourismActivities
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        $option = $options["action"];
-        // Set up list action buttons
-        foreach ($this->ListActions as $listAction) {
-            if ($listAction->Select == ACTION_MULTIPLE) {
-                $item = &$option->add("custom_" . $listAction->Action);
-                $caption = $listAction->Caption;
-                $icon = ($listAction->Icon != "") ? '<i class="' . HtmlEncode($listAction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<button type="button" class="btn btn-default ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" data-ew-action="submit" form="ftourism_activitieslist"' . $listAction->toDataAttributes() . '>' . $icon . '</button>';
-                $item->Visible = $listAction->Allowed;
-            }
-        }
-
-        // Hide multi edit, grid edit and other options
-        if ($this->TotalRecords <= 0) {
-            $option = $options["addedit"];
-            $item = $option["gridedit"];
-            if ($item) {
-                $item->Visible = false;
-            }
-            $option = $options["action"];
-            $option->hideAllOptions();
-        }
-    }
-
-    // Process list action
-    protected function processListAction()
-    {
-        global $Language, $Security, $Response;
-        $users = [];
-        $user = "";
-        $filter = $this->getFilterFromRecordKeys();
-        $userAction = Post("action", "");
-        if ($filter != "" && $userAction != "") {
-            $conn = $this->getConnection();
-            // Clear current action
-            $this->CurrentAction = "";
-            // Check permission first
-            $actionCaption = $userAction;
-            $listAction = $this->ListActions[$userAction] ?? null;
-            if ($listAction) {
-                $this->UserAction = $userAction;
-                $actionCaption = $listAction->Caption ?: $listAction->Action;
-                if (!$listAction->Allowed) {
-                    $errmsg = str_replace('%s', $actionCaption, $Language->phrase("CustomActionNotAllowed"));
-                    if (Post("ajax") == $userAction) { // Ajax
-                        echo "<p class=\"text-danger\">" . $errmsg . "</p>";
-                        return true;
-                    } else {
-                        $this->setFailureMessage($errmsg);
-                        return false;
-                    }
-                }
-            } else {
-                $errmsg = str_replace('%s', $userAction, $Language->phrase("CustomActionNotFound"));
-                if (Post("ajax") == $userAction) { // Ajax
-                    echo "<p class=\"text-danger\">" . $errmsg . "</p>";
-                    return true;
-                } else {
-                    $this->setFailureMessage($errmsg);
-                    return false;
+            if (in_array($this->CurrentMode, ["add", "copy", "edit"]) && !$this->isConfirm()) { // Check add/copy/edit mode
+                if ($this->AllowAddDeleteRow) {
+                    $option = $options["addedit"];
+                    $option->UseDropDownButton = false;
+                    $item = &$option->add("addblankrow");
+                    $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-ew-action=\"add-grid-row\">" . $Language->phrase("AddBlankRow") . "</a>";
+                    $item->Visible = $Security->canAdd();
+                    $this->ShowOtherOptions = $item->Visible;
                 }
             }
-            $rows = $this->loadRs($filter)->fetchAllAssociative();
-            $this->SelectedCount = count($rows);
-            $this->ActionValue = Post("actionvalue");
-
-            // Call row action event
-            if ($this->SelectedCount > 0) {
-                if ($this->UseTransaction) {
-                    $conn->beginTransaction();
-                }
-                $this->SelectedIndex = 0;
-                foreach ($rows as $row) {
-                    $this->SelectedIndex++;
-                    $processed = $listAction->handle($row, $this);
-                    if (!$processed) {
-                        break;
-                    }
-                    $processed = $this->rowCustomAction($userAction, $row);
-                    if (!$processed) {
-                        break;
-                    }
-                }
-                if ($processed) {
-                    if ($this->UseTransaction) { // Commit transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->commit();
-                        }
-                    }
-                    if ($this->getSuccessMessage() == "") {
-                        $this->setSuccessMessage($listAction->SuccessMessage);
-                    }
-                    if ($this->getSuccessMessage() == "") {
-                        $this->setSuccessMessage(str_replace("%s", $actionCaption, $Language->phrase("CustomActionCompleted"))); // Set up success message
-                    }
-                } else {
-                    if ($this->UseTransaction) { // Rollback transaction
-                        if ($conn->isTransactionActive()) {
-                            $conn->rollback();
-                        }
-                    }
-                    if ($this->getFailureMessage() == "") {
-                        $this->setFailureMessage($listAction->FailureMessage);
-                    }
-
-                    // Set up error message
-                    if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
-                        // Use the message, do nothing
-                    } elseif ($this->CancelMessage != "") {
-                        $this->setFailureMessage($this->CancelMessage);
-                        $this->CancelMessage = "";
-                    } else {
-                        $this->setFailureMessage(str_replace('%s', $actionCaption, $Language->phrase("CustomActionFailed")));
-                    }
-                }
+            if ($this->CurrentMode == "view") { // Check view mode
+                $option = $options["addedit"];
+                $item = $option["add"];
+                $this->ShowOtherOptions = $item?->Visible ?? false;
             }
-            if (Post("ajax") == $userAction) { // Ajax
-                if (WithJsonResponse()) { // List action returns JSON
-                    $this->clearSuccessMessage(); // Clear success message
-                    $this->clearFailureMessage(); // Clear failure message
-                } else {
-                    if ($this->getSuccessMessage() != "") {
-                        echo "<p class=\"text-success\">" . $this->getSuccessMessage() . "</p>";
-                        $this->clearSuccessMessage(); // Clear success message
-                    }
-                    if ($this->getFailureMessage() != "") {
-                        echo "<p class=\"text-danger\">" . $this->getFailureMessage() . "</p>";
-                        $this->clearFailureMessage(); // Clear failure message
-                    }
-                }
-                return true;
-            }
-        }
-        return false; // Not ajax request
     }
 
     // Set up Grid
     public function setupGrid()
     {
         global $CurrentForm;
-        if ($this->ExportAll && $this->isExport()) {
-            $this->StopRecord = $this->TotalRecords;
-        } else {
-            // Set the last record to display
-            if ($this->TotalRecords > $this->StartRecord + $this->DisplayRecords - 1) {
-                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
-            } else {
-                $this->StopRecord = $this->TotalRecords;
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->TotalRecords; // Show all records
+
+        // Restore number of post back records
+        if ($CurrentForm && ($this->isConfirm() || $this->EventCancelled)) {
+            $CurrentForm->resetIndex();
+            if ($CurrentForm->hasValue($this->FormKeyCountName) && ($this->isGridAdd() || $this->isGridEdit() || $this->isConfirm())) {
+                $this->KeyCount = $CurrentForm->getValue($this->FormKeyCountName);
+                $this->StopRecord = $this->StartRecord + $this->KeyCount - 1;
             }
         }
         $this->RecordCount = $this->StartRecord - 1;
@@ -1848,6 +1575,17 @@ class TourismActivitiesList extends TourismActivities
                 return;
             }
         }
+        if ($this->isGridAdd() || $this->isGridEdit() || $this->isConfirm() || $this->isMultiEdit()) {
+            $this->RowIndex++;
+            $CurrentForm->Index = $this->RowIndex;
+            if ($CurrentForm->hasValue($this->FormActionName) && ($this->isConfirm() || $this->EventCancelled)) {
+                $this->RowAction = strval($CurrentForm->getValue($this->FormActionName));
+            } elseif ($this->isGridAdd()) {
+                $this->RowAction = "insert";
+            } else {
+                $this->RowAction = "";
+            }
+        }
 
         // Set up key count
         $this->KeyCount = $this->RowIndex;
@@ -1855,25 +1593,41 @@ class TourismActivitiesList extends TourismActivities
         // Init row class and style
         $this->resetAttributes();
         $this->CssClass = "";
-        if ($this->isCopy() && $this->InlineRowCount == 0 && !$this->loadRow()) { // Inline copy
-            $this->CurrentAction = "add";
-        }
-        if ($this->isAdd() && $this->InlineRowCount == 0 || $this->isGridAdd()) {
-            $this->loadRowValues(); // Load default values
-            $this->OldKey = "";
-            $this->setKey($this->OldKey);
-        } elseif ($this->isInlineInserted() && $this->UseInfiniteScroll) {
-            // Nothing to do, just use current values
-        } elseif (!($this->isCopy() && $this->InlineRowCount == 0)) {
-            $this->loadRowValues($this->CurrentRow); // Load row values
-            if ($this->isGridEdit() || $this->isMultiEdit()) {
+        if ($this->isGridAdd()) {
+            if ($this->CurrentMode == "copy") {
+                $this->loadRowValues($this->CurrentRow); // Load row values
                 $this->OldKey = $this->getKey(true); // Get from CurrentValue
-                $this->setKey($this->OldKey);
+            } else {
+                $this->loadRowValues(); // Load default values
+                $this->OldKey = "";
             }
+        } else {
+            $this->loadRowValues($this->CurrentRow); // Load row values
+            $this->OldKey = $this->getKey(true); // Get from CurrentValue
         }
+        $this->setKey($this->OldKey);
         $this->RowType = RowType::VIEW; // Render view
         if (($this->isAdd() || $this->isCopy()) && $this->InlineRowCount == 0 || $this->isGridAdd()) { // Add
             $this->RowType = RowType::ADD; // Render add
+        }
+        if ($this->isGridAdd() && $this->EventCancelled && !$CurrentForm->hasValue($this->FormBlankRowName)) { // Insert failed
+            $this->restoreCurrentRowFormValues($this->RowIndex); // Restore form values
+        }
+        if ($this->isGridEdit()) { // Grid edit
+            if ($this->EventCancelled) {
+                $this->restoreCurrentRowFormValues($this->RowIndex); // Restore form values
+            }
+            if ($this->RowAction == "insert") {
+                $this->RowType = RowType::ADD; // Render add
+            } else {
+                $this->RowType = RowType::EDIT; // Render edit
+            }
+        }
+        if ($this->isGridEdit() && ($this->RowType == RowType::EDIT || $this->RowType == RowType::ADD) && $this->EventCancelled) { // Update failed
+            $this->restoreCurrentRowFormValues($this->RowIndex); // Restore form values
+        }
+        if ($this->isConfirm()) { // Confirm row
+            $this->restoreCurrentRowFormValues($this->RowIndex); // Restore form values
         }
 
         // Inline Add/Copy row (row 0)
@@ -1911,14 +1665,127 @@ class TourismActivitiesList extends TourismActivities
         $this->renderListOptions();
     }
 
-    // Load basic search values
-    protected function loadBasicSearchValues()
+    // Get upload files
+    protected function getUploadFiles()
     {
-        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
-        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
-            $this->Command = "search";
+        global $CurrentForm, $Language;
+    }
+
+    // Load default values
+    protected function loadDefaultValues()
+    {
+        $this->display_order->DefaultValue = $this->display_order->getDefault(); // PHP
+        $this->display_order->OldValue = $this->display_order->DefaultValue;
+    }
+
+    // Load form values
+    protected function loadFormValues()
+    {
+        // Load from form
+        global $CurrentForm;
+        $CurrentForm->FormName = $this->FormName;
+        $validate = !Config("SERVER_VALIDATE");
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
         }
-        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+
+        // Check field name 'destination_id' first before field var 'x_destination_id'
+        $val = $CurrentForm->hasValue("destination_id") ? $CurrentForm->getValue("destination_id") : $CurrentForm->getValue("x_destination_id");
+        if (!$this->destination_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->destination_id->Visible = false; // Disable update for API request
+            } else {
+                $this->destination_id->setFormValue($val, true, $validate);
+            }
+        }
+        if ($CurrentForm->hasValue("o_destination_id")) {
+            $this->destination_id->setOldValue($CurrentForm->getValue("o_destination_id"));
+        }
+
+        // Check field name 'activity_name' first before field var 'x_activity_name'
+        $val = $CurrentForm->hasValue("activity_name") ? $CurrentForm->getValue("activity_name") : $CurrentForm->getValue("x_activity_name");
+        if (!$this->activity_name->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->activity_name->Visible = false; // Disable update for API request
+            } else {
+                $this->activity_name->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_activity_name")) {
+            $this->activity_name->setOldValue($CurrentForm->getValue("o_activity_name"));
+        }
+
+        // Check field name 'duration' first before field var 'x_duration'
+        $val = $CurrentForm->hasValue("duration") ? $CurrentForm->getValue("duration") : $CurrentForm->getValue("x_duration");
+        if (!$this->duration->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->duration->Visible = false; // Disable update for API request
+            } else {
+                $this->duration->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_duration")) {
+            $this->duration->setOldValue($CurrentForm->getValue("o_duration"));
+        }
+
+        // Check field name 'display_order' first before field var 'x_display_order'
+        $val = $CurrentForm->hasValue("display_order") ? $CurrentForm->getValue("display_order") : $CurrentForm->getValue("x_display_order");
+        if (!$this->display_order->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->display_order->Visible = false; // Disable update for API request
+            } else {
+                $this->display_order->setFormValue($val, true, $validate);
+            }
+        }
+        if ($CurrentForm->hasValue("o_display_order")) {
+            $this->display_order->setOldValue($CurrentForm->getValue("o_display_order"));
+        }
+
+        // Check field name 'created_at' first before field var 'x_created_at'
+        $val = $CurrentForm->hasValue("created_at") ? $CurrentForm->getValue("created_at") : $CurrentForm->getValue("x_created_at");
+        if (!$this->created_at->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->created_at->Visible = false; // Disable update for API request
+            } else {
+                $this->created_at->setFormValue($val);
+            }
+            $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        }
+        if ($CurrentForm->hasValue("o_created_at")) {
+            $this->created_at->setOldValue($CurrentForm->getValue("o_created_at"));
+        }
+
+        // Check field name 'difficulty_level_id' first before field var 'x_difficulty_level_id'
+        $val = $CurrentForm->hasValue("difficulty_level_id") ? $CurrentForm->getValue("difficulty_level_id") : $CurrentForm->getValue("x_difficulty_level_id");
+        if (!$this->difficulty_level_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->difficulty_level_id->Visible = false; // Disable update for API request
+            } else {
+                $this->difficulty_level_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_difficulty_level_id")) {
+            $this->difficulty_level_id->setOldValue($CurrentForm->getValue("o_difficulty_level_id"));
+        }
+    }
+
+    // Restore form values
+    public function restoreFormValues()
+    {
+        global $CurrentForm;
+        if (!$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->CurrentValue = $this->id->FormValue;
+        }
+        $this->destination_id->CurrentValue = $this->destination_id->FormValue;
+        $this->activity_name->CurrentValue = $this->activity_name->FormValue;
+        $this->duration->CurrentValue = $this->duration->FormValue;
+        $this->display_order->CurrentValue = $this->display_order->FormValue;
+        $this->created_at->CurrentValue = $this->created_at->FormValue;
+        $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
+        $this->difficulty_level_id->CurrentValue = $this->difficulty_level_id->FormValue;
     }
 
     /**
@@ -2066,9 +1933,7 @@ class TourismActivitiesList extends TourismActivities
         // Initialize URLs
         $this->ViewUrl = $this->getViewUrl();
         $this->EditUrl = $this->getEditUrl();
-        $this->InlineEditUrl = $this->getInlineEditUrl();
         $this->CopyUrl = $this->getCopyUrl();
-        $this->InlineCopyUrl = $this->getInlineCopyUrl();
         $this->DeleteUrl = $this->getDeleteUrl();
 
         // Call Row_Rendering event
@@ -2165,6 +2030,197 @@ class TourismActivitiesList extends TourismActivities
             // difficulty_level_id
             $this->difficulty_level_id->HrefValue = "";
             $this->difficulty_level_id->TooltipValue = "";
+        } elseif ($this->RowType == RowType::ADD) {
+            // id
+
+            // destination_id
+            $this->destination_id->setupEditAttributes();
+            if ($this->destination_id->getSessionValue() != "") {
+                $this->destination_id->CurrentValue = GetForeignKeyValue($this->destination_id->getSessionValue());
+                $this->destination_id->OldValue = $this->destination_id->CurrentValue;
+                $this->destination_id->ViewValue = $this->destination_id->CurrentValue;
+                $this->destination_id->ViewValue = FormatNumber($this->destination_id->ViewValue, $this->destination_id->formatPattern());
+            } else {
+                $this->destination_id->EditValue = $this->destination_id->CurrentValue;
+                $this->destination_id->PlaceHolder = RemoveHtml($this->destination_id->caption());
+                if (strval($this->destination_id->EditValue) != "" && is_numeric($this->destination_id->EditValue)) {
+                    $this->destination_id->EditValue = FormatNumber($this->destination_id->EditValue, null);
+                }
+            }
+
+            // activity_name
+            $this->activity_name->setupEditAttributes();
+            if (!$this->activity_name->Raw) {
+                $this->activity_name->CurrentValue = HtmlDecode($this->activity_name->CurrentValue);
+            }
+            $this->activity_name->EditValue = HtmlEncode($this->activity_name->CurrentValue);
+            $this->activity_name->PlaceHolder = RemoveHtml($this->activity_name->caption());
+
+            // duration
+            $this->duration->setupEditAttributes();
+            if (!$this->duration->Raw) {
+                $this->duration->CurrentValue = HtmlDecode($this->duration->CurrentValue);
+            }
+            $this->duration->EditValue = HtmlEncode($this->duration->CurrentValue);
+            $this->duration->PlaceHolder = RemoveHtml($this->duration->caption());
+
+            // display_order
+            $this->display_order->setupEditAttributes();
+            $this->display_order->EditValue = $this->display_order->CurrentValue;
+            $this->display_order->PlaceHolder = RemoveHtml($this->display_order->caption());
+            if (strval($this->display_order->EditValue) != "" && is_numeric($this->display_order->EditValue)) {
+                $this->display_order->EditValue = FormatNumber($this->display_order->EditValue, null);
+            }
+
+            // created_at
+
+            // difficulty_level_id
+            $this->difficulty_level_id->setupEditAttributes();
+            $curVal = trim(strval($this->difficulty_level_id->CurrentValue));
+            if ($curVal != "") {
+                $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->lookupCacheOption($curVal);
+            } else {
+                $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->Lookup !== null && is_array($this->difficulty_level_id->lookupOptions()) && count($this->difficulty_level_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->difficulty_level_id->ViewValue !== null) { // Load from cache
+                $this->difficulty_level_id->EditValue = array_values($this->difficulty_level_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->difficulty_level_id->CurrentValue, $this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->difficulty_level_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->difficulty_level_id->EditValue = $arwrk;
+            }
+            $this->difficulty_level_id->PlaceHolder = RemoveHtml($this->difficulty_level_id->caption());
+
+            // Add refer script
+
+            // id
+            $this->id->HrefValue = "";
+
+            // destination_id
+            $this->destination_id->HrefValue = "";
+
+            // activity_name
+            $this->activity_name->HrefValue = "";
+
+            // duration
+            $this->duration->HrefValue = "";
+
+            // display_order
+            $this->display_order->HrefValue = "";
+
+            // created_at
+            $this->created_at->HrefValue = "";
+
+            // difficulty_level_id
+            $this->difficulty_level_id->HrefValue = "";
+        } elseif ($this->RowType == RowType::EDIT) {
+            // id
+            $this->id->setupEditAttributes();
+            $this->id->EditValue = $this->id->CurrentValue;
+
+            // destination_id
+            $this->destination_id->setupEditAttributes();
+            if ($this->destination_id->getSessionValue() != "") {
+                $this->destination_id->CurrentValue = GetForeignKeyValue($this->destination_id->getSessionValue());
+                $this->destination_id->OldValue = $this->destination_id->CurrentValue;
+                $this->destination_id->ViewValue = $this->destination_id->CurrentValue;
+                $this->destination_id->ViewValue = FormatNumber($this->destination_id->ViewValue, $this->destination_id->formatPattern());
+            } else {
+                $this->destination_id->EditValue = $this->destination_id->CurrentValue;
+                $this->destination_id->PlaceHolder = RemoveHtml($this->destination_id->caption());
+                if (strval($this->destination_id->EditValue) != "" && is_numeric($this->destination_id->EditValue)) {
+                    $this->destination_id->EditValue = FormatNumber($this->destination_id->EditValue, null);
+                }
+            }
+
+            // activity_name
+            $this->activity_name->setupEditAttributes();
+            if (!$this->activity_name->Raw) {
+                $this->activity_name->CurrentValue = HtmlDecode($this->activity_name->CurrentValue);
+            }
+            $this->activity_name->EditValue = HtmlEncode($this->activity_name->CurrentValue);
+            $this->activity_name->PlaceHolder = RemoveHtml($this->activity_name->caption());
+
+            // duration
+            $this->duration->setupEditAttributes();
+            if (!$this->duration->Raw) {
+                $this->duration->CurrentValue = HtmlDecode($this->duration->CurrentValue);
+            }
+            $this->duration->EditValue = HtmlEncode($this->duration->CurrentValue);
+            $this->duration->PlaceHolder = RemoveHtml($this->duration->caption());
+
+            // display_order
+            $this->display_order->setupEditAttributes();
+            $this->display_order->EditValue = $this->display_order->CurrentValue;
+            $this->display_order->PlaceHolder = RemoveHtml($this->display_order->caption());
+            if (strval($this->display_order->EditValue) != "" && is_numeric($this->display_order->EditValue)) {
+                $this->display_order->EditValue = FormatNumber($this->display_order->EditValue, null);
+            }
+
+            // created_at
+
+            // difficulty_level_id
+            $this->difficulty_level_id->setupEditAttributes();
+            $curVal = trim(strval($this->difficulty_level_id->CurrentValue));
+            if ($curVal != "") {
+                $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->lookupCacheOption($curVal);
+            } else {
+                $this->difficulty_level_id->ViewValue = $this->difficulty_level_id->Lookup !== null && is_array($this->difficulty_level_id->lookupOptions()) && count($this->difficulty_level_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->difficulty_level_id->ViewValue !== null) { // Load from cache
+                $this->difficulty_level_id->EditValue = array_values($this->difficulty_level_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->difficulty_level_id->CurrentValue, $this->difficulty_level_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->difficulty_level_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->difficulty_level_id->EditValue = $arwrk;
+            }
+            $this->difficulty_level_id->PlaceHolder = RemoveHtml($this->difficulty_level_id->caption());
+
+            // Edit refer script
+
+            // id
+            $this->id->HrefValue = "";
+
+            // destination_id
+            $this->destination_id->HrefValue = "";
+
+            // activity_name
+            $this->activity_name->HrefValue = "";
+
+            // duration
+            $this->duration->HrefValue = "";
+
+            // display_order
+            $this->display_order->HrefValue = "";
+
+            // created_at
+            $this->created_at->HrefValue = "";
+
+            // difficulty_level_id
+            $this->difficulty_level_id->HrefValue = "";
+        }
+        if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
+            $this->setupFieldTitles();
         }
 
         // Call Row Rendered event
@@ -2173,154 +2229,375 @@ class TourismActivitiesList extends TourismActivities
         }
     }
 
-    // Set up search options
-    protected function setupSearchOptions()
+    // Validate form
+    protected function validateForm()
     {
         global $Language, $Security;
-        $pageUrl = $this->pageUrl(false);
-        $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
-        // Search button
-        $item = &$this->SearchOptions->add("searchtoggle");
-        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"ftourism_activitiessrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
-        $item->Visible = true;
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+        $validateForm = true;
+            if ($this->id->Visible && $this->id->Required) {
+                if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                    $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+                }
+            }
+            if ($this->destination_id->Visible && $this->destination_id->Required) {
+                if (!$this->destination_id->IsDetailKey && EmptyValue($this->destination_id->FormValue)) {
+                    $this->destination_id->addErrorMessage(str_replace("%s", $this->destination_id->caption(), $this->destination_id->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->destination_id->FormValue)) {
+                $this->destination_id->addErrorMessage($this->destination_id->getErrorMessage(false));
+            }
+            if ($this->activity_name->Visible && $this->activity_name->Required) {
+                if (!$this->activity_name->IsDetailKey && EmptyValue($this->activity_name->FormValue)) {
+                    $this->activity_name->addErrorMessage(str_replace("%s", $this->activity_name->caption(), $this->activity_name->RequiredErrorMessage));
+                }
+            }
+            if ($this->duration->Visible && $this->duration->Required) {
+                if (!$this->duration->IsDetailKey && EmptyValue($this->duration->FormValue)) {
+                    $this->duration->addErrorMessage(str_replace("%s", $this->duration->caption(), $this->duration->RequiredErrorMessage));
+                }
+            }
+            if ($this->display_order->Visible && $this->display_order->Required) {
+                if (!$this->display_order->IsDetailKey && EmptyValue($this->display_order->FormValue)) {
+                    $this->display_order->addErrorMessage(str_replace("%s", $this->display_order->caption(), $this->display_order->RequiredErrorMessage));
+                }
+            }
+            if (!CheckInteger($this->display_order->FormValue)) {
+                $this->display_order->addErrorMessage($this->display_order->getErrorMessage(false));
+            }
+            if ($this->created_at->Visible && $this->created_at->Required) {
+                if (!$this->created_at->IsDetailKey && EmptyValue($this->created_at->FormValue)) {
+                    $this->created_at->addErrorMessage(str_replace("%s", $this->created_at->caption(), $this->created_at->RequiredErrorMessage));
+                }
+            }
+            if ($this->difficulty_level_id->Visible && $this->difficulty_level_id->Required) {
+                if (!$this->difficulty_level_id->IsDetailKey && EmptyValue($this->difficulty_level_id->FormValue)) {
+                    $this->difficulty_level_id->addErrorMessage(str_replace("%s", $this->difficulty_level_id->caption(), $this->difficulty_level_id->RequiredErrorMessage));
+                }
+            }
 
-        // Show all button
-        $item = &$this->SearchOptions->add("showall");
-        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        // Return validate result
+        $validateForm = $validateForm && !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateForm;
+    }
+
+    // Delete records based on current filter
+    protected function deleteRows()
+    {
+        global $Language, $Security;
+        if (!$Security->canDelete()) {
+            $this->setFailureMessage($Language->phrase("NoDeletePermission")); // No delete permission
+            return false;
+        }
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $rows = $conn->fetchAllAssociative($sql);
+        if (count($rows) == 0) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
+            return false;
+        }
+
+        // Clone old rows
+        $rsold = $rows;
+        $successKeys = [];
+        $failKeys = [];
+        foreach ($rsold as $row) {
+            $thisKey = "";
+            if ($thisKey != "") {
+                $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
+            }
+            $thisKey .= $row['id'];
+
+            // Call row deleting event
+            $deleteRow = $this->rowDeleting($row);
+            if ($deleteRow) { // Delete
+                $deleteRow = $this->delete($row);
+                if (!$deleteRow && !EmptyValue($this->DbErrorMessage)) { // Show database error
+                    $this->setFailureMessage($this->DbErrorMessage);
+                }
+            }
+            if ($deleteRow === false) {
+                if ($this->UseTransaction) {
+                    $successKeys = []; // Reset success keys
+                    break;
+                }
+                $failKeys[] = $thisKey;
+            } else {
+                if (Config("DELETE_UPLOADED_FILES")) { // Delete old files
+                    $this->deleteUploadedFiles($row);
+                }
+
+                // Call Row Deleted event
+                $this->rowDeleted($row);
+                $successKeys[] = $thisKey;
+            }
+        }
+
+        // Any records deleted
+        $deleteRows = count($successKeys) > 0;
+        if (!$deleteRows) {
+            // Set up error message
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("DeleteCancelled"));
+            }
+        }
+        return $deleteRows;
+    }
+
+    // Update record based on key values
+    protected function editRow()
+    {
+        global $Security, $Language;
+        $oldKeyFilter = $this->getRecordFilter();
+        $filter = $this->applyUserIDFilters($oldKeyFilter);
+        $conn = $this->getConnection();
+
+        // Load old row
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $rsold = $conn->fetchAssociative($sql);
+        if (!$rsold) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
+            return false; // Update Failed
         } else {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+            // Load old values
+            $this->loadDbValues($rsold);
         }
-        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
 
-        // Button group for search
-        $this->SearchOptions->UseDropDownButton = false;
-        $this->SearchOptions->UseButtonGroup = true;
-        $this->SearchOptions->DropDownButtonPhrase = $Language->phrase("ButtonSearch");
+        // Get new row
+        $rsnew = $this->getEditRow($rsold);
 
-        // Add group option item
-        $item = &$this->SearchOptions->addGroupOption();
-        $item->Body = "";
-        $item->Visible = false;
+        // Update current values
+        $this->setCurrentValues($rsnew);
 
-        // Hide search options
-        if ($this->isExport() || $this->CurrentAction && $this->CurrentAction != "search") {
-            $this->SearchOptions->hideAllOptions();
+        // Call Row Updating event
+        $updateRow = $this->rowUpdating($rsold, $rsnew);
+        if ($updateRow) {
+            if (count($rsnew) > 0) {
+                $this->CurrentFilter = $filter; // Set up current filter
+                $editRow = $this->update($rsnew, "", $rsold);
+                if (!$editRow && !EmptyValue($this->DbErrorMessage)) { // Show database error
+                    $this->setFailureMessage($this->DbErrorMessage);
+                }
+            } else {
+                $editRow = true; // No field to update
+            }
+            if ($editRow) {
+            }
+        } else {
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("UpdateCancelled"));
+            }
+            $editRow = false;
         }
-        if (!$Security->canSearch()) {
-            $this->SearchOptions->hideAllOptions();
-            $this->FilterOptions->hideAllOptions();
+
+        // Call Row_Updated event
+        if ($editRow) {
+            $this->rowUpdated($rsold, $rsnew);
+        }
+        return $editRow;
+    }
+
+    /**
+     * Get edit row
+     *
+     * @return array
+     */
+    protected function getEditRow($rsold)
+    {
+        global $Security;
+        $rsnew = [];
+
+        // destination_id
+        if ($this->destination_id->getSessionValue() != "") {
+            $this->destination_id->ReadOnly = true;
+        }
+        $this->destination_id->setDbValueDef($rsnew, $this->destination_id->CurrentValue, $this->destination_id->ReadOnly);
+
+        // activity_name
+        $this->activity_name->setDbValueDef($rsnew, $this->activity_name->CurrentValue, $this->activity_name->ReadOnly);
+
+        // duration
+        $this->duration->setDbValueDef($rsnew, $this->duration->CurrentValue, $this->duration->ReadOnly);
+
+        // display_order
+        $this->display_order->setDbValueDef($rsnew, $this->display_order->CurrentValue, $this->display_order->ReadOnly);
+
+        // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
+        $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), $this->created_at->ReadOnly);
+
+        // difficulty_level_id
+        $this->difficulty_level_id->setDbValueDef($rsnew, $this->difficulty_level_id->CurrentValue, $this->difficulty_level_id->ReadOnly);
+        return $rsnew;
+    }
+
+    /**
+     * Restore edit form from row
+     * @param array $row Row
+     */
+    protected function restoreEditFormFromRow($row)
+    {
+        if (isset($row['destination_id'])) { // destination_id
+            $this->destination_id->CurrentValue = $row['destination_id'];
+        }
+        if (isset($row['activity_name'])) { // activity_name
+            $this->activity_name->CurrentValue = $row['activity_name'];
+        }
+        if (isset($row['duration'])) { // duration
+            $this->duration->CurrentValue = $row['duration'];
+        }
+        if (isset($row['display_order'])) { // display_order
+            $this->display_order->CurrentValue = $row['display_order'];
+        }
+        if (isset($row['created_at'])) { // created_at
+            $this->created_at->CurrentValue = $row['created_at'];
+        }
+        if (isset($row['difficulty_level_id'])) { // difficulty_level_id
+            $this->difficulty_level_id->CurrentValue = $row['difficulty_level_id'];
         }
     }
 
-    // Check if any search fields
-    public function hasSearchFields()
+    // Add record
+    protected function addRow($rsold = null)
     {
-        return true;
+        global $Language, $Security;
+
+        // Set up foreign key field value from Session
+        if ($this->getCurrentMasterTable() == "tourism_destinations") {
+            $this->destination_id->Visible = true; // Need to insert foreign key
+            $this->destination_id->CurrentValue = $this->destination_id->getSessionValue();
+        }
+
+        // Get new row
+        $rsnew = $this->getAddRow();
+
+        // Update current values
+        $this->setCurrentValues($rsnew);
+        $conn = $this->getConnection();
+
+        // Load db values from old row
+        $this->loadDbValues($rsold);
+
+        // Call Row Inserting event
+        $insertRow = $this->rowInserting($rsold, $rsnew);
+        if ($insertRow) {
+            $addRow = $this->insert($rsnew);
+            if ($addRow) {
+            } elseif (!EmptyValue($this->DbErrorMessage)) { // Show database error
+                $this->setFailureMessage($this->DbErrorMessage);
+            }
+        } else {
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("InsertCancelled"));
+            }
+            $addRow = false;
+        }
+        if ($addRow) {
+            // Call Row Inserted event
+            $this->rowInserted($rsold, $rsnew);
+        }
+        return $addRow;
     }
 
-    // Render search options
-    protected function renderSearchOptions()
+    /**
+     * Get add row
+     *
+     * @return array
+     */
+    protected function getAddRow()
     {
-        if (!$this->hasSearchFields() && $this->SearchOptions["searchtoggle"]) {
-            $this->SearchOptions["searchtoggle"]->Visible = false;
+        global $Security;
+        $rsnew = [];
+
+        // destination_id
+        $this->destination_id->setDbValueDef($rsnew, $this->destination_id->CurrentValue, false);
+
+        // activity_name
+        $this->activity_name->setDbValueDef($rsnew, $this->activity_name->CurrentValue, false);
+
+        // duration
+        $this->duration->setDbValueDef($rsnew, $this->duration->CurrentValue, false);
+
+        // display_order
+        $this->display_order->setDbValueDef($rsnew, $this->display_order->CurrentValue, strval($this->display_order->CurrentValue) == "");
+
+        // created_at
+        $this->created_at->CurrentValue = $this->created_at->getAutoUpdateValue(); // PHP
+        $this->created_at->setDbValueDef($rsnew, UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern()), false);
+
+        // difficulty_level_id
+        $this->difficulty_level_id->setDbValueDef($rsnew, $this->difficulty_level_id->CurrentValue, false);
+        return $rsnew;
+    }
+
+    /**
+     * Restore add form from row
+     * @param array $row Row
+     */
+    protected function restoreAddFormFromRow($row)
+    {
+        if (isset($row['destination_id'])) { // destination_id
+            $this->destination_id->setFormValue($row['destination_id']);
+        }
+        if (isset($row['activity_name'])) { // activity_name
+            $this->activity_name->setFormValue($row['activity_name']);
+        }
+        if (isset($row['duration'])) { // duration
+            $this->duration->setFormValue($row['duration']);
+        }
+        if (isset($row['display_order'])) { // display_order
+            $this->display_order->setFormValue($row['display_order']);
+        }
+        if (isset($row['created_at'])) { // created_at
+            $this->created_at->setFormValue($row['created_at']);
+        }
+        if (isset($row['difficulty_level_id'])) { // difficulty_level_id
+            $this->difficulty_level_id->setFormValue($row['difficulty_level_id']);
         }
     }
 
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "tourism_destinations") {
-                $validMaster = true;
-                $masterTbl = Container("tourism_destinations");
-                if (($parm = Get("fk_id", Get("destination_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->destination_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->destination_id->setSessionValue($this->destination_id->QueryStringValue);
-                    $foreignKeys["destination_id"] = $this->destination_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "tourism_destinations") {
-                $validMaster = true;
-                $masterTbl = Container("tourism_destinations");
-                if (($parm = Post("fk_id", Post("destination_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->destination_id->FormValue = $masterTbl->id->FormValue;
-                    $this->destination_id->setSessionValue($this->destination_id->FormValue);
-                    $foreignKeys["destination_id"] = $this->destination_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Update URL
-            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
-            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
-            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
-            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
-            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
-
-            // Set up Breadcrumb
-            if (!$this->isExport()) {
-                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
-            }
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "tourism_destinations") {
-                if (!array_key_exists("destination_id", $foreignKeys)) { // Not current foreign key
-                    $this->destination_id->setSessionValue("");
-                }
+        // Hide foreign keys
+        $masterTblVar = $this->getCurrentMasterTable();
+        if ($masterTblVar == "tourism_destinations") {
+            $masterTbl = Container("tourism_destinations");
+            $this->destination_id->Visible = false;
+            if ($masterTbl->EventCancelled) {
+                $this->EventCancelled = true;
             }
         }
         $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
         $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
-    }
-
-    // Set up Breadcrumb
-    protected function setupBreadcrumb()
-    {
-        global $Breadcrumb, $Language;
-        $Breadcrumb = new Breadcrumb("index");
-        $url = CurrentUrl();
-        $url = preg_replace('/\?cmd=reset(all){0,1}$/i', '', $url); // Remove cmd=reset(all)
-        $Breadcrumb->add("list", $this->TableVar, $url, "", $this->TableVar, true);
     }
 
     // Setup lookup options
@@ -2365,146 +2642,6 @@ class TourismActivitiesList extends TourismActivities
                 $fld->Lookup->Options = $ar;
             }
         }
-    }
-
-    // Set up starting record parameters
-    public function setupStartRecord()
-    {
-        if ($this->DisplayRecords == 0) {
-            return;
-        }
-        $pageNo = Get(Config("TABLE_PAGE_NUMBER"));
-        $startRec = Get(Config("TABLE_START_REC"));
-        $infiniteScroll = ConvertToBool(Param("infinitescroll"));
-        if ($pageNo !== null) { // Check for "pageno" parameter first
-            $pageNo = ParseInteger($pageNo);
-            if (is_numeric($pageNo)) {
-                $this->StartRecord = ($pageNo - 1) * $this->DisplayRecords + 1;
-                if ($this->StartRecord <= 0) {
-                    $this->StartRecord = 1;
-                } elseif ($this->StartRecord >= (int)(($this->TotalRecords - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1) {
-                    $this->StartRecord = (int)(($this->TotalRecords - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1;
-                }
-            }
-        } elseif ($startRec !== null && is_numeric($startRec)) { // Check for "start" parameter
-            $this->StartRecord = $startRec;
-        } elseif (!$infiniteScroll) {
-            $this->StartRecord = $this->getStartRecordNumber();
-        }
-
-        // Check if correct start record counter
-        if (!is_numeric($this->StartRecord) || intval($this->StartRecord) <= 0) { // Avoid invalid start record counter
-            $this->StartRecord = 1; // Reset start record counter
-        } elseif ($this->StartRecord > $this->TotalRecords) { // Avoid starting record > total records
-            $this->StartRecord = (int)(($this->TotalRecords - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1; // Point to last page first record
-        } elseif (($this->StartRecord - 1) % $this->DisplayRecords != 0) {
-            $this->StartRecord = (int)(($this->StartRecord - 1) / $this->DisplayRecords) * $this->DisplayRecords + 1; // Point to page boundary
-        }
-        if (!$infiniteScroll) {
-            $this->setStartRecordNumber($this->StartRecord);
-        }
-    }
-
-    // Get page count
-    public function pageCount() {
-        return ceil($this->TotalRecords / $this->DisplayRecords);
-    }
-
-    // Parse query builder rule
-    protected function parseRules($group, $fieldName = "", $itemName = "") {
-        $group["condition"] ??= "AND";
-        if (!in_array($group["condition"], ["AND", "OR"])) {
-            throw new \Exception("Unable to build SQL query with condition '" . $group["condition"] . "'");
-        }
-        if (!is_array($group["rules"] ?? null)) {
-            return "";
-        }
-        $parts = [];
-        foreach ($group["rules"] as $rule) {
-            if (is_array($rule["rules"] ?? null) && count($rule["rules"]) > 0) {
-                $part = $this->parseRules($rule, $fieldName, $itemName);
-                if ($part) {
-                    $parts[] = "(" . " " . $part . " " . ")" . " ";
-                }
-            } else {
-                $field = $rule["field"];
-                $fld = $this->fieldByParam($field);
-                $dbid = $this->Dbid;
-                if ($fld instanceof ReportField && is_array($fld->DashboardSearchSourceFields)) {
-                    $item = $fld->DashboardSearchSourceFields[$itemName] ?? null;
-                    if ($item) {
-                        $tbl = Container($item["table"]);
-                        $dbid = $tbl->Dbid;
-                        $fld = $tbl->Fields[$item["field"]];
-                    } else {
-                        $fld = null;
-                    }
-                }
-                if ($fld && ($fieldName == "" || $fld->Name == $fieldName)) { // Field name not specified or matched field name
-                    $fldOpr = array_search($rule["operator"], Config("CLIENT_SEARCH_OPERATORS"));
-                    $ope = Config("QUERY_BUILDER_OPERATORS")[$rule["operator"]] ?? null;
-                    if (!$ope || !$fldOpr) {
-                        throw new \Exception("Unknown SQL operation for operator '" . $rule["operator"] . "'");
-                    }
-                    if ($ope["nb_inputs"] > 0 && isset($rule["value"]) && !EmptyValue($rule["value"]) || IsNullOrEmptyOperator($fldOpr)) {
-                        $fldVal = $rule["value"];
-                        if (is_array($fldVal)) {
-                            $fldVal = $fld->isMultiSelect() ? implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal) : $fldVal[0];
-                        }
-                        $useFilter = $fld->UseFilter; // Query builder does not use filter
-                        try {
-                            if ($fld instanceof ReportField) { // Search report fields
-                                if ($fld->SearchType == "dropdown") {
-                                    if (is_array($fldVal)) {
-                                        $sql = "";
-                                        foreach ($fldVal as $val) {
-                                            AddFilter($sql, DropDownFilter($fld, $val, $fldOpr, $dbid), "OR");
-                                        }
-                                        $parts[] = $sql;
-                                    } else {
-                                        $parts[] = DropDownFilter($fld, $fldVal, $fldOpr, $dbid);
-                                    }
-                                } else {
-                                    $fld->AdvancedSearch->SearchOperator = $fldOpr;
-                                    $fld->AdvancedSearch->SearchValue = $fldVal;
-                                    $parts[] = GetReportFilter($fld, false, $dbid);
-                                }
-                            } else { // Search normal fields
-                                if ($fld->isMultiSelect()) {
-                                    $parts[] = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, ConvertSearchValue($fldVal, $fldOpr, $fld), $this->Dbid) : "";
-                                } else {
-                                    $fldVal2 = ContainsString($fldOpr, "BETWEEN") ? $rule["value"][1] : ""; // BETWEEN
-                                    if (is_array($fldVal2)) {
-                                        $fldVal2 = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal2);
-                                    }
-                                    $fld->AdvancedSearch->SearchValue = ConvertSearchValue($fldVal, $fldOpr, $fld);
-                                    $fld->AdvancedSearch->SearchValue2 = ConvertSearchValue($fldVal2, $fldOpr, $fld);
-                                    $parts[] = GetSearchSql(
-                                        $fld,
-                                        $fld->AdvancedSearch->SearchValue, // SearchValue
-                                        $fldOpr,
-                                        "", // $fldCond not used
-                                        $fld->AdvancedSearch->SearchValue2, // SearchValue2
-                                        "", // $fldOpr2 not used
-                                        $this->Dbid
-                                    );
-                                }
-                            }
-                        } finally {
-                            $fld->UseFilter = $useFilter;
-                        }
-                    }
-                }
-            }
-        }
-        $where = "";
-        foreach ($parts as $part) {
-            AddFilter($where, $part, $group["condition"]);
-        }
-        if ($where && ($group["not"] ?? false)) {
-            $where = "NOT (" . $where . ")";
-        }
-        return $where;
     }
 
     // Page Load event
@@ -2599,61 +2736,5 @@ class TourismActivitiesList extends TourismActivities
     {
         // Example:
         //$this->ListOptions["new"]->Body = "xxx";
-    }
-
-    // Row Custom Action event
-    public function rowCustomAction($action, $row)
-    {
-        // Return false to abort
-        return true;
-    }
-
-    // Page Exporting event
-    // $doc = export object
-    public function pageExporting(&$doc)
-    {
-        //$doc->Text = "my header"; // Export header
-        //return false; // Return false to skip default export and use Row_Export event
-        return true; // Return true to use default export and skip Row_Export event
-    }
-
-    // Row Export event
-    // $doc = export document object
-    public function rowExport($doc, $rs)
-    {
-        //$doc->Text .= "my content"; // Build HTML with field value: $rs["MyField"] or $this->MyField->ViewValue
-    }
-
-    // Page Exported event
-    // $doc = export document object
-    public function pageExported($doc)
-    {
-        //$doc->Text .= "my footer"; // Export footer
-        //Log($doc->Text);
-    }
-
-    // Page Importing event
-    public function pageImporting(&$builder, &$options)
-    {
-        //var_dump($options); // Show all options for importing
-        //$builder = fn($workflow) => $workflow->addStep($myStep);
-        //return false; // Return false to skip import
-        return true;
-    }
-
-    // Row Import event
-    public function rowImport(&$row, $cnt)
-    {
-        //Log($cnt); // Import record count
-        //var_dump($row); // Import row
-        //return false; // Return false to skip import
-        return true;
-    }
-
-    // Page Imported event
-    public function pageImported($obj, $results)
-    {
-        //var_dump($obj); // Workflow result object
-        //var_dump($results); // Import results
     }
 }

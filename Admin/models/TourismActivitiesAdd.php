@@ -549,6 +549,10 @@ class TourismActivitiesAdd extends TourismActivities
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
+        // Set up master/detail parameters
+        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
+        $this->setupMasterParms();
+
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
@@ -593,7 +597,7 @@ class TourismActivitiesAdd extends TourismActivities
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "TourismActivitiesList") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -953,10 +957,16 @@ class TourismActivitiesAdd extends TourismActivities
         } elseif ($this->RowType == RowType::ADD) {
             // destination_id
             $this->destination_id->setupEditAttributes();
-            $this->destination_id->EditValue = $this->destination_id->CurrentValue;
-            $this->destination_id->PlaceHolder = RemoveHtml($this->destination_id->caption());
-            if (strval($this->destination_id->EditValue) != "" && is_numeric($this->destination_id->EditValue)) {
-                $this->destination_id->EditValue = FormatNumber($this->destination_id->EditValue, null);
+            if ($this->destination_id->getSessionValue() != "") {
+                $this->destination_id->CurrentValue = GetForeignKeyValue($this->destination_id->getSessionValue());
+                $this->destination_id->ViewValue = $this->destination_id->CurrentValue;
+                $this->destination_id->ViewValue = FormatNumber($this->destination_id->ViewValue, $this->destination_id->formatPattern());
+            } else {
+                $this->destination_id->EditValue = $this->destination_id->CurrentValue;
+                $this->destination_id->PlaceHolder = RemoveHtml($this->destination_id->caption());
+                if (strval($this->destination_id->EditValue) != "" && is_numeric($this->destination_id->EditValue)) {
+                    $this->destination_id->EditValue = FormatNumber($this->destination_id->EditValue, null);
+                }
             }
 
             // activity_name
@@ -1223,6 +1233,78 @@ class TourismActivitiesAdd extends TourismActivities
         if (isset($row['difficulty_level_id'])) { // difficulty_level_id
             $this->difficulty_level_id->setFormValue($row['difficulty_level_id']);
         }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "tourism_destinations") {
+                $validMaster = true;
+                $masterTbl = Container("tourism_destinations");
+                if (($parm = Get("fk_id", Get("destination_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->destination_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->destination_id->setSessionValue($this->destination_id->QueryStringValue);
+                    $foreignKeys["destination_id"] = $this->destination_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "tourism_destinations") {
+                $validMaster = true;
+                $masterTbl = Container("tourism_destinations");
+                if (($parm = Post("fk_id", Post("destination_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->destination_id->FormValue = $masterTbl->id->FormValue;
+                    $this->destination_id->setSessionValue($this->destination_id->FormValue);
+                    $foreignKeys["destination_id"] = $this->destination_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "tourism_destinations") {
+                if (!array_key_exists("destination_id", $foreignKeys)) { // Not current foreign key
+                    $this->destination_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

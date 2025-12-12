@@ -231,6 +231,22 @@ loadjs.ready("head", function () {
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("tourism_activities", explode(",", $Page->getCurrentDetailTable())) && $tourism_activities->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("tourism_activities", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "TourismActivitiesGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("destination_gallery", explode(",", $Page->getCurrentDetailTable())) && $destination_gallery->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("destination_gallery", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "DestinationGalleryGrid.php" ?>
+<?php } ?>
 </form>
 </main>
 <?php

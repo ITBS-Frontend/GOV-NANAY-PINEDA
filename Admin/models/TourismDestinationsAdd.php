@@ -566,6 +566,9 @@ class TourismDestinationsAdd extends TourismDestinations
             $this->loadFormValues(); // Load form values
         }
 
+        // Set up detail parameters
+        $this->setupDetailParms();
+
         // Validate form if post back
         if ($postBack) {
             if (!$this->validateForm()) {
@@ -590,6 +593,9 @@ class TourismDestinationsAdd extends TourismDestinations
                     $this->terminate("TourismDestinationsList"); // No matching record, return to list
                     return;
                 }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "insert": // Add new record
                 $this->SendEmail = true; // Send email on add success
@@ -597,7 +603,11 @@ class TourismDestinationsAdd extends TourismDestinations
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    $returnUrl = $this->getReturnUrl();
+                    if ($this->getCurrentDetailTable() != "") { // Master/detail add
+                        $returnUrl = $this->getDetailUrl();
+                    } else {
+                        $returnUrl = $this->getReturnUrl();
+                    }
                     if (GetPageName($returnUrl) == "TourismDestinationsList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                     } elseif (GetPageName($returnUrl) == "TourismDestinationsView") {
@@ -630,6 +640,9 @@ class TourismDestinationsAdd extends TourismDestinations
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Add failed, restore form values
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -1434,6 +1447,19 @@ class TourismDestinationsAdd extends TourismDestinations
                 }
             }
 
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("TourismActivitiesGrid");
+        if (in_array("tourism_activities", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("DestinationGalleryGrid");
+        if (in_array("destination_gallery", $detailTblVar) && $detailPage->DetailAdd) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
 
@@ -1466,6 +1492,11 @@ class TourismDestinationsAdd extends TourismDestinations
         $this->setCurrentValues($rsnew);
         $conn = $this->getConnection();
 
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
+
         // Load db values from old row
         $this->loadDbValues($rsold);
         $this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
@@ -1496,6 +1527,48 @@ class TourismDestinationsAdd extends TourismDestinations
                 $this->setFailureMessage($Language->phrase("InsertCancelled"));
             }
             $addRow = false;
+        }
+
+        // Add detail records
+        if ($addRow) {
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("TourismActivitiesGrid");
+            if (in_array("tourism_activities", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->destination_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "tourism_activities"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->destination_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+            $detailPage = Container("DestinationGalleryGrid");
+            if (in_array("destination_gallery", $detailTblVar) && $detailPage->DetailAdd && $addRow) {
+                $detailPage->destination_id->setSessionValue($this->id->CurrentValue); // Set master key
+                $Security->loadCurrentUserLevel($this->ProjectID . "destination_gallery"); // Load user level of detail table
+                $addRow = $detailPage->gridInsert();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+                if (!$addRow) {
+                $detailPage->destination_id->setSessionValue(""); // Clear master key if insert failed
+                }
+            }
+        }
+
+        // Commit/Rollback transaction
+        if ($this->getCurrentDetailTable() != "") {
+            if ($addRow) {
+                if ($this->UseTransaction) { // Commit transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->commit();
+                    }
+                }
+            } else {
+                if ($this->UseTransaction) { // Rollback transaction
+                    if ($conn->isTransactionActive()) {
+                        $conn->rollback();
+                    }
+                }
+            }
         }
         if ($addRow) {
             // Call Row Inserted event
@@ -1634,6 +1707,59 @@ class TourismDestinationsAdd extends TourismDestinations
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->setFormValue($row['created_at']);
+        }
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("tourism_activities", $detailTblVar)) {
+                $detailPageObj = Container("TourismActivitiesGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->destination_id->IsDetailKey = true;
+                    $detailPageObj->destination_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->destination_id->setSessionValue($detailPageObj->destination_id->CurrentValue);
+                }
+            }
+            if (in_array("destination_gallery", $detailTblVar)) {
+                $detailPageObj = Container("DestinationGalleryGrid");
+                if ($detailPageObj->DetailAdd) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    if ($this->CopyRecord) {
+                        $detailPageObj->CurrentMode = "copy";
+                    } else {
+                        $detailPageObj->CurrentMode = "add";
+                    }
+                    $detailPageObj->CurrentAction = "gridadd";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->destination_id->IsDetailKey = true;
+                    $detailPageObj->destination_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->destination_id->setSessionValue($detailPageObj->destination_id->CurrentValue);
+                }
+            }
         }
     }
 

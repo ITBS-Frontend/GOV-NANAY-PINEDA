@@ -408,6 +408,9 @@ class DestinationGalleryDelete extends DestinationGallery
         // Set up lookup cache
         $this->setupLookupOptions($this->destination_id);
 
+        // Set up master/detail parameters
+        $this->setupMasterParms();
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -830,6 +833,79 @@ class DestinationGalleryDelete extends DestinationGallery
             WriteJson(["success" => true, "action" => Config("API_DELETE_ACTION"), $table => $rows]);
         }
         return $deleteRows;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "tourism_destinations") {
+                $validMaster = true;
+                $masterTbl = Container("tourism_destinations");
+                if (($parm = Get("fk_id", Get("destination_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->destination_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->destination_id->setSessionValue($this->destination_id->QueryStringValue);
+                    $foreignKeys["destination_id"] = $this->destination_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "tourism_destinations") {
+                $validMaster = true;
+                $masterTbl = Container("tourism_destinations");
+                if (($parm = Post("fk_id", Post("destination_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->destination_id->FormValue = $masterTbl->id->FormValue;
+                    $this->destination_id->setSessionValue($this->destination_id->FormValue);
+                    $foreignKeys["destination_id"] = $this->destination_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilterFromSession());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "tourism_destinations") {
+                if (!array_key_exists("destination_id", $foreignKeys)) { // Not current foreign key
+                    $this->destination_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

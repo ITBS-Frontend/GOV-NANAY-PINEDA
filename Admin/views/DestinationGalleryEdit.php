@@ -73,6 +73,10 @@ loadjs.ready("head", function () {
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "tourism_destinations") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="tourism_destinations">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->destination_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id"<?= $Page->id->rowAttributes() ?>>
@@ -90,6 +94,11 @@ loadjs.ready("head", function () {
     <div id="r_destination_id"<?= $Page->destination_id->rowAttributes() ?>>
         <label id="elh_destination_gallery_destination_id" for="x_destination_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->destination_id->caption() ?><?= $Page->destination_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->destination_id->cellAttributes() ?>>
+<?php if ($Page->destination_id->getSessionValue() != "") { ?>
+<span<?= $Page->destination_id->viewAttributes() ?>>
+<span class="form-control-plaintext"><?= $Page->destination_id->getDisplayValue($Page->destination_id->ViewValue) ?></span></span>
+<input type="hidden" id="x_destination_id" name="x_destination_id" value="<?= HtmlEncode($Page->destination_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_destination_gallery_destination_id">
     <select
         id="x_destination_id"
@@ -129,6 +138,7 @@ loadjs.ready("fdestination_galleryedit", function() {
 </script>
 <?php } ?>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

@@ -549,6 +549,10 @@ class DestinationGalleryAdd extends DestinationGallery
         // Load old record or default values
         $rsold = $this->loadOldRecord();
 
+        // Set up master/detail parameters
+        // NOTE: Must be after loadOldRecord to prevent master key values being overwritten
+        $this->setupMasterParms();
+
         // Load form values
         if ($postBack) {
             $this->loadFormValues(); // Load form values
@@ -593,7 +597,7 @@ class DestinationGalleryAdd extends DestinationGallery
                     }
 
                     // Handle UseAjaxActions with return page
-                    if ($this->IsModal && $this->UseAjaxActions) {
+                    if ($this->IsModal && $this->UseAjaxActions && !$this->getCurrentMasterTable()) {
                         $this->IsModal = false;
                         if (GetPageName($returnUrl) != "DestinationGalleryList") {
                             Container("app.flash")->addMessage("Return-Url", $returnUrl); // Save return URL
@@ -921,30 +925,55 @@ class DestinationGalleryAdd extends DestinationGallery
         } elseif ($this->RowType == RowType::ADD) {
             // destination_id
             $this->destination_id->setupEditAttributes();
-            $curVal = trim(strval($this->destination_id->CurrentValue));
-            if ($curVal != "") {
-                $this->destination_id->ViewValue = $this->destination_id->lookupCacheOption($curVal);
-            } else {
-                $this->destination_id->ViewValue = $this->destination_id->Lookup !== null && is_array($this->destination_id->lookupOptions()) && count($this->destination_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->destination_id->ViewValue !== null) { // Load from cache
-                $this->destination_id->EditValue = array_values($this->destination_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+            if ($this->destination_id->getSessionValue() != "") {
+                $this->destination_id->CurrentValue = GetForeignKeyValue($this->destination_id->getSessionValue());
+                $curVal = strval($this->destination_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->destination_id->ViewValue = $this->destination_id->lookupCacheOption($curVal);
+                    if ($this->destination_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = SearchFilter($this->destination_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->destination_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                        $sqlWrk = $this->destination_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $conn = Conn();
+                        $config = $conn->getConfiguration();
+                        $config->setResultCache($this->Cache);
+                        $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->destination_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->destination_id->ViewValue = $this->destination_id->displayValue($arwrk);
+                        } else {
+                            $this->destination_id->ViewValue = FormatNumber($this->destination_id->CurrentValue, $this->destination_id->formatPattern());
+                        }
+                    }
                 } else {
-                    $filterWrk = SearchFilter($this->destination_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->destination_id->CurrentValue, $this->destination_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $this->destination_id->ViewValue = null;
                 }
-                $sqlWrk = $this->destination_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->destination_id->EditValue = $arwrk;
+            } else {
+                $curVal = trim(strval($this->destination_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->destination_id->ViewValue = $this->destination_id->lookupCacheOption($curVal);
+                } else {
+                    $this->destination_id->ViewValue = $this->destination_id->Lookup !== null && is_array($this->destination_id->lookupOptions()) && count($this->destination_id->lookupOptions()) > 0 ? $curVal : null;
+                }
+                if ($this->destination_id->ViewValue !== null) { // Load from cache
+                    $this->destination_id->EditValue = array_values($this->destination_id->lookupOptions());
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = SearchFilter($this->destination_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->destination_id->CurrentValue, $this->destination_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    }
+                    $sqlWrk = $this->destination_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->destination_id->EditValue = $arwrk;
+                }
+                $this->destination_id->PlaceHolder = RemoveHtml($this->destination_id->caption());
             }
-            $this->destination_id->PlaceHolder = RemoveHtml($this->destination_id->caption());
 
             // image_path
             $this->image_path->setupEditAttributes();
@@ -1193,6 +1222,78 @@ class DestinationGalleryAdd extends DestinationGallery
         if (isset($row['created_at'])) { // created_at
             $this->created_at->setFormValue($row['created_at']);
         }
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        $foreignKeys = [];
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "tourism_destinations") {
+                $validMaster = true;
+                $masterTbl = Container("tourism_destinations");
+                if (($parm = Get("fk_id", Get("destination_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->destination_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
+                    $this->destination_id->setSessionValue($this->destination_id->QueryStringValue);
+                    $foreignKeys["destination_id"] = $this->destination_id->QueryStringValue;
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "tourism_destinations") {
+                $validMaster = true;
+                $masterTbl = Container("tourism_destinations");
+                if (($parm = Post("fk_id", Post("destination_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->destination_id->FormValue = $masterTbl->id->FormValue;
+                    $this->destination_id->setSessionValue($this->destination_id->FormValue);
+                    $foreignKeys["destination_id"] = $this->destination_id->FormValue;
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "tourism_destinations") {
+                if (!array_key_exists("destination_id", $foreignKeys)) { // Not current foreign key
+                    $this->destination_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
+        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

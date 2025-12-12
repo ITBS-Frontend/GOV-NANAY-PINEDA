@@ -73,16 +73,26 @@ $Page->showMessage();
 <input type="hidden" name="json" value="1">
 <?php } ?>
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "tourism_destinations") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="tourism_destinations">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->destination_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->destination_id->Visible) { // destination_id ?>
     <div id="r_destination_id"<?= $Page->destination_id->rowAttributes() ?>>
         <label id="elh_tourism_activities_destination_id" for="x_destination_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->destination_id->caption() ?><?= $Page->destination_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->destination_id->cellAttributes() ?>>
+<?php if ($Page->destination_id->getSessionValue() != "") { ?>
+<span<?= $Page->destination_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->destination_id->getDisplayValue($Page->destination_id->ViewValue))) ?>"></span>
+<input type="hidden" id="x_destination_id" name="x_destination_id" value="<?= HtmlEncode($Page->destination_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_tourism_activities_destination_id">
 <input type="<?= $Page->destination_id->getInputTextType() ?>" name="x_destination_id" id="x_destination_id" data-table="tourism_activities" data-field="x_destination_id" value="<?= $Page->destination_id->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->destination_id->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->destination_id->formatPattern()) ?>"<?= $Page->destination_id->editAttributes() ?> aria-describedby="x_destination_id_help">
 <?= $Page->destination_id->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->destination_id->getErrorMessage() ?></div>
 </span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

@@ -50,6 +50,15 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "tourism_destinations") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/TourismDestinationsMaster.php";
+    }
+}
+?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="ftourism_activitiessrch" id="ftourism_activitiessrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="ftourism_activitiessrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -131,6 +140,10 @@ $Page->showMessage();
 <input type="hidden" name="t" value="tourism_activities">
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "tourism_destinations" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="tourism_destinations">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->destination_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_tourism_activities" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>

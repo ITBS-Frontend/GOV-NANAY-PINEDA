@@ -130,6 +130,7 @@ class TourismDestinations extends DbTable
         $this->id->Raw = true;
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
@@ -545,6 +546,36 @@ class TourismDestinations extends DbTable
             }
             $field->setSort($fldSort);
         }
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")) ?? "";
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "tourism_activities") {
+            $detailUrl = Container("tourism_activities")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "destination_gallery") {
+            $detailUrl = Container("destination_gallery")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "TourismDestinationsList";
+        }
+        return $detailUrl;
     }
 
     // Render X Axis for chart
@@ -1190,7 +1221,11 @@ class TourismDestinations extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("TourismDestinationsEdit", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("TourismDestinationsEdit", $parm);
+        } else {
+            $url = $this->keyUrl("TourismDestinationsEdit", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -1204,7 +1239,11 @@ class TourismDestinations extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("TourismDestinationsAdd", $parm);
+        if ($parm != "") {
+            $url = $this->keyUrl("TourismDestinationsAdd", $parm);
+        } else {
+            $url = $this->keyUrl("TourismDestinationsAdd", Config("TABLE_SHOW_DETAIL") . "=");
+        }
         return $this->addMasterUrl($url);
     }
 

@@ -598,6 +598,9 @@ class TourismDestinationsEdit extends TourismDestinations
         // Process form if post back
         if ($postBack) {
             $this->loadFormValues(); // Get form values
+
+            // Set up detail parameters
+            $this->setupDetailParms();
         }
 
         // Validate form if post back
@@ -624,9 +627,16 @@ class TourismDestinationsEdit extends TourismDestinations
                         $this->terminate("TourismDestinationsList"); // No matching record, return to list
                         return;
                     }
+
+                // Set up detail parameters
+                $this->setupDetailParms();
                 break;
             case "update": // Update
-                $returnUrl = $this->getReturnUrl();
+                if ($this->getCurrentDetailTable() != "") { // Master/detail edit
+                    $returnUrl = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
+                } else {
+                    $returnUrl = $this->getReturnUrl();
+                }
                 if (GetPageName($returnUrl) == "TourismDestinationsList") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
@@ -665,6 +675,9 @@ class TourismDestinationsEdit extends TourismDestinations
                 } else {
                     $this->EventCancelled = true; // Event cancelled
                     $this->restoreFormValues(); // Restore form values if update failed
+
+                    // Set up detail parameters
+                    $this->setupDetailParms();
                 }
         }
 
@@ -1478,6 +1491,19 @@ class TourismDestinationsEdit extends TourismDestinations
                 }
             }
 
+        // Validate detail grid
+        $detailTblVar = explode(",", $this->getCurrentDetailTable());
+        $detailPage = Container("TourismActivitiesGrid");
+        if (in_array("tourism_activities", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+        $detailPage = Container("DestinationGalleryGrid");
+        if (in_array("destination_gallery", $detailTblVar) && $detailPage->DetailEdit) {
+            $detailPage->run();
+            $validateForm = $validateForm && $detailPage->validateGridForm();
+        }
+
         // Return validate result
         $validateForm = $validateForm && !$this->hasInvalidFields();
 
@@ -1515,6 +1541,11 @@ class TourismDestinationsEdit extends TourismDestinations
 
         // Update current values
         $this->setCurrentValues($rsnew);
+
+        // Begin transaction
+        if ($this->getCurrentDetailTable() != "" && $this->UseTransaction) {
+            $conn->beginTransaction();
+        }
         if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
             $this->featured_image->UploadPath = $this->featured_image->getUploadPath();
             if (!EmptyValue($this->featured_image->Upload->FileName)) {
@@ -1540,6 +1571,38 @@ class TourismDestinationsEdit extends TourismDestinations
                     if (!SaveUploadFiles($this->featured_image, $rsnew['featured_image'], false)) {
                         $this->setFailureMessage($Language->phrase("UploadError7"));
                         return false;
+                    }
+                }
+            }
+
+            // Update detail records
+            $detailTblVar = explode(",", $this->getCurrentDetailTable());
+            $detailPage = Container("TourismActivitiesGrid");
+            if (in_array("tourism_activities", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "tourism_activities"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
+            $detailPage = Container("DestinationGalleryGrid");
+            if (in_array("destination_gallery", $detailTblVar) && $detailPage->DetailEdit && $editRow) {
+                $Security->loadCurrentUserLevel($this->ProjectID . "destination_gallery"); // Load user level of detail table
+                $editRow = $detailPage->gridUpdate();
+                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
+            }
+
+            // Commit/Rollback transaction
+            if ($this->getCurrentDetailTable() != "") {
+                if ($editRow) {
+                    if ($this->UseTransaction) { // Commit transaction
+                        if ($conn->isTransactionActive()) {
+                            $conn->commit();
+                        }
+                    }
+                } else {
+                    if ($this->UseTransaction) { // Rollback transaction
+                        if ($conn->isTransactionActive()) {
+                            $conn->rollback();
+                        }
                     }
                 }
             }
@@ -1694,6 +1757,51 @@ class TourismDestinationsEdit extends TourismDestinations
         }
         if (isset($row['created_at'])) { // created_at
             $this->created_at->CurrentValue = $row['created_at'];
+        }
+    }
+
+    // Set up detail parms based on QueryString
+    protected function setupDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("tourism_activities", $detailTblVar)) {
+                $detailPageObj = Container("TourismActivitiesGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->destination_id->IsDetailKey = true;
+                    $detailPageObj->destination_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->destination_id->setSessionValue($detailPageObj->destination_id->CurrentValue);
+                }
+            }
+            if (in_array("destination_gallery", $detailTblVar)) {
+                $detailPageObj = Container("DestinationGalleryGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "edit";
+                    $detailPageObj->CurrentAction = "gridedit";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->destination_id->IsDetailKey = true;
+                    $detailPageObj->destination_id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->destination_id->setSessionValue($detailPageObj->destination_id->CurrentValue);
+                }
+            }
         }
     }
 

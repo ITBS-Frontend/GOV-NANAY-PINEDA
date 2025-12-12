@@ -314,6 +314,22 @@ loadjs.ready("ftourism_destinationsadd", function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("tourism_activities", explode(",", $Page->getCurrentDetailTable())) && $tourism_activities->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("tourism_activities", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "TourismActivitiesGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("destination_gallery", explode(",", $Page->getCurrentDetailTable())) && $destination_gallery->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("destination_gallery", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "DestinationGalleryGrid.php" ?>
+<?php } ?>
 <?= $Page->IsModal ? '<template class="ew-modal-buttons">' : '<div class="row ew-buttons">' ?><!-- buttons .row -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" form="ftourism_destinationsadd"><?= $Language->phrase("AddBtn") ?></button>
