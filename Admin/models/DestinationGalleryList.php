@@ -2093,6 +2093,8 @@ class DestinationGalleryList extends DestinationGallery
             // image_path
             $this->image_path->UploadPath = $this->image_path->getUploadPath(); // PHP
             if (!EmptyValue($this->image_path->Upload->DbValue)) {
+                $this->image_path->ImageWidth = 50;
+                $this->image_path->ImageHeight = 50;
                 $this->image_path->ImageAlt = $this->image_path->alt();
                 $this->image_path->ImageCssClass = "ew-image";
                 $this->image_path->ViewValue = $this->image_path->Upload->DbValue;

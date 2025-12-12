@@ -1089,6 +1089,8 @@ class TourismDestinationsAdd extends TourismDestinations
             // featured_image
             $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
             if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->ImageWidth = 50;
+                $this->featured_image->ImageHeight = 50;
                 $this->featured_image->ImageAlt = $this->featured_image->alt();
                 $this->featured_image->ImageCssClass = "ew-image";
                 $this->featured_image->ViewValue = $this->featured_image->Upload->DbValue;
@@ -1268,6 +1270,8 @@ class TourismDestinationsAdd extends TourismDestinations
             $this->featured_image->setupEditAttributes();
             $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
             if (!EmptyValue($this->featured_image->Upload->DbValue)) {
+                $this->featured_image->ImageWidth = 50;
+                $this->featured_image->ImageHeight = 50;
                 $this->featured_image->ImageAlt = $this->featured_image->alt();
                 $this->featured_image->ImageCssClass = "ew-image";
                 $this->featured_image->EditValue = $this->featured_image->Upload->DbValue;
