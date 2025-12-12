@@ -151,6 +151,7 @@ class NewsPostsList extends NewsPosts
         $this->excerpt->Visible = false;
         $this->_content->Visible = false;
         $this->category_id->setVisibility();
+        $this->news_type_id->Visible = false;
         $this->featured_image->setVisibility();
         $this->author_name->setVisibility();
         $this->is_featured->setVisibility();
@@ -159,7 +160,6 @@ class NewsPostsList extends NewsPosts
         $this->views_count->Visible = false;
         $this->created_at->Visible = false;
         $this->updated_at->Visible = false;
-        $this->news_type_id->Visible = false;
     }
 
     // Constructor
@@ -710,9 +710,9 @@ class NewsPostsList extends NewsPosts
 
         // Set up lookup cache
         $this->setupLookupOptions($this->category_id);
+        $this->setupLookupOptions($this->news_type_id);
         $this->setupLookupOptions($this->is_featured);
         $this->setupLookupOptions($this->is_published);
-        $this->setupLookupOptions($this->news_type_id);
 
         // Update form name to avoid conflict
         if ($this->IsModal) {
@@ -1056,6 +1056,7 @@ class NewsPostsList extends NewsPosts
         $filterList = Concat($filterList, $this->excerpt->AdvancedSearch->toJson(), ","); // Field excerpt
         $filterList = Concat($filterList, $this->_content->AdvancedSearch->toJson(), ","); // Field content
         $filterList = Concat($filterList, $this->category_id->AdvancedSearch->toJson(), ","); // Field category_id
+        $filterList = Concat($filterList, $this->news_type_id->AdvancedSearch->toJson(), ","); // Field news_type_id
         $filterList = Concat($filterList, $this->featured_image->AdvancedSearch->toJson(), ","); // Field featured_image
         $filterList = Concat($filterList, $this->author_name->AdvancedSearch->toJson(), ","); // Field author_name
         $filterList = Concat($filterList, $this->is_featured->AdvancedSearch->toJson(), ","); // Field is_featured
@@ -1064,7 +1065,6 @@ class NewsPostsList extends NewsPosts
         $filterList = Concat($filterList, $this->views_count->AdvancedSearch->toJson(), ","); // Field views_count
         $filterList = Concat($filterList, $this->created_at->AdvancedSearch->toJson(), ","); // Field created_at
         $filterList = Concat($filterList, $this->updated_at->AdvancedSearch->toJson(), ","); // Field updated_at
-        $filterList = Concat($filterList, $this->news_type_id->AdvancedSearch->toJson(), ","); // Field news_type_id
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1152,6 +1152,14 @@ class NewsPostsList extends NewsPosts
         $this->category_id->AdvancedSearch->SearchOperator2 = @$filter["w_category_id"];
         $this->category_id->AdvancedSearch->save();
 
+        // Field news_type_id
+        $this->news_type_id->AdvancedSearch->SearchValue = @$filter["x_news_type_id"];
+        $this->news_type_id->AdvancedSearch->SearchOperator = @$filter["z_news_type_id"];
+        $this->news_type_id->AdvancedSearch->SearchCondition = @$filter["v_news_type_id"];
+        $this->news_type_id->AdvancedSearch->SearchValue2 = @$filter["y_news_type_id"];
+        $this->news_type_id->AdvancedSearch->SearchOperator2 = @$filter["w_news_type_id"];
+        $this->news_type_id->AdvancedSearch->save();
+
         // Field featured_image
         $this->featured_image->AdvancedSearch->SearchValue = @$filter["x_featured_image"];
         $this->featured_image->AdvancedSearch->SearchOperator = @$filter["z_featured_image"];
@@ -1215,14 +1223,6 @@ class NewsPostsList extends NewsPosts
         $this->updated_at->AdvancedSearch->SearchValue2 = @$filter["y_updated_at"];
         $this->updated_at->AdvancedSearch->SearchOperator2 = @$filter["w_updated_at"];
         $this->updated_at->AdvancedSearch->save();
-
-        // Field news_type_id
-        $this->news_type_id->AdvancedSearch->SearchValue = @$filter["x_news_type_id"];
-        $this->news_type_id->AdvancedSearch->SearchOperator = @$filter["z_news_type_id"];
-        $this->news_type_id->AdvancedSearch->SearchCondition = @$filter["v_news_type_id"];
-        $this->news_type_id->AdvancedSearch->SearchValue2 = @$filter["y_news_type_id"];
-        $this->news_type_id->AdvancedSearch->SearchOperator2 = @$filter["w_news_type_id"];
-        $this->news_type_id->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1384,6 +1384,7 @@ class NewsPostsList extends NewsPosts
                 $this->excerpt->setSort("");
                 $this->_content->setSort("");
                 $this->category_id->setSort("");
+                $this->news_type_id->setSort("");
                 $this->featured_image->setSort("");
                 $this->author_name->setSort("");
                 $this->is_featured->setSort("");
@@ -1392,7 +1393,6 @@ class NewsPostsList extends NewsPosts
                 $this->views_count->setSort("");
                 $this->created_at->setSort("");
                 $this->updated_at->setSort("");
-                $this->news_type_id->setSort("");
             }
 
             // Reset start position
@@ -2203,6 +2203,7 @@ class NewsPostsList extends NewsPosts
         $this->excerpt->setDbValue($row['excerpt']);
         $this->_content->setDbValue($row['content']);
         $this->category_id->setDbValue($row['category_id']);
+        $this->news_type_id->setDbValue($row['news_type_id']);
         $this->featured_image->Upload->DbValue = $row['featured_image'];
         $this->featured_image->setDbValue($this->featured_image->Upload->DbValue);
         $this->author_name->setDbValue($row['author_name']);
@@ -2212,7 +2213,6 @@ class NewsPostsList extends NewsPosts
         $this->views_count->setDbValue($row['views_count']);
         $this->created_at->setDbValue($row['created_at']);
         $this->updated_at->setDbValue($row['updated_at']);
-        $this->news_type_id->setDbValue($row['news_type_id']);
     }
 
     // Return a row with default values
@@ -2225,6 +2225,7 @@ class NewsPostsList extends NewsPosts
         $row['excerpt'] = $this->excerpt->DefaultValue;
         $row['content'] = $this->_content->DefaultValue;
         $row['category_id'] = $this->category_id->DefaultValue;
+        $row['news_type_id'] = $this->news_type_id->DefaultValue;
         $row['featured_image'] = $this->featured_image->DefaultValue;
         $row['author_name'] = $this->author_name->DefaultValue;
         $row['is_featured'] = $this->is_featured->DefaultValue;
@@ -2233,7 +2234,6 @@ class NewsPostsList extends NewsPosts
         $row['views_count'] = $this->views_count->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
         $row['updated_at'] = $this->updated_at->DefaultValue;
-        $row['news_type_id'] = $this->news_type_id->DefaultValue;
         return $row;
     }
 
@@ -2286,6 +2286,8 @@ class NewsPostsList extends NewsPosts
 
         // category_id
 
+        // news_type_id
+
         // featured_image
 
         // author_name
@@ -2301,8 +2303,6 @@ class NewsPostsList extends NewsPosts
         // created_at
 
         // updated_at
-
-        // news_type_id
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -2336,6 +2336,29 @@ class NewsPostsList extends NewsPosts
                 }
             } else {
                 $this->category_id->ViewValue = null;
+            }
+
+            // news_type_id
+            $curVal = strval($this->news_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->news_type_id->ViewValue = $this->news_type_id->lookupCacheOption($curVal);
+                if ($this->news_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->news_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->news_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->news_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->news_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->news_type_id->ViewValue = $this->news_type_id->displayValue($arwrk);
+                    } else {
+                        $this->news_type_id->ViewValue = FormatNumber($this->news_type_id->CurrentValue, $this->news_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->news_type_id->ViewValue = null;
             }
 
             // featured_image
@@ -2382,29 +2405,6 @@ class NewsPostsList extends NewsPosts
             // updated_at
             $this->updated_at->ViewValue = $this->updated_at->CurrentValue;
             $this->updated_at->ViewValue = FormatDateTime($this->updated_at->ViewValue, $this->updated_at->formatPattern());
-
-            // news_type_id
-            $curVal = strval($this->news_type_id->CurrentValue);
-            if ($curVal != "") {
-                $this->news_type_id->ViewValue = $this->news_type_id->lookupCacheOption($curVal);
-                if ($this->news_type_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->news_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->news_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->news_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->news_type_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->news_type_id->ViewValue = $this->news_type_id->displayValue($arwrk);
-                    } else {
-                        $this->news_type_id->ViewValue = FormatNumber($this->news_type_id->CurrentValue, $this->news_type_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->news_type_id->ViewValue = null;
-            }
 
             // id
             $this->id->HrefValue = "";
@@ -2543,11 +2543,11 @@ class NewsPostsList extends NewsPosts
             switch ($fld->FieldVar) {
                 case "x_category_id":
                     break;
+                case "x_news_type_id":
+                    break;
                 case "x_is_featured":
                     break;
                 case "x_is_published":
-                    break;
-                case "x_news_type_id":
                     break;
                 default:
                     $lookupFilter = "";

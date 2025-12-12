@@ -127,6 +127,7 @@ class NewsPostsAdd extends NewsPosts
         $this->excerpt->setVisibility();
         $this->_content->setVisibility();
         $this->category_id->setVisibility();
+        $this->news_type_id->setVisibility();
         $this->featured_image->setVisibility();
         $this->author_name->setVisibility();
         $this->is_featured->setVisibility();
@@ -135,7 +136,6 @@ class NewsPostsAdd extends NewsPosts
         $this->views_count->setVisibility();
         $this->created_at->setVisibility();
         $this->updated_at->setVisibility();
-        $this->news_type_id->setVisibility();
     }
 
     // Constructor
@@ -521,9 +521,9 @@ class NewsPostsAdd extends NewsPosts
 
         // Set up lookup cache
         $this->setupLookupOptions($this->category_id);
+        $this->setupLookupOptions($this->news_type_id);
         $this->setupLookupOptions($this->is_featured);
         $this->setupLookupOptions($this->is_published);
-        $this->setupLookupOptions($this->news_type_id);
 
         // Load default values for add
         $this->loadDefaultValues();
@@ -754,6 +754,16 @@ class NewsPostsAdd extends NewsPosts
             }
         }
 
+        // Check field name 'news_type_id' first before field var 'x_news_type_id'
+        $val = $CurrentForm->hasValue("news_type_id") ? $CurrentForm->getValue("news_type_id") : $CurrentForm->getValue("x_news_type_id");
+        if (!$this->news_type_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->news_type_id->Visible = false; // Disable update for API request
+            } else {
+                $this->news_type_id->setFormValue($val);
+            }
+        }
+
         // Check field name 'author_name' first before field var 'x_author_name'
         $val = $CurrentForm->hasValue("author_name") ? $CurrentForm->getValue("author_name") : $CurrentForm->getValue("x_author_name");
         if (!$this->author_name->IsDetailKey) {
@@ -827,16 +837,6 @@ class NewsPostsAdd extends NewsPosts
             $this->updated_at->CurrentValue = UnFormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern());
         }
 
-        // Check field name 'news_type_id' first before field var 'x_news_type_id'
-        $val = $CurrentForm->hasValue("news_type_id") ? $CurrentForm->getValue("news_type_id") : $CurrentForm->getValue("x_news_type_id");
-        if (!$this->news_type_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->news_type_id->Visible = false; // Disable update for API request
-            } else {
-                $this->news_type_id->setFormValue($val);
-            }
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
 		$this->featured_image->OldUploadPath = $this->featured_image->getUploadPath(); // PHP
@@ -853,6 +853,7 @@ class NewsPostsAdd extends NewsPosts
         $this->excerpt->CurrentValue = $this->excerpt->FormValue;
         $this->_content->CurrentValue = $this->_content->FormValue;
         $this->category_id->CurrentValue = $this->category_id->FormValue;
+        $this->news_type_id->CurrentValue = $this->news_type_id->FormValue;
         $this->author_name->CurrentValue = $this->author_name->FormValue;
         $this->is_featured->CurrentValue = $this->is_featured->FormValue;
         $this->is_published->CurrentValue = $this->is_published->FormValue;
@@ -863,7 +864,6 @@ class NewsPostsAdd extends NewsPosts
         $this->created_at->CurrentValue = UnFormatDateTime($this->created_at->CurrentValue, $this->created_at->formatPattern());
         $this->updated_at->CurrentValue = $this->updated_at->FormValue;
         $this->updated_at->CurrentValue = UnFormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern());
-        $this->news_type_id->CurrentValue = $this->news_type_id->FormValue;
     }
 
     /**
@@ -910,6 +910,7 @@ class NewsPostsAdd extends NewsPosts
         $this->excerpt->setDbValue($row['excerpt']);
         $this->_content->setDbValue($row['content']);
         $this->category_id->setDbValue($row['category_id']);
+        $this->news_type_id->setDbValue($row['news_type_id']);
         $this->featured_image->Upload->DbValue = $row['featured_image'];
         $this->featured_image->setDbValue($this->featured_image->Upload->DbValue);
         $this->author_name->setDbValue($row['author_name']);
@@ -919,7 +920,6 @@ class NewsPostsAdd extends NewsPosts
         $this->views_count->setDbValue($row['views_count']);
         $this->created_at->setDbValue($row['created_at']);
         $this->updated_at->setDbValue($row['updated_at']);
-        $this->news_type_id->setDbValue($row['news_type_id']);
     }
 
     // Return a row with default values
@@ -932,6 +932,7 @@ class NewsPostsAdd extends NewsPosts
         $row['excerpt'] = $this->excerpt->DefaultValue;
         $row['content'] = $this->_content->DefaultValue;
         $row['category_id'] = $this->category_id->DefaultValue;
+        $row['news_type_id'] = $this->news_type_id->DefaultValue;
         $row['featured_image'] = $this->featured_image->DefaultValue;
         $row['author_name'] = $this->author_name->DefaultValue;
         $row['is_featured'] = $this->is_featured->DefaultValue;
@@ -940,7 +941,6 @@ class NewsPostsAdd extends NewsPosts
         $row['views_count'] = $this->views_count->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
         $row['updated_at'] = $this->updated_at->DefaultValue;
-        $row['news_type_id'] = $this->news_type_id->DefaultValue;
         return $row;
     }
 
@@ -993,6 +993,9 @@ class NewsPostsAdd extends NewsPosts
         // category_id
         $this->category_id->RowCssClass = "row";
 
+        // news_type_id
+        $this->news_type_id->RowCssClass = "row";
+
         // featured_image
         $this->featured_image->RowCssClass = "row";
 
@@ -1016,9 +1019,6 @@ class NewsPostsAdd extends NewsPosts
 
         // updated_at
         $this->updated_at->RowCssClass = "row";
-
-        // news_type_id
-        $this->news_type_id->RowCssClass = "row";
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1058,6 +1058,29 @@ class NewsPostsAdd extends NewsPosts
                 }
             } else {
                 $this->category_id->ViewValue = null;
+            }
+
+            // news_type_id
+            $curVal = strval($this->news_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->news_type_id->ViewValue = $this->news_type_id->lookupCacheOption($curVal);
+                if ($this->news_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->news_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->news_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->news_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->news_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->news_type_id->ViewValue = $this->news_type_id->displayValue($arwrk);
+                    } else {
+                        $this->news_type_id->ViewValue = FormatNumber($this->news_type_id->CurrentValue, $this->news_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->news_type_id->ViewValue = null;
             }
 
             // featured_image
@@ -1105,29 +1128,6 @@ class NewsPostsAdd extends NewsPosts
             $this->updated_at->ViewValue = $this->updated_at->CurrentValue;
             $this->updated_at->ViewValue = FormatDateTime($this->updated_at->ViewValue, $this->updated_at->formatPattern());
 
-            // news_type_id
-            $curVal = strval($this->news_type_id->CurrentValue);
-            if ($curVal != "") {
-                $this->news_type_id->ViewValue = $this->news_type_id->lookupCacheOption($curVal);
-                if ($this->news_type_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->news_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->news_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->news_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->news_type_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->news_type_id->ViewValue = $this->news_type_id->displayValue($arwrk);
-                    } else {
-                        $this->news_type_id->ViewValue = FormatNumber($this->news_type_id->CurrentValue, $this->news_type_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->news_type_id->ViewValue = null;
-            }
-
             // title
             $this->_title->HrefValue = "";
 
@@ -1142,6 +1142,9 @@ class NewsPostsAdd extends NewsPosts
 
             // category_id
             $this->category_id->HrefValue = "";
+
+            // news_type_id
+            $this->news_type_id->HrefValue = "";
 
             // featured_image
             $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
@@ -1176,9 +1179,6 @@ class NewsPostsAdd extends NewsPosts
 
             // updated_at
             $this->updated_at->HrefValue = "";
-
-            // news_type_id
-            $this->news_type_id->HrefValue = "";
         } elseif ($this->RowType == RowType::ADD) {
             // title
             $this->_title->setupEditAttributes();
@@ -1232,6 +1232,33 @@ class NewsPostsAdd extends NewsPosts
                 $this->category_id->EditValue = $arwrk;
             }
             $this->category_id->PlaceHolder = RemoveHtml($this->category_id->caption());
+
+            // news_type_id
+            $this->news_type_id->setupEditAttributes();
+            $curVal = trim(strval($this->news_type_id->CurrentValue));
+            if ($curVal != "") {
+                $this->news_type_id->ViewValue = $this->news_type_id->lookupCacheOption($curVal);
+            } else {
+                $this->news_type_id->ViewValue = $this->news_type_id->Lookup !== null && is_array($this->news_type_id->lookupOptions()) && count($this->news_type_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->news_type_id->ViewValue !== null) { // Load from cache
+                $this->news_type_id->EditValue = array_values($this->news_type_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->news_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->news_type_id->CurrentValue, $this->news_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->news_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->news_type_id->EditValue = $arwrk;
+            }
+            $this->news_type_id->PlaceHolder = RemoveHtml($this->news_type_id->caption());
 
             // featured_image
             $this->featured_image->setupEditAttributes();
@@ -1288,33 +1315,6 @@ class NewsPostsAdd extends NewsPosts
 
             // updated_at
 
-            // news_type_id
-            $this->news_type_id->setupEditAttributes();
-            $curVal = trim(strval($this->news_type_id->CurrentValue));
-            if ($curVal != "") {
-                $this->news_type_id->ViewValue = $this->news_type_id->lookupCacheOption($curVal);
-            } else {
-                $this->news_type_id->ViewValue = $this->news_type_id->Lookup !== null && is_array($this->news_type_id->lookupOptions()) && count($this->news_type_id->lookupOptions()) > 0 ? $curVal : null;
-            }
-            if ($this->news_type_id->ViewValue !== null) { // Load from cache
-                $this->news_type_id->EditValue = array_values($this->news_type_id->lookupOptions());
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = SearchFilter($this->news_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->news_type_id->CurrentValue, $this->news_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                }
-                $sqlWrk = $this->news_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $conn = Conn();
-                $config = $conn->getConfiguration();
-                $config->setResultCache($this->Cache);
-                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->news_type_id->EditValue = $arwrk;
-            }
-            $this->news_type_id->PlaceHolder = RemoveHtml($this->news_type_id->caption());
-
             // Add refer script
 
             // title
@@ -1331,6 +1331,9 @@ class NewsPostsAdd extends NewsPosts
 
             // category_id
             $this->category_id->HrefValue = "";
+
+            // news_type_id
+            $this->news_type_id->HrefValue = "";
 
             // featured_image
             $this->featured_image->UploadPath = $this->featured_image->getUploadPath(); // PHP
@@ -1365,9 +1368,6 @@ class NewsPostsAdd extends NewsPosts
 
             // updated_at
             $this->updated_at->HrefValue = "";
-
-            // news_type_id
-            $this->news_type_id->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1414,6 +1414,11 @@ class NewsPostsAdd extends NewsPosts
                     $this->category_id->addErrorMessage(str_replace("%s", $this->category_id->caption(), $this->category_id->RequiredErrorMessage));
                 }
             }
+            if ($this->news_type_id->Visible && $this->news_type_id->Required) {
+                if (!$this->news_type_id->IsDetailKey && EmptyValue($this->news_type_id->FormValue)) {
+                    $this->news_type_id->addErrorMessage(str_replace("%s", $this->news_type_id->caption(), $this->news_type_id->RequiredErrorMessage));
+                }
+            }
             if ($this->featured_image->Visible && $this->featured_image->Required) {
                 if ($this->featured_image->Upload->FileName == "" && !$this->featured_image->Upload->KeepFile) {
                     $this->featured_image->addErrorMessage(str_replace("%s", $this->featured_image->caption(), $this->featured_image->RequiredErrorMessage));
@@ -1458,11 +1463,6 @@ class NewsPostsAdd extends NewsPosts
             if ($this->updated_at->Visible && $this->updated_at->Required) {
                 if (!$this->updated_at->IsDetailKey && EmptyValue($this->updated_at->FormValue)) {
                     $this->updated_at->addErrorMessage(str_replace("%s", $this->updated_at->caption(), $this->updated_at->RequiredErrorMessage));
-                }
-            }
-            if ($this->news_type_id->Visible && $this->news_type_id->Required) {
-                if (!$this->news_type_id->IsDetailKey && EmptyValue($this->news_type_id->FormValue)) {
-                    $this->news_type_id->addErrorMessage(str_replace("%s", $this->news_type_id->caption(), $this->news_type_id->RequiredErrorMessage));
                 }
             }
 
@@ -1623,6 +1623,9 @@ class NewsPostsAdd extends NewsPosts
         // category_id
         $this->category_id->setDbValueDef($rsnew, $this->category_id->CurrentValue, false);
 
+        // news_type_id
+        $this->news_type_id->setDbValueDef($rsnew, $this->news_type_id->CurrentValue, false);
+
         // featured_image
         if ($this->featured_image->Visible && !$this->featured_image->Upload->KeepFile) {
             if ($this->featured_image->Upload->FileName == "") {
@@ -1663,9 +1666,6 @@ class NewsPostsAdd extends NewsPosts
         // updated_at
         $this->updated_at->CurrentValue = $this->updated_at->getAutoUpdateValue(); // PHP
         $this->updated_at->setDbValueDef($rsnew, UnFormatDateTime($this->updated_at->CurrentValue, $this->updated_at->formatPattern()), false);
-
-        // news_type_id
-        $this->news_type_id->setDbValueDef($rsnew, $this->news_type_id->CurrentValue, false);
         return $rsnew;
     }
 
@@ -1690,6 +1690,9 @@ class NewsPostsAdd extends NewsPosts
         if (isset($row['category_id'])) { // category_id
             $this->category_id->setFormValue($row['category_id']);
         }
+        if (isset($row['news_type_id'])) { // news_type_id
+            $this->news_type_id->setFormValue($row['news_type_id']);
+        }
         if (isset($row['featured_image'])) { // featured_image
             $this->featured_image->setFormValue($row['featured_image']);
         }
@@ -1713,9 +1716,6 @@ class NewsPostsAdd extends NewsPosts
         }
         if (isset($row['updated_at'])) { // updated_at
             $this->updated_at->setFormValue($row['updated_at']);
-        }
-        if (isset($row['news_type_id'])) { // news_type_id
-            $this->news_type_id->setFormValue($row['news_type_id']);
         }
     }
 
@@ -1779,11 +1779,11 @@ class NewsPostsAdd extends NewsPosts
             switch ($fld->FieldVar) {
                 case "x_category_id":
                     break;
+                case "x_news_type_id":
+                    break;
                 case "x_is_featured":
                     break;
                 case "x_is_published":
-                    break;
-                case "x_news_type_id":
                     break;
                 default:
                     $lookupFilter = "";

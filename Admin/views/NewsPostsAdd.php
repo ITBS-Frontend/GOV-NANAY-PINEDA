@@ -27,6 +27,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["excerpt", [fields.excerpt.visible && fields.excerpt.required ? ew.Validators.required(fields.excerpt.caption) : null], fields.excerpt.isInvalid],
             ["_content", [fields._content.visible && fields._content.required ? ew.Validators.required(fields._content.caption) : null], fields._content.isInvalid],
             ["category_id", [fields.category_id.visible && fields.category_id.required ? ew.Validators.required(fields.category_id.caption) : null], fields.category_id.isInvalid],
+            ["news_type_id", [fields.news_type_id.visible && fields.news_type_id.required ? ew.Validators.required(fields.news_type_id.caption) : null], fields.news_type_id.isInvalid],
             ["featured_image", [fields.featured_image.visible && fields.featured_image.required ? ew.Validators.fileRequired(fields.featured_image.caption) : null], fields.featured_image.isInvalid],
             ["author_name", [fields.author_name.visible && fields.author_name.required ? ew.Validators.required(fields.author_name.caption) : null], fields.author_name.isInvalid],
             ["is_featured", [fields.is_featured.visible && fields.is_featured.required ? ew.Validators.required(fields.is_featured.caption) : null], fields.is_featured.isInvalid],
@@ -34,8 +35,7 @@ loadjs.ready(["wrapper", "head"], function () {
             ["published_date", [fields.published_date.visible && fields.published_date.required ? ew.Validators.required(fields.published_date.caption) : null, ew.Validators.datetime(fields.published_date.clientFormatPattern)], fields.published_date.isInvalid],
             ["views_count", [fields.views_count.visible && fields.views_count.required ? ew.Validators.required(fields.views_count.caption) : null, ew.Validators.integer], fields.views_count.isInvalid],
             ["created_at", [fields.created_at.visible && fields.created_at.required ? ew.Validators.required(fields.created_at.caption) : null], fields.created_at.isInvalid],
-            ["updated_at", [fields.updated_at.visible && fields.updated_at.required ? ew.Validators.required(fields.updated_at.caption) : null], fields.updated_at.isInvalid],
-            ["news_type_id", [fields.news_type_id.visible && fields.news_type_id.required ? ew.Validators.required(fields.news_type_id.caption) : null], fields.news_type_id.isInvalid]
+            ["updated_at", [fields.updated_at.visible && fields.updated_at.required ? ew.Validators.required(fields.updated_at.caption) : null], fields.updated_at.isInvalid]
         ])
 
         // Form_CustomValidate
@@ -52,9 +52,9 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "category_id": <?= $Page->category_id->toClientList($Page) ?>,
+            "news_type_id": <?= $Page->news_type_id->toClientList($Page) ?>,
             "is_featured": <?= $Page->is_featured->toClientList($Page) ?>,
             "is_published": <?= $Page->is_published->toClientList($Page) ?>,
-            "news_type_id": <?= $Page->news_type_id->toClientList($Page) ?>,
         })
         .build();
     window[form.id] = form;
@@ -122,12 +122,18 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->_content->Visible) { // content ?>
     <div id="r__content"<?= $Page->_content->rowAttributes() ?>>
-        <label id="elh_news_posts__content" for="x__content" class="<?= $Page->LeftColumnClass ?>"><?= $Page->_content->caption() ?><?= $Page->_content->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_news_posts__content" class="<?= $Page->LeftColumnClass ?>"><?= $Page->_content->caption() ?><?= $Page->_content->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->_content->cellAttributes() ?>>
 <span id="el_news_posts__content">
+<?php $Page->_content->EditAttrs->appendClass("editor"); ?>
 <textarea data-table="news_posts" data-field="x__content" name="x__content" id="x__content" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->_content->getPlaceHolder()) ?>"<?= $Page->_content->editAttributes() ?> aria-describedby="x__content_help"><?= $Page->_content->EditValue ?></textarea>
 <?= $Page->_content->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->_content->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fnews_postsadd", "editor"], function() {
+    ew.createEditor("fnews_postsadd", "x__content", 35, 4, <?= $Page->_content->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 </div></div>
     </div>
@@ -170,6 +176,52 @@ loadjs.ready("fnews_postsadd", function() {
     }
     options.minimumResultsForSearch = Infinity;
     options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.news_posts.fields.category_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->news_type_id->Visible) { // news_type_id ?>
+    <div id="r_news_type_id"<?= $Page->news_type_id->rowAttributes() ?>>
+        <label id="elh_news_posts_news_type_id" for="x_news_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->news_type_id->caption() ?><?= $Page->news_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->news_type_id->cellAttributes() ?>>
+<span id="el_news_posts_news_type_id">
+    <select
+        id="x_news_type_id"
+        name="x_news_type_id"
+        class="form-select ew-select<?= $Page->news_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->news_type_id->IsNativeSelect) { ?>
+        data-select2-id="fnews_postsadd_x_news_type_id"
+        <?php } ?>
+        data-table="news_posts"
+        data-field="x_news_type_id"
+        data-value-separator="<?= $Page->news_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->news_type_id->getPlaceHolder()) ?>"
+        <?= $Page->news_type_id->editAttributes() ?>>
+        <?= $Page->news_type_id->selectOptionListHtml("x_news_type_id") ?>
+    </select>
+    <?= $Page->news_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->news_type_id->getErrorMessage() ?></div>
+<?= $Page->news_type_id->Lookup->getParamTag($Page, "p_x_news_type_id") ?>
+<?php if (!$Page->news_type_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fnews_postsadd", function() {
+    var options = { name: "x_news_type_id", selectId: "fnews_postsadd_x_news_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fnews_postsadd.lists.news_type_id?.lookupOptions.length) {
+        options.data = { id: "x_news_type_id", form: "fnews_postsadd" };
+    } else {
+        options.ajax = { id: "x_news_type_id", form: "fnews_postsadd", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.news_posts.fields.news_type_id.selectOptions);
     ew.createSelect(options);
 });
 </script>
@@ -302,52 +354,6 @@ loadjs.ready(["fnews_postsadd", "datetimepicker"], function () {
 <input type="<?= $Page->views_count->getInputTextType() ?>" name="x_views_count" id="x_views_count" data-table="news_posts" data-field="x_views_count" value="<?= $Page->views_count->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Page->views_count->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->views_count->formatPattern()) ?>"<?= $Page->views_count->editAttributes() ?> aria-describedby="x_views_count_help">
 <?= $Page->views_count->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->views_count->getErrorMessage() ?></div>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->news_type_id->Visible) { // news_type_id ?>
-    <div id="r_news_type_id"<?= $Page->news_type_id->rowAttributes() ?>>
-        <label id="elh_news_posts_news_type_id" for="x_news_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->news_type_id->caption() ?><?= $Page->news_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->news_type_id->cellAttributes() ?>>
-<span id="el_news_posts_news_type_id">
-    <select
-        id="x_news_type_id"
-        name="x_news_type_id"
-        class="form-select ew-select<?= $Page->news_type_id->isInvalidClass() ?>"
-        <?php if (!$Page->news_type_id->IsNativeSelect) { ?>
-        data-select2-id="fnews_postsadd_x_news_type_id"
-        <?php } ?>
-        data-table="news_posts"
-        data-field="x_news_type_id"
-        data-value-separator="<?= $Page->news_type_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->news_type_id->getPlaceHolder()) ?>"
-        <?= $Page->news_type_id->editAttributes() ?>>
-        <?= $Page->news_type_id->selectOptionListHtml("x_news_type_id") ?>
-    </select>
-    <?= $Page->news_type_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->news_type_id->getErrorMessage() ?></div>
-<?= $Page->news_type_id->Lookup->getParamTag($Page, "p_x_news_type_id") ?>
-<?php if (!$Page->news_type_id->IsNativeSelect) { ?>
-<script>
-loadjs.ready("fnews_postsadd", function() {
-    var options = { name: "x_news_type_id", selectId: "fnews_postsadd_x_news_type_id" },
-        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
-    if (!el)
-        return;
-    options.closeOnSelect = !options.multiple;
-    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
-    if (fnews_postsadd.lists.news_type_id?.lookupOptions.length) {
-        options.data = { id: "x_news_type_id", form: "fnews_postsadd" };
-    } else {
-        options.ajax = { id: "x_news_type_id", form: "fnews_postsadd", limit: ew.LOOKUP_PAGE_SIZE };
-    }
-    options.minimumResultsForSearch = Infinity;
-    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.news_posts.fields.news_type_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-<?php } ?>
 </span>
 </div></div>
     </div>

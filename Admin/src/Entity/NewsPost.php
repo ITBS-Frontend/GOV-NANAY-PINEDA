@@ -49,6 +49,9 @@ class NewsPost extends AbstractEntity
     #[Column(name: "category_id", type: "integer", nullable: true)]
     private ?int $categoryId;
 
+    #[Column(name: "news_type_id", type: "integer", nullable: true)]
+    private ?int $newsTypeId;
+
     #[Column(name: "featured_image", type: "string", nullable: true)]
     private ?string $featuredImage;
 
@@ -72,9 +75,6 @@ class NewsPost extends AbstractEntity
 
     #[Column(name: "updated_at", type: "datetime", nullable: true)]
     private ?DateTime $updatedAt;
-
-    #[Column(name: "news_type_id", type: "integer", nullable: true)]
-    private ?int $newsTypeId;
 
     public function __construct()
     {
@@ -145,6 +145,17 @@ class NewsPost extends AbstractEntity
     public function setCategoryId(?int $value): static
     {
         $this->categoryId = $value;
+        return $this;
+    }
+
+    public function getNewsTypeId(): ?int
+    {
+        return $this->newsTypeId;
+    }
+
+    public function setNewsTypeId(?int $value): static
+    {
+        $this->newsTypeId = $value;
         return $this;
     }
 
@@ -233,17 +244,6 @@ class NewsPost extends AbstractEntity
     public function setUpdatedAt(?DateTime $value): static
     {
         $this->updatedAt = $value;
-        return $this;
-    }
-
-    public function getNewsTypeId(): ?int
-    {
-        return $this->newsTypeId;
-    }
-
-    public function setNewsTypeId(?int $value): static
-    {
-        $this->newsTypeId = $value;
         return $this;
     }
 }

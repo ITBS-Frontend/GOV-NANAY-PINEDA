@@ -638,13 +638,16 @@
         <phrase id="fldcaption" value="slug" />
       </field>
       <field id="excerpt">
-        <phrase id="fldcaption" value="excerpt" />
+        <phrase id="fldcaption" value="short description" />
       </field>
       <field id="_content">
-        <phrase id="fldcaption" value="content" />
+        <phrase id="fldcaption" value="full description" />
       </field>
       <field id="category_id">
         <phrase id="fldcaption" value="category id" />
+      </field>
+      <field id="news_type_id">
+        <phrase id="fldcaption" value="news type id" />
       </field>
       <field id="featured_image">
         <phrase id="fldcaption" value="featured image" />
@@ -677,9 +680,6 @@
       </field>
       <field id="updated_at">
         <phrase id="fldcaption" value="updated at" />
-      </field>
-      <field id="news_type_id">
-        <phrase id="fldcaption" value="news type id" />
       </field>
     </table>
     <table id="news_tags">

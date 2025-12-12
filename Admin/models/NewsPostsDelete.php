@@ -127,6 +127,7 @@ class NewsPostsDelete extends NewsPosts
         $this->excerpt->Visible = false;
         $this->_content->Visible = false;
         $this->category_id->setVisibility();
+        $this->news_type_id->Visible = false;
         $this->featured_image->setVisibility();
         $this->author_name->setVisibility();
         $this->is_featured->setVisibility();
@@ -135,7 +136,6 @@ class NewsPostsDelete extends NewsPosts
         $this->views_count->Visible = false;
         $this->created_at->Visible = false;
         $this->updated_at->Visible = false;
-        $this->news_type_id->Visible = false;
     }
 
     // Constructor
@@ -416,9 +416,9 @@ class NewsPostsDelete extends NewsPosts
 
         // Set up lookup cache
         $this->setupLookupOptions($this->category_id);
+        $this->setupLookupOptions($this->news_type_id);
         $this->setupLookupOptions($this->is_featured);
         $this->setupLookupOptions($this->is_published);
-        $this->setupLookupOptions($this->news_type_id);
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -608,6 +608,7 @@ class NewsPostsDelete extends NewsPosts
         $this->excerpt->setDbValue($row['excerpt']);
         $this->_content->setDbValue($row['content']);
         $this->category_id->setDbValue($row['category_id']);
+        $this->news_type_id->setDbValue($row['news_type_id']);
         $this->featured_image->Upload->DbValue = $row['featured_image'];
         $this->featured_image->setDbValue($this->featured_image->Upload->DbValue);
         $this->author_name->setDbValue($row['author_name']);
@@ -617,7 +618,6 @@ class NewsPostsDelete extends NewsPosts
         $this->views_count->setDbValue($row['views_count']);
         $this->created_at->setDbValue($row['created_at']);
         $this->updated_at->setDbValue($row['updated_at']);
-        $this->news_type_id->setDbValue($row['news_type_id']);
     }
 
     // Return a row with default values
@@ -630,6 +630,7 @@ class NewsPostsDelete extends NewsPosts
         $row['excerpt'] = $this->excerpt->DefaultValue;
         $row['content'] = $this->_content->DefaultValue;
         $row['category_id'] = $this->category_id->DefaultValue;
+        $row['news_type_id'] = $this->news_type_id->DefaultValue;
         $row['featured_image'] = $this->featured_image->DefaultValue;
         $row['author_name'] = $this->author_name->DefaultValue;
         $row['is_featured'] = $this->is_featured->DefaultValue;
@@ -638,7 +639,6 @@ class NewsPostsDelete extends NewsPosts
         $row['views_count'] = $this->views_count->DefaultValue;
         $row['created_at'] = $this->created_at->DefaultValue;
         $row['updated_at'] = $this->updated_at->DefaultValue;
-        $row['news_type_id'] = $this->news_type_id->DefaultValue;
         return $row;
     }
 
@@ -666,6 +666,8 @@ class NewsPostsDelete extends NewsPosts
 
         // category_id
 
+        // news_type_id
+
         // featured_image
 
         // author_name
@@ -681,8 +683,6 @@ class NewsPostsDelete extends NewsPosts
         // created_at
 
         // updated_at
-
-        // news_type_id
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -716,6 +716,29 @@ class NewsPostsDelete extends NewsPosts
                 }
             } else {
                 $this->category_id->ViewValue = null;
+            }
+
+            // news_type_id
+            $curVal = strval($this->news_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->news_type_id->ViewValue = $this->news_type_id->lookupCacheOption($curVal);
+                if ($this->news_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->news_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->news_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->news_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->news_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->news_type_id->ViewValue = $this->news_type_id->displayValue($arwrk);
+                    } else {
+                        $this->news_type_id->ViewValue = FormatNumber($this->news_type_id->CurrentValue, $this->news_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->news_type_id->ViewValue = null;
             }
 
             // featured_image
@@ -762,29 +785,6 @@ class NewsPostsDelete extends NewsPosts
             // updated_at
             $this->updated_at->ViewValue = $this->updated_at->CurrentValue;
             $this->updated_at->ViewValue = FormatDateTime($this->updated_at->ViewValue, $this->updated_at->formatPattern());
-
-            // news_type_id
-            $curVal = strval($this->news_type_id->CurrentValue);
-            if ($curVal != "") {
-                $this->news_type_id->ViewValue = $this->news_type_id->lookupCacheOption($curVal);
-                if ($this->news_type_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = SearchFilter($this->news_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->news_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
-                    $sqlWrk = $this->news_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                    $conn = Conn();
-                    $config = $conn->getConfiguration();
-                    $config->setResultCache($this->Cache);
-                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->news_type_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->news_type_id->ViewValue = $this->news_type_id->displayValue($arwrk);
-                    } else {
-                        $this->news_type_id->ViewValue = FormatNumber($this->news_type_id->CurrentValue, $this->news_type_id->formatPattern());
-                    }
-                }
-            } else {
-                $this->news_type_id->ViewValue = null;
-            }
 
             // id
             $this->id->HrefValue = "";
@@ -967,11 +967,11 @@ class NewsPostsDelete extends NewsPosts
             switch ($fld->FieldVar) {
                 case "x_category_id":
                     break;
+                case "x_news_type_id":
+                    break;
                 case "x_is_featured":
                     break;
                 case "x_is_published":
-                    break;
-                case "x_news_type_id":
                     break;
                 default:
                     $lookupFilter = "";

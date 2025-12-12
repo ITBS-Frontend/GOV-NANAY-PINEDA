@@ -117,6 +117,17 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->news_type_id->Visible) { // news_type_id ?>
+    <tr id="r_news_type_id"<?= $Page->news_type_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_news_posts_news_type_id"><?= $Page->news_type_id->caption() ?></span></td>
+        <td data-name="news_type_id"<?= $Page->news_type_id->cellAttributes() ?>>
+<span id="el_news_posts_news_type_id">
+<span<?= $Page->news_type_id->viewAttributes() ?>>
+<?= $Page->news_type_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->featured_image->Visible) { // featured_image ?>
     <tr id="r_featured_image"<?= $Page->featured_image->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_news_posts_featured_image"><?= $Page->featured_image->caption() ?></span></td>
@@ -204,17 +215,6 @@ loadjs.ready("head", function () {
 <span id="el_news_posts_updated_at">
 <span<?= $Page->updated_at->viewAttributes() ?>>
 <?= $Page->updated_at->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->news_type_id->Visible) { // news_type_id ?>
-    <tr id="r_news_type_id"<?= $Page->news_type_id->rowAttributes() ?>>
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_news_posts_news_type_id"><?= $Page->news_type_id->caption() ?></span></td>
-        <td data-name="news_type_id"<?= $Page->news_type_id->cellAttributes() ?>>
-<span id="el_news_posts_news_type_id">
-<span<?= $Page->news_type_id->viewAttributes() ?>>
-<?= $Page->news_type_id->getViewValue() ?></span>
 </span>
 </td>
     </tr>
