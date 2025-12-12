@@ -5,6 +5,60 @@
     <menu id="153">
       <phrase id="menutext" value="Dashboard" />
     </menu>
+    <menu id="24">
+      <phrase id="menutext" value="Projects" />
+    </menu>
+    <menu id="4">
+      <phrase id="menutext" value="Projects" />
+    </menu>
+    <menu id="14">
+      <phrase id="menutext" value="Project Gallery" />
+    </menu>
+    <menu id="15">
+      <phrase id="menutext" value="Project Highlights" />
+    </menu>
+    <menu id="96">
+      <phrase id="menutext" value="Program Types" />
+    </menu>
+    <menu id="1">
+      <phrase id="menutext" value="Categories" />
+    </menu>
+    <menu id="98">
+      <phrase id="menutext" value="Category Types" />
+    </menu>
+    <menu id="106">
+      <phrase id="menutext" value="Project Types" />
+    </menu>
+    <menu id="92">
+      <phrase id="menutext" value="Development" />
+    </menu>
+    <menu id="50">
+      <phrase id="menutext" value="Economic Indicators" />
+    </menu>
+    <menu id="45">
+      <phrase id="menutext" value="Business Sectors" />
+    </menu>
+    <menu id="56">
+      <phrase id="menutext" value="Investment Opportunities" />
+    </menu>
+    <menu id="44">
+      <phrase id="menutext" value="News Article" />
+    </menu>
+    <menu id="27">
+      <phrase id="menutext" value="News Posts" />
+    </menu>
+    <menu id="25">
+      <phrase id="menutext" value="News Categories" />
+    </menu>
+    <menu id="26">
+      <phrase id="menutext" value="News Post Tags" />
+    </menu>
+    <menu id="28">
+      <phrase id="menutext" value="News Tags" />
+    </menu>
+    <menu id="105">
+      <phrase id="menutext" value="News Types" />
+    </menu>
     <menu id="88">
       <phrase id="menutext" value="About Pampanga" />
     </menu>
@@ -92,18 +146,6 @@
     <menu id="107">
       <phrase id="menutext" value="Status Types" />
     </menu>
-    <menu id="92">
-      <phrase id="menutext" value="Development" />
-    </menu>
-    <menu id="50">
-      <phrase id="menutext" value="Economic Indicators" />
-    </menu>
-    <menu id="45">
-      <phrase id="menutext" value="Business Sectors" />
-    </menu>
-    <menu id="56">
-      <phrase id="menutext" value="Investment Opportunities" />
-    </menu>
     <menu id="93">
       <phrase id="menutext" value="Emergency and Disaster" />
     </menu>
@@ -127,48 +169,6 @@
     </menu>
     <menu id="103">
       <phrase id="menutext" value="Environmental Program Types" />
-    </menu>
-    <menu id="44">
-      <phrase id="menutext" value="News Article" />
-    </menu>
-    <menu id="27">
-      <phrase id="menutext" value="News Posts" />
-    </menu>
-    <menu id="25">
-      <phrase id="menutext" value="News Categories" />
-    </menu>
-    <menu id="26">
-      <phrase id="menutext" value="News Post Tags" />
-    </menu>
-    <menu id="28">
-      <phrase id="menutext" value="News Tags" />
-    </menu>
-    <menu id="105">
-      <phrase id="menutext" value="News Types" />
-    </menu>
-    <menu id="24">
-      <phrase id="menutext" value="Projects" />
-    </menu>
-    <menu id="4">
-      <phrase id="menutext" value="Projects" />
-    </menu>
-    <menu id="14">
-      <phrase id="menutext" value="Project Gallery" />
-    </menu>
-    <menu id="15">
-      <phrase id="menutext" value="Project Highlights" />
-    </menu>
-    <menu id="96">
-      <phrase id="menutext" value="Program Types" />
-    </menu>
-    <menu id="1">
-      <phrase id="menutext" value="Categories" />
-    </menu>
-    <menu id="98">
-      <phrase id="menutext" value="Category Types" />
-    </menu>
-    <menu id="106">
-      <phrase id="menutext" value="Project Types" />
     </menu>
     <menu id="2">
       <phrase id="menutext" value="Political Journey" />
