@@ -338,7 +338,7 @@ section{
 
 .slide-content {
     display: grid;
-    grid-template-columns: 650px 1fr;
+    grid-template-columns: 750px 1fr;
     align-items: center;
     /* max-width: 1400px;
     margin: 0 auto; */
@@ -383,7 +383,7 @@ section{
 }
 
 .slide-title {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 1.5rem;
