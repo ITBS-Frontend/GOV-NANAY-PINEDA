@@ -60,21 +60,9 @@ $additionalCSS = ['css/tourism.css'];
                     <p class="section-subtitle">Find the perfect destination for your interests</p>
                 </div>
 
-                <!-- Category Tabs -->
-                <div class="category-tabs-container">
-                    <button class="category-scroll-btn scroll-left" id="categoryScrollLeft">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    
-                    <div class="category-tabs-wrapper" id="categoryTabsWrapper">
-                        <div class="category-tabs" id="categoryTabs">
-                            <div class="loading-spinner"></div>
-                        </div>
-                    </div>
-                    
-                    <button class="category-scroll-btn scroll-right" id="categoryScrollRight">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+                <!-- Category Tabs - Updated Design -->
+                <div class="filter-tabs" id="categoryTabs">
+                    <div class="loading-spinner"></div>
                 </div>
 
                 <!-- Destinations Grid -->
@@ -94,35 +82,41 @@ $additionalCSS = ['css/tourism.css'];
                     <p class="section-subtitle">Hotels, restaurants, and services for your convenience</p>
                 </div>
 
-                <!-- Facility Type Tabs -->
-                <div class="facility-type-tabs">
-                    <button class="facility-tab active" data-type="all">
+                <!-- Facility Type Tabs - Updated Design -->
+                <div class="filter-tabs facility-type-tabs">
+                    <button class="filter-tab active" data-type="all">
                         <i class="fas fa-th"></i>
                         <span>All</span>
                     </button>
-                    <button class="facility-tab" data-type="Hotel">
+                    <button class="filter-tab" data-type="Hotel">
                         <i class="fas fa-hotel"></i>
                         <span>Hotels</span>
                     </button>
-                    <button class="facility-tab" data-type="Restaurant">
+                    <button class="filter-tab" data-type="Restaurant">
                         <i class="fas fa-utensils"></i>
                         <span>Restaurants</span>
                     </button>
-                    <button class="facility-tab" data-type="Transport Service">
+                    <button class="filter-tab" data-type="Transport Service">
                         <i class="fas fa-bus"></i>
                         <span>Transport</span>
                     </button>
-                    <button class="facility-tab" data-type="Tour Operator">
+                    <button class="filter-tab" data-type="Tour Operator">
                         <i class="fas fa-suitcase"></i>
                         <span>Tour Operators</span>
                     </button>
                 </div>
 
-                <!-- Ownership Filter -->
-                <div class="ownership-filter">
-                    <button class="ownership-btn active" data-ownership="all">All Facilities</button>
-                    <button class="ownership-btn" data-ownership="Government">Government</button>
-                    <button class="ownership-btn" data-ownership="Private">Private</button>
+                <!-- Ownership Filter - Updated Design -->
+                <div class="filter-tabs ownership-filter">
+                    <button class="filter-tab active" data-ownership="all">All Facilities</button>
+                    <button class="filter-tab" data-ownership="Government">
+                        <i class="fas fa-landmark"></i>
+                        Government
+                    </button>
+                    <button class="filter-tab" data-ownership="Private">
+                        <i class="fas fa-building"></i>
+                        Private
+                    </button>
                 </div>
 
                 <!-- Facilities Grid -->
@@ -188,8 +182,8 @@ $additionalCSS = ['css/tourism.css'];
         let currentCategory = 'all';
         let currentFacilityType = 'all';
         let currentOwnership = 'all';
-        let facilityTypes = {}; // Store type name to ID mapping
-        let ownershipTypes = {}; // Store ownership name to ID mapping
+        let facilityTypes = {};
+        let ownershipTypes = {};
         
         // Load facility types first
         loadFacilityTypes();
@@ -214,50 +208,17 @@ $additionalCSS = ['css/tourism.css'];
                 success: function(response) {
                     if (response.success && response.data) {
                         response.data.forEach(type => {
-                            // Store by exact type_name from database
                             facilityTypes[type.type_name] = type.id;
                         });
                     }
                 }
             });
             
-            // Store ownership type IDs
             ownershipTypes = {
                 'Government': 1,
                 'Private': 2
             };
         }
-        
-        // Category scroll functionality
-        function updateCategoryScrollButtons() {
-            const container = $('#categoryTabs')[0];
-            const wrapper = $('#categoryTabsWrapper');
-            
-            if (!container) return;
-            
-            const isScrollable = container.scrollWidth > container.clientWidth;
-            const isAtStart = container.scrollLeft <= 10;
-            const isAtEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - 10;
-            
-            if (isScrollable) {
-                wrapper.addClass('has-scroll');
-                wrapper.toggleClass('at-start', isAtStart);
-                wrapper.toggleClass('at-end', isAtEnd);
-            } else {
-                wrapper.removeClass('has-scroll at-start at-end');
-            }
-        }
-        
-        $('#categoryScrollLeft').click(function() {
-            $('#categoryTabs').animate({ scrollLeft: '-=200' }, 300, updateCategoryScrollButtons);
-        });
-        
-        $('#categoryScrollRight').click(function() {
-            $('#categoryTabs').animate({ scrollLeft: '+=200' }, 300, updateCategoryScrollButtons);
-        });
-        
-        $('#categoryTabs').scroll(updateCategoryScrollButtons);
-        $(window).resize(updateCategoryScrollButtons);
         
         // Load counts
         function loadCounts() {
@@ -338,7 +299,6 @@ $additionalCSS = ['css/tourism.css'];
                 success: function(response) {
                     if (response.success && response.data) {
                         renderCategories(response.data);
-                        setTimeout(updateCategoryScrollButtons, 100);
                     }
                 }
             });
@@ -346,7 +306,7 @@ $additionalCSS = ['css/tourism.css'];
         
         function renderCategories(categories) {
             let html = `
-                <button class="category-tab active" data-category="all">
+                <button class="filter-tab active" data-category="all">
                     <i class="fas fa-th"></i>
                     <span>All Destinations</span>
                 </button>
@@ -354,10 +314,10 @@ $additionalCSS = ['css/tourism.css'];
             
             categories.forEach(cat => {
                 html += `
-                    <button class="category-tab" data-category="${cat.id}" style="--tab-color: ${cat.color_code}">
+                    <button class="filter-tab" data-category="${cat.id}">
                         <i class="${cat.icon_class || 'fas fa-map-marker-alt'}"></i>
                         <span>${cat.name}</span>
-                        ${cat.destination_count > 0 ? `<span class="tab-count">${cat.destination_count}</span>` : ''}
+                        ${cat.destination_count > 0 ? `<span class="filter-count">${cat.destination_count}</span>` : ''}
                     </button>
                 `;
             });
@@ -366,8 +326,8 @@ $additionalCSS = ['css/tourism.css'];
         }
         
         // Category tab click
-        $(document).on('click', '.category-tab', function() {
-            $('.category-tab').removeClass('active');
+        $(document).on('click', '.filter-tabs#categoryTabs .filter-tab', function() {
+            $('.filter-tabs#categoryTabs .filter-tab').removeClass('active');
             $(this).addClass('active');
             currentCategory = $(this).data('category');
             loadDestinations();
@@ -446,16 +406,16 @@ $additionalCSS = ['css/tourism.css'];
         }
         
         // Facility type tabs
-        $('.facility-tab').click(function() {
-            $('.facility-tab').removeClass('active');
+        $(document).on('click', '.facility-type-tabs .filter-tab', function() {
+            $('.facility-type-tabs .filter-tab').removeClass('active');
             $(this).addClass('active');
             currentFacilityType = $(this).data('type');
             loadFacilities();
         });
         
         // Ownership filter
-        $('.ownership-btn').click(function() {
-            $('.ownership-btn').removeClass('active');
+        $(document).on('click', '.ownership-filter .filter-tab', function() {
+            $('.ownership-filter .filter-tab').removeClass('active');
             $(this).addClass('active');
             currentOwnership = $(this).data('ownership');
             loadFacilities();
@@ -467,7 +427,6 @@ $additionalCSS = ['css/tourism.css'];
             const params = [];
             
             if (currentFacilityType !== 'all') {
-                // Get ID from mapping
                 const typeId = facilityTypes[currentFacilityType];
                 if (typeId) {
                     params.push(`type=${typeId}`);
@@ -475,7 +434,6 @@ $additionalCSS = ['css/tourism.css'];
             }
             
             if (currentOwnership !== 'all') {
-                // Get ID from mapping
                 const ownershipId = ownershipTypes[currentOwnership];
                 if (ownershipId) {
                     params.push(`ownership=${ownershipId}`);
@@ -602,7 +560,7 @@ $additionalCSS = ['css/tourism.css'];
             $('#facilitiesGrid').html(html);
         }
         
-        // Smooth scroll to sections
+        // Smooth scroll
         $('a[href^="#"]').click(function(e) {
             e.preventDefault();
             const target = $(this.getAttribute('href'));
@@ -611,6 +569,19 @@ $additionalCSS = ['css/tourism.css'];
                     scrollTop: target.offset().top - 80
                 }, 800);
             }
+        });
+
+        // Scroll to top
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 300) {
+                $('.scroll-top').addClass('show');
+            } else {
+                $('.scroll-top').removeClass('show');
+            }
+        });
+        
+        $('.scroll-top').click(function() {
+            $('html, body').animate({ scrollTop: 0 }, 800);
         });
     });
     </script>
