@@ -536,14 +536,12 @@ $additionalCSS = ['css/tourism.css'];
                                 ${facility.contact_number ? `
                                     <a href="tel:${facility.contact_number}" class="facility-btn">
                                         <i class="fas fa-phone"></i>
-                                  
                                     </a>
                                 ` : ''}
                                 ${facility.website ? `
                                     <a href="${facility.website}" target="_blank" class="facility-btn">
                                         <i class="fas fa-globe"></i>
-                                   
-                                    </a>
+                                        </a>
                                 ` : ''}
                                 ${facility.email ? `
                                     <a href="mailto:${facility.email}" class="facility-btn">

@@ -272,19 +272,19 @@ $additionalCSS = ['css/project-detail.css'];
             `;
         }
         
-        if (project.budget_display) {
-            infoHtml += `
-                <div class="info-item">
-                    <div class="info-icon" style="background: #10B981">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div class="info-content">
-                        <h4>Budget</h4>
-                        <p>${escapeHtml(project.budget_display)}</p>
-                    </div>
-                </div>
-            `;
-        }
+        // if (project.budget_display) {
+        //     infoHtml += `
+        //         <div class="info-item">
+        //             <div class="info-icon" style="background: #10B981">
+        //                 <i class="fas fa-money-bill-wave"></i>
+        //             </div>
+        //             <div class="info-content">
+        //                 <h4>Budget</h4>
+        //                 <p>${escapeHtml(project.budget_display)}</p>
+        //             </div>
+        //         </div>
+        //     `;
+        // }
         
         if (project.location) {
             infoHtml += `
