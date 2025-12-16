@@ -37,37 +37,26 @@ $additionalCSS = ['css/homepage.css'];
         </section>
 
         <!-- Projects Section -->
-        <!-- <section id="projects" class="projects-section">
-            <div class="section-header">
-                <h2 class="section-title">Governance Portfolio</h2>
-                <p class="section-subtitle">
-                    Transformative initiatives that have positioned Pampanga as a model 
-                    province through innovative governance and inclusive development.
-                </p>
-            </div>
+<section id="projects" class="projects-section">
+    <div class="section-header">
+        <h2 class="section-title">Recent Projects</h2>
+        <p class="section-subtitle">
+            Latest transformative initiatives positioning Pampanga as a model province
+        </p>
+    </div>
 
-            <div class="category-tabs-container">
-                <button class="category-scroll-btn scroll-left" id="projectScrollLeft">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                
-                <div class="category-tabs-wrapper" id="projectTabsWrapper">
-                    <div class="category-tabs" id="categoryTabs">
-                        <div class="loading-spinner"></div>
-                    </div>
-                </div>
-                
-                <button class="category-scroll-btn scroll-right" id="projectScrollRight">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-
-            <div class="projects-grid" id="projectsGrid">
-                <div class="loading-container">
-                    <div class="loading-spinner"></div>
-                </div>
-            </div>
-        </section> -->
+    <div class="projects-grid" id="recentProjectsGrid">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+    
+    <div class="view-all-container" style="text-align: center; margin-top: 30px;">
+        <a href="development.php" class="view-more">
+            View All Projects <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</section>
 
         <!-- UPDATED: About Pampanga Section -->
         <section id="about" class="about-pampanga-section">
@@ -285,6 +274,7 @@ $additionalCSS = ['css/homepage.css'];
             loadPampangaPreview();
             loadQuickFacts();
             loadGovernorBioPreview();
+            loadRecentProjects();
 
             // Project Category Scroll Functionality
             function updateProjectScrollButtons() {
@@ -384,6 +374,79 @@ $additionalCSS = ['css/homepage.css'];
                         $('#projectsGrid').html('<p class="text-center">Error loading projects</p>');
                     }
                 });
+            }
+            function loadRecentProjects() {
+                $.ajax({
+                    url: `${API_BASE}/Admin/api/projects/recent?limit=6`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            displayRecentProjects(response.data);
+                        } else {
+                            showError('Failed to load projects');
+                        }
+                    },
+                    error: function() {
+                        showError('Failed to load projects');
+                    }
+                });
+            }
+
+            function displayRecentProjects(projects) {
+                const grid = $('#recentProjectsGrid');
+                
+                if (!projects || projects.length === 0) {
+                    grid.html('<p style="text-align: center;">No projects available</p>');
+                    return;
+                }
+                
+                let html = '';
+                projects.forEach(project => {
+                    html += `
+                        <div class="project-card">
+                            <div class="project-image">
+                                <img src="${project.image_url || 'assets/images/default-project.jpg'}" 
+                                    alt="${project.title}" loading="lazy">
+                                <span class="project-category" style="background: ${project.color_code}">
+                                    ${project.category_name || 'General'}
+                                </span>
+                            </div>
+                            <div class="project-content">
+                                <h3 class="project-title">${project.title}</h3>
+                                <p class="project-description">${truncateText(project.description, 120)}</p>
+                                <div class="project-meta">
+                                  
+                                    ${project.project_date ? `<span>Date: ${formatDate(project.project_date)}</span>` : ''}
+                                </div>
+                                <a href="project-detail.php?id=${project.id}" class="project-read-more">
+                                    Read More <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                grid.html(html);
+            }
+
+            function truncateText(text, maxLength) {
+                if (!text || text.length <= maxLength) return text;
+                return text.substr(0, maxLength) + '...';
+            }
+
+            function formatDate(dateStr) {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            function showError(message) {
+                $('#recentProjectsGrid').html(`
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #e53e3e;"></i>
+                        <p style="margin-top: 15px;">${message}</p>
+                    </div>
+                `);
             }
 
             function loadPampangaHistory() {
@@ -494,7 +557,7 @@ $additionalCSS = ['css/homepage.css'];
                                         Read More
                                     
                                          </a>
-                                         <a class="view-more" href="development.php">View More Projects</a>
+                                       
                                     </div>
                                 </div>
                                 <div class="slide-picture">

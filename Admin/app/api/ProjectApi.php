@@ -1,6 +1,24 @@
 <?php
 namespace PHPMaker2024\Gov_Nanay_Pineda;
 
+// Recent projects endpoint
+$app->get("/projects/recent", function ($request, $response, $args) {
+    try {
+        $limit = $request->getQueryParam('limit', 4);
+        
+        $service = new ProjectService();
+        $result = $service->getRecentProjects($limit);
+        
+        $response = $response->withHeader('Content-Type', 'application/json');
+        return $response->write(json_encode($result, JSON_PRETTY_PRINT));
+    } catch (\Exception $e) {
+        $errorResponse = ['success' => false, 'message' => $e->getMessage()];
+        $response = $response->withHeader('Content-Type', 'application/json');
+        $response = $response->withStatus(500);
+        return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
+    }
+});
+
 // Featured projects endpoint
 $app->get("/projects/featured", function ($request, $response, $args) {
     try {
@@ -181,3 +199,4 @@ $app->get("/projects/{id}", function ($request, $response, $args) {
         return $response->write(json_encode($errorResponse, JSON_PRETTY_PRINT));
     }
 });
+

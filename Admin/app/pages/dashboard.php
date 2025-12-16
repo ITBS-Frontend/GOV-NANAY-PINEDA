@@ -91,7 +91,7 @@ $categoryStats = $conn->executeQuery($sql)->fetchAllAssociative();
             border-bottom: 1px solid #e2e8f0;
             color: #2d3748;
         }
-        .recent-table tr:hover { background: #f7fafc; }
+        /* .recent-table tr:hover { background: #f7fafc; } */
         
         .category-item { 
             display: flex; 
@@ -173,7 +173,7 @@ $categoryStats = $conn->executeQuery($sql)->fetchAllAssociative();
                         <tr>
                             <th>Title</th>
                             <th>Date</th>
-                            <th>Budget</th>
+                        
                         </tr>
                     </thead>
                     <tbody>
@@ -181,7 +181,7 @@ $categoryStats = $conn->executeQuery($sql)->fetchAllAssociative();
                         <tr>
                             <td><?= htmlspecialchars($proj['title']) ?></td>
                             <td><?= $proj['project_date'] ? date('M d, Y', strtotime($proj['project_date'])) : 'N/A' ?></td>
-                            <td><?= $proj['budget_amount'] ? '₱' . number_format($proj['budget_amount'], 2) : 'N/A' ?></td>
+                           
                         </tr>
                         <?php endforeach; ?>
                     </tbody>

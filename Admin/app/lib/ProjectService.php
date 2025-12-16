@@ -595,5 +595,60 @@ public function getProjectDetails($projectId)
     }
 }
 
+/**
+ * Get recent projects (limit 4 for homepage)
+ */
+public function getRecentProjects($limit = 6) 
+{
+    try {
+        $conn = Conn();
+        
+        $sql = "
+            SELECT 
+                p.id,
+                p.title,
+                p.description,
+                p.project_number,
+                p.featured_image,
+                p.budget_amount,
+                p.project_date,
+                c.name as category_name,
+                c.color_code
+            FROM projects p
+            LEFT JOIN categories c ON p.category_id = c.id
+            ORDER BY p.created_at DESC
+            LIMIT ?
+        ";
+        
+        $projects = $conn->executeQuery($sql, [$limit])->fetchAllAssociative();
+        
+        foreach ($projects as &$project) {
+            // Generate presigned URL for featured image
+            if (!empty($project['featured_image'])) {
+                $project['image_url'] = getPresignedUrl('gov-pineda-images/' . $project['featured_image']);
+            } else {
+                $project['image_url'] = null;
+            }
+            
+            // Format budget
+            if ($project['budget_amount']) {
+                $project['budget_formatted'] = '₱' . number_format($project['budget_amount'], 2);
+            }
+            
+            // Format project number
+            $project['display_number'] = str_pad($project['project_number'], 2, '0', STR_PAD_LEFT);
+        }
+        
+        return [
+            'success' => true,
+            'data' => $projects
+        ];
+        
+    } catch (\Exception $e) {
+        error_log('Get recent projects error: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to fetch recent projects'];
+    }
+}
+
 
 }
