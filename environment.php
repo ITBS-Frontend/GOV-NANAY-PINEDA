@@ -503,7 +503,7 @@ $(document).ready(function() {
                         ${incident.casualties || incident.damages_estimated ? `
                             <div class="incident-stats">
                                 ${incident.casualties ? `<span><i class="fas fa-heartbeat"></i> ${incident.casualties} casualties</span>` : ''}
-                                ${incident.damages_estimated ? `<span><i class="fas fa-dollar-sign"></i> ${incident.damages_estimated}</span>` : ''}
+                                ${incident.damages_estimated ? `₱ ${incident.damages_estimated}</span>` : ''}
                             </div>
                         ` : ''}
                     </div>
