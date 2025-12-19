@@ -109,7 +109,7 @@ $additionalCSS = ['css/homepage.css'];
         </section>
 
         <!-- NEW: Leadership Section -->
-        <section id="leadership" class="leadership-section">
+        <!-- <section id="leadership" class="leadership-section">
             <div class="leadership-container">
                 <div class="leadership-image-col">
                     <div class="governor-card">
@@ -174,10 +174,10 @@ $additionalCSS = ['css/homepage.css'];
                     </a>
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <!-- UPDATED: Pampanga History Timeline Section -->
-        <section id="history" class="history-section">
+        <!-- <section id="history" class="history-section">
             <div class="section-header">
                 <div class="section-label">Our Heritage</div>
                 <h2 class="section-title">Pampanga Through the Ages</h2>
@@ -192,7 +192,7 @@ $additionalCSS = ['css/homepage.css'];
                     <div class="loading-spinner"></div>
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <!-- NEW: Key Initiatives Section -->
         <section class="key-initiatives-section">
