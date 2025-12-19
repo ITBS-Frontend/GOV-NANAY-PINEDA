@@ -35,6 +35,11 @@ $additionalCSS = ['css/homepage.css'];
             </div>
             
         </section>
+<style>
+.about-pampanga-section {
+    background: linear-gradient(110deg, rgba(195, 210, 232, 0.25) 0.45%, #FFF 100.78%);
+}
+</style>
 
         <!-- Projects Section -->
 <section id="projects" class="projects-section">

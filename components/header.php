@@ -1,5 +1,5 @@
 <!-- Header Navigation Component -->
-<nav>
+<nav class="site-header">
     <div class="logo-icon"><img src="assets/Ph_seal_pampanga.png" alt=""></div>
     <button class="hamburger" aria-label="Toggle menu">
         <span></span>
@@ -53,7 +53,192 @@
     
     </div>
 </nav>
+<style>
 
+nav {
+    display: flex;
+    width: 100%;
+    max-width: 100vw;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    background: #DEDBC0;
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.25);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    margin: 0;
+    transition: transform 0.3s ease;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: space-around;
+}
+
+nav.hide {
+    transform: translateY(-100%);
+}
+
+.nav-container {
+    display: flex;
+    height: 80px;
+    max-width: 1400px;
+    width: 100%;
+    padding: 16px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-icon img {
+    height: 60px;
+    width: auto;
+}
+
+.nav-menu {
+    display: flex;
+    padding: 15px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 34px;
+    border-radius: 50px;
+    background: #FFF;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-item.active {
+    background: #FFF;
+    box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.nav-item:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.nav-item i {
+    font-size: 18px;
+    color: #333;
+}
+
+.nav-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: #333;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.nav-item.has-dropdown {
+    position: relative;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.dropdown-icon {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.nav-item.has-dropdown.active .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: #FFF;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    min-width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: #F5F5F5;
+}
+
+.dropdown-item i {
+    font-size: 16px;
+    width: 20px;
+}
+
+body {
+    padding-top: 80px;
+}
+nav.hide {
+    transform: translateY(-100%);
+}
+
+
+.indicator {
+    display: none;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+    </style>
 <script>
 $(document).ready(function() {
     // Hamburger menu toggle
@@ -130,5 +315,18 @@ $(document).ready(function() {
             }
         }
     });
+
+    // Header show/hide: only visible at scrollY === 0
+    function handleHeaderVisibility() {
+        if (window.scrollY === 0) {
+            $('nav.site-header').removeClass('hide');
+        } else {
+            $('nav.site-header').addClass('hide');
+        }
+    }
+    // Initial check
+    handleHeaderVisibility();
+    // Listen to scroll
+    $(window).on('scroll', handleHeaderVisibility);
 });
 </script>

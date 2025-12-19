@@ -81,7 +81,7 @@
         <div class="footer-bottom">
             <div class="footer-bottom-content">
                 <p class="copyright">
-                    &copy; <?php echo date('Y'); ?> Office of Gov. Lilia "Nanay" Pineda. All rights reserved.
+                    &copy; <?php echo date('Y'); ?> Office of Gov. Lilia Pineda. All rights reserved.
                 </p>
                 <!-- <div class="footer-bottom-links">
                     <a href="#">Privacy Policy</a>
