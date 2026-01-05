@@ -380,60 +380,81 @@ $additionalCSS = ['css/homepage.css'];
                     }
                 });
             }
-            function loadRecentProjects() {
-                $.ajax({
-                    url: `${API_BASE}/Admin/api/projects/recent?limit=6`,
-                    method: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            displayRecentProjects(response.data);
-                        } else {
-                            showError('Failed to load projects');
-                        }
-                    },
-                    error: function() {
-                        showError('Failed to load projects');
-                    }
-                });
+function loadRecentProjects() {
+    console.log('Loading recent projects...'); // Debug
+    
+    $.ajax({
+        url: `${API_BASE}/Admin/api/projects/recent?limit=6`,
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            console.log('API Response:', response); // Debug
+            
+            if (response.success && response.data) {
+                displayRecentProjects(response.data);
+            } else {
+                console.error('API returned error:', response.message);
+                showError(response.message || 'Failed to load projects');
+                $('#recentProjectsGrid').html('<p style="text-align: center; padding: 40px;">No projects available</p>');
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                responseText: xhr.responseText,
+                error: error
+            });
+            
+            showError('Failed to load projects. Please check console for details.');
+            $('#recentProjectsGrid').html('<p style="text-align: center; padding: 40px; color: #dc3545;">Failed to load projects</p>');
+        }
+    });
+}
 
-            function displayRecentProjects(projects) {
-                const grid = $('#recentProjectsGrid');
-                
-                if (!projects || projects.length === 0) {
-                    grid.html('<p style="text-align: center;">No projects available</p>');
-                    return;
-                }
-                
-                let html = '';
-                projects.forEach(project => {
-                    html += `
-                        <div class="project-card">
-                            <div class="project-image">
-                                <img src="${project.image_url || 'assets/images/default-project.jpg'}" 
-                                    alt="${project.title}" loading="lazy">
-                                <span class="project-category" style="background: ${project.color_code}">
-                                    ${project.category_name || 'General'}
-                                </span>
-                            </div>
-                            <div class="project-content">
-                                <h3 class="project-title">${project.title}</h3>
-                                <p class="project-description">${truncateText(project.description, 120)}</p>
-                                <div class="project-meta">
-                                  
-                                    ${project.project_date ? `<span>Date: ${formatDate(project.project_date)}</span>` : ''}
-                                </div>
-                                <a href="project-detail.php?id=${project.id}" class="project-read-more">
-                                    Read More <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                grid.html(html);
-            }
+function displayRecentProjects(projects) {
+    const grid = $('#recentProjectsGrid');
+    
+    console.log('Displaying projects:', projects.length); // Debug
+    
+    if (!projects || projects.length === 0) {
+        grid.html('<p style="text-align: center; padding: 40px;">No projects available</p>');
+        return;
+    }
+    
+    let html = '';
+    projects.forEach((project, index) => {
+        console.log(`Project ${index}:`, project); // Debug each project
+        
+        html += `
+            <div class="project-card">
+                <div class="project-image">
+                    <img src="${escapeHtml(project.image_url) || 'assets/images/default-project.jpg'}" 
+                        alt="${escapeHtml(project.title)}" 
+                        loading="lazy"
+                        onerror="this.src='assets/images/default-project.jpg'">
+                    ${project.category_name ? `
+                        <span class="project-category" style="background: ${escapeHtml(project.color_code || '#6c757d')}">
+                            ${escapeHtml(project.category_name)}
+                        </span>
+                    ` : ''}
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">${escapeHtml(project.title)}</h3>
+                    <p class="project-description">${truncateText(escapeHtml(project.description || ''), 120)}</p>
+                    <div class="project-meta">
+                        ${project.project_date ? `<span><i class="fas fa-calendar"></i> ${formatDate(project.project_date)}</span>` : ''}
+                    </div>
+                    <a href="project-detail.php?id=${project.id}" class="project-read-more">
+                        Read More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        `;
+    });
+    
+    grid.html(html);
+}
 
             function truncateText(text, maxLength) {
                 if (!text || text.length <= maxLength) return text;
@@ -453,6 +474,13 @@ $additionalCSS = ['css/homepage.css'];
                     </div>
                 `);
             }
+
+            function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
             function loadPampangaHistory() {
                 $.ajax({

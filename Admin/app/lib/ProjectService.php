@@ -612,15 +612,19 @@ public function getRecentProjects($limit = 6)
                 p.featured_image,
                 p.budget_amount,
                 p.project_date,
+                p.created_at,
                 c.name as category_name,
                 c.color_code
             FROM projects p
             LEFT JOIN categories c ON p.category_id = c.id
-            ORDER BY p.created_at DESC
+            WHERE p.featured_image IS NOT NULL
+            ORDER BY p.project_date DESC NULLS LAST, p.created_at DESC
             LIMIT ?
         ";
         
-        $projects = $conn->executeQuery($sql, [$limit])->fetchAllAssociative();
+        // Use Doctrine DBAL's correct method
+        $result = $conn->executeQuery($sql, [$limit]);
+        $projects = $result->fetchAllAssociative(); // Correct Doctrine DBAL method
         
         foreach ($projects as &$project) {
             // Generate presigned URL for featured image
@@ -631,22 +635,31 @@ public function getRecentProjects($limit = 6)
             }
             
             // Format budget
-            if ($project['budget_amount']) {
+            if (!empty($project['budget_amount'])) {
                 $project['budget_formatted'] = '₱' . number_format($project['budget_amount'], 2);
+            } else {
+                $project['budget_formatted'] = null;
             }
             
             // Format project number
-            $project['display_number'] = str_pad($project['project_number'], 2, '0', STR_PAD_LEFT);
+            if (!empty($project['project_number'])) {
+                $project['display_number'] = str_pad($project['project_number'], 2, '0', STR_PAD_LEFT);
+            }
         }
         
         return [
             'success' => true,
-            'data' => $projects
+            'data' => $projects,
+            'count' => count($projects)
         ];
         
     } catch (\Exception $e) {
         error_log('Get recent projects error: ' . $e->getMessage());
-        return ['success' => false, 'message' => 'Failed to fetch recent projects'];
+        return [
+            'success' => false, 
+            'message' => 'Failed to fetch recent projects',
+            'error' => $e->getMessage()
+        ];
     }
 }
 
