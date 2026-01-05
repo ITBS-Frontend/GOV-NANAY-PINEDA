@@ -62,7 +62,7 @@ nav {
     flex-direction: row;
     align-items: center;
     gap: 10px;
-    background: #DEDBC0;
+    background: #54586c;
     box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.25);
     position: fixed;
     top: 0;
@@ -103,7 +103,7 @@ nav.hide {
 
 .nav-menu {
     display: flex;
-    padding: 15px 20px;
+    padding: 10px 13px;
     justify-content: center;
     align-items: center;
     gap: 34px;
@@ -115,7 +115,7 @@ nav.hide {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 4px 10px;
+    padding: 10px 13px;
     border-radius: 100px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -123,8 +123,9 @@ nav.hide {
 }
 
 .nav-item.active {
-    background: #FFF;
-    box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.25);
+    background: #60A5FA;
+    /* box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.25); */
+    color: white;
 }
 
 .nav-item:hover:not(.active) {
