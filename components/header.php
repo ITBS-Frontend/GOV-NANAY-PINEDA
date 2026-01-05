@@ -62,7 +62,7 @@ nav {
     flex-direction: row;
     align-items: center;
     gap: 10px;
-    background: #54586c;
+    background: #E4EAF4;
     box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.25);
     position: fixed;
     top: 0;
@@ -108,7 +108,7 @@ nav.hide {
     align-items: center;
     gap: 34px;
     border-radius: 50px;
-    background: #FFF;
+    background: #C3D1E8;
 }
 
 .nav-item {
@@ -123,7 +123,7 @@ nav.hide {
 }
 
 .nav-item.active {
-    background: #60A5FA;
+    background: #AAB8CF;
     /* box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.25); */
     color: white;
 }
