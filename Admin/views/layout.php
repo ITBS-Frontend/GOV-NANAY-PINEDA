@@ -240,7 +240,7 @@ ew.ready("head", [ew.PATH_BASE + "ckeditor/ckeditor.js?v=24.15.0", ew.PATH_BASE 
                     <a class="nav-link" data-widget="pushmenu" data-enable-remember="true" data-ew-action="none"><i class="fa-solid fa-bars ew-icon"></i></a>
                 </li>
                 <a class="navbar-brand d-none" href="#" data-ew-action="none">
-                    <span class="brand-text">Gov. Lilia "Nanay" Pineda</span>
+                    <img src="<?= GetUrl("images/Ph_seal_pampanga.png") ?>" alt="" class="brand-image ew-brand-image">
                 </a>
             </ul>
             <!-- Right navbar links -->
@@ -253,7 +253,7 @@ ew.ready("head", [ew.PATH_BASE + "ckeditor/ckeditor.js?v=24.15.0", ew.PATH_BASE 
         <div class="brand-container">
             <!-- Brand Logo //** Note: Only licensed users are allowed to change the logo ** -->
             <a href="#" class="brand-link">
-                <span class="brand-text">Gov. Lilia "Nanay" Pineda</span>
+                <img src="<?= GetUrl("images/Ph_seal_pampanga.png") ?>" alt="" class="brand-image ew-brand-image">
             </a>
             <?php if (preg_match('/\bsidebar-mini\b/', Config("BODY_CLASS"))) { ?>
             <a class="pushmenu mx-1" data-pushmenu="mini" role="button"><i class="fa-solid fa-angle-double-left"></i></a>

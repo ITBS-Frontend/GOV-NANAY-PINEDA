@@ -519,6 +519,9 @@ body > div.wrapper.ew-layout > div.content-wrapper > section > div > div.custom-
 
 .brand-link .brand-image{
   max-height: 50px !important;
+}.brand-link{
+  display: flex !important;
+  justify-content: center;
 }
 
  .brand-link .brand-image {

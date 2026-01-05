@@ -16,7 +16,7 @@ $totalCategories = $conn->executeQuery("SELECT COUNT(*) FROM categories")->fetch
 // Tourism stats
 $totalDestinations = $conn->executeQuery("SELECT COUNT(*) FROM tourism_destinations WHERE is_active = TRUE")->fetchOne() ?: 0;
 
-// Recent projectsf
+// Recent projects
 $sql = "SELECT id, title, project_date, budget_amount FROM projects ORDER BY created_at DESC LIMIT 5";
 $recentProjects = $conn->executeQuery($sql)->fetchAllAssociative();
 
@@ -91,7 +91,6 @@ $categoryStats = $conn->executeQuery($sql)->fetchAllAssociative();
             border-bottom: 1px solid #e2e8f0;
             color: #2d3748;
         }
-        /* .recent-table tr:hover { background: #f7fafc; } */
         
         .category-item { 
             display: flex; 
@@ -131,7 +130,63 @@ $categoryStats = $conn->executeQuery($sql)->fetchAllAssociative();
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
-        
+
+        /* ==================== DARK MODE STYLES ==================== */
+        [data-bs-theme=dark] .dashboard-container {
+            background: transparent;
+        }
+
+        [data-bs-theme=dark] .recent-table td {
+            color: white !important;
+        }
+
+        [data-bs-theme=dark] .card {
+            background: #1e293b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        [data-bs-theme=dark] .card-title {
+            color: #e2e8f0;
+            border-bottom-color: #334155;
+        }
+
+        [data-bs-theme=dark] .recent-table th {
+            background: #0f172a;
+            color: #94a3b8;
+        }
+
+        [data-bs-theme=dark] .recent-table td {
+            color: #cbd5e1;
+            border-bottom-color: #334155;
+        }
+
+        [data-bs-theme=dark] .recent-table tbody tr:hover {
+            background: #0f172a;
+        }
+
+        [data-bs-theme=dark] .category-item {
+            background: #0f172a;
+        }
+
+        [data-bs-theme=dark] .category-name {
+            color: #e2e8f0;
+        }
+
+        [data-bs-theme=dark] .category-count {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Stats cards remain colorful in dark mode but with adjusted shadows */
+        [data-bs-theme=dark] .stat-card {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* Empty state text */
+        [data-bs-theme=dark] .card p {
+            color: #64748b !important;
+        }
+
         @media (max-width: 768px) {
             .content-grid { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: 1fr; }
@@ -173,7 +228,6 @@ $categoryStats = $conn->executeQuery($sql)->fetchAllAssociative();
                         <tr>
                             <th>Title</th>
                             <th>Date</th>
-                        
                         </tr>
                     </thead>
                     <tbody>
@@ -181,7 +235,6 @@ $categoryStats = $conn->executeQuery($sql)->fetchAllAssociative();
                         <tr>
                             <td><?= htmlspecialchars($proj['title']) ?></td>
                             <td><?= $proj['project_date'] ? date('M d, Y', strtotime($proj['project_date'])) : 'N/A' ?></td>
-                           
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -207,17 +260,6 @@ $categoryStats = $conn->executeQuery($sql)->fetchAllAssociative();
                         <p style="text-align: center; color: #a0aec0; padding: 20px;">No categories yet</p>
                     <?php endif; ?>
                 </div>
-                
-                <!-- Quick Actions -->
-                <!-- <div class="card">
-                    <div class="card-title">Quick Actions</div>
-                    <div class="quick-actions">
-                        <a href="projectsadd" class="action-btn">+ Add Project</a>
-                        <a href="tourism_destinationsadd" class="action-btn">+ Add Destination</a>
-                        <a href="categorieslist" class="action-btn">Manage Categories</a>
-                        <a href="projectslist" class="action-btn">View All Projects</a>
-                    </div>
-                </div> -->
             </div>
         </div>
     </div>
